@@ -12,12 +12,19 @@ git
 To start development from a machine with rvm and postgres installed:
 
 git clone git@github.com:controlshift/open_agra.git
+
 cd agra
+
 gem install bundler
+
 bundle install
+
 rake db:create
+
 rake db:migrate
+
 rake db:prepare_organisation
+
 rake db:seed_fu
 
 rails s
