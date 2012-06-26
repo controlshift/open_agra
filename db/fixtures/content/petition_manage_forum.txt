@@ -1,0 +1,1 @@
+<!-- this text appears on the manage page, below the progress bar -->

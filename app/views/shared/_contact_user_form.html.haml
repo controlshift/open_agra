@@ -1,0 +1,52 @@
+- cache(Digest::SHA1.hexdigest("email_#{user.id}_#{url}_#{local_assigns[:name]}_#{local_assigns[:email]}"), expires_in: 1.hour) do
+  #contact_user_form.modal.hide
+    .modal-header
+      %a.close{ href: "#", "data-dismiss" => "modal" } ×
+      %h3 Contact #{user.full_name}
+    .modal-body
+      = simple_form_for @email, :url => url, :validate => true, :wrapper => :compact, :authenticity_token => false do |f|
+        = f.input :from_name, :label=>"Your name", :autofocus => true, :input_html => { :value => local_assigns[:name] ? name : '', :class => 'span6', :validate => { :format => false } }
+        = f.input :from_address, :label=>"Your email", :input_html => { type: 'email', :value => local_assigns[:email] ? email : '', :class => 'span6' }
+        = f.input :subject, :label=>"Subject", :input_html => { :class => 'span6' }
+        = f.input :content, :as => :text, :label=>"Body", :input_html => { :class => 'span6', :rows => 6 }
+
+    .modal-footer
+      .left.error.hide{ id: "label-send-error" }
+        Something's wrong, please try again.
+      %a.btn{ id: "btn-send" } Send
+      .right
+        %img.ajax-loader.hide{ id: "img-send-loader", src: asset_path("ajax-loader-24.gif") }
+
+  :javascript
+    $("#btn-send").click(function() {
+      var form = $("#new_email");
+      var settings = window[form.attr('id')];
+
+      if (form.isValid(settings.validators)) {
+        $("#btn-send").hide();
+        $("#img-send-loader").show();
+        $("#label-send-error").hide();
+
+        var request = $.ajax({
+          url: "#{url}.json",
+          type: "post",
+          data: $("#new_email").serialize(),
+          success: function(resp) {
+            $("#btn-send").show();
+            $("#img-send-loader").hide();
+            $("#label-send-error").hide();
+            $("#contact_user_form").modal('hide');
+            alert_message("Your message has been sent.");
+            form.resetForm();
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            $("#btn-send").show();
+            $("#img-send-loader").hide();
+            $("#label-send-error").show();
+
+            json = eval('(' + jqXHR.responseText + ')');
+            $("#label-send-error").html(json['message']);
+          }
+        });
+      }
+    });

@@ -1,0 +1,13 @@
+# we use websolr in production.
+
+development:
+  solr:
+    hostname: localhost
+    port: 8982
+    log_level: WARNING
+
+test:
+  solr:
+    hostname: localhost
+    port: 8981
+    log_level: WARNING

@@ -1,0 +1,11 @@
+= render :partial => 'shared/errors', :locals => {:error_obj => @content}
+
+= simple_form_for [:org, @content], :wrapper => :compact do |form|
+  = form.input :body, as: 'text', input_html: { class:  'span9'}
+  = form.input :filter, :as => 'select', :collection => Content::FILTER_TYPES, :include_blank => false, :default => "none"
+  = form.input :organisation_id, :as => 'hidden'
+  = form.input :slug, :as => 'hidden'
+  = form.input :name, :as => 'hidden'
+  = form.input :category, :as => 'hidden'
+
+  = form.button :submit

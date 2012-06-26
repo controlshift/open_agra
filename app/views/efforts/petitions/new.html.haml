@@ -1,0 +1,14 @@
+.row
+  .span7.offset2
+    .create
+      = render partial: "petitions/petition_chevron"
+      
+    = title "New #{@effort.title} Campaign"
+      
+    %p.mt10.mb20
+      = @effort.description
+
+    - if @petition.persisted?
+      = render partial: "petitions/form", locals: {post_path: url_for(@petition), show_details: false, cancel_path: launch_petition_path(@petition)}
+    - else
+      = render partial: "petitions/form", locals: {post_path: petitions_path, show_details: false}

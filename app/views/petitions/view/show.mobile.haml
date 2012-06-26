@@ -1,0 +1,94 @@
+- title @petition.title
+
+= render partial: 'petitions/view/alert_if_petition_cancelled'
+= render partial: 'petitions/view/alert_if_petition_prohibited'
+
+.petition-box
+  %h2.who To: #{@petition.who}
+  %h1.title= @petition.title
+    
+.petition{ @signature.errors.none? ? {} : {style: "display:none;"} }
+  .petition-box
+    .mt10
+      = button_tag 'Sign', class: 'btn btn-primary btn-sign'
+
+    .row.mt10
+      - unless @petition.image_file_name.blank?
+        .span4
+          = petition_image(@petition, :hero)
+
+      .span8
+        .petition-text.mt20
+          %pre.what= auto_link(h(@petition.what), :html => { :target => '_blank' })
+          %h3.subtitle Why is this important?
+          %pre.why= auto_link(h(@petition.why), :html => { :target => '_blank' })
+          - if @petition.delivery_details && !@petition.delivery_details.blank?
+            %h3.subtitle How it will be delivered
+            %pre.delivery= auto_link(h(@petition.delivery_details), :html => { :target => '_blank' })
+        .clear
+
+    .mt10
+      = button_tag 'Sign', class: 'btn btn-primary btn-sign'
+        
+    .mt20
+      = button_to 'Flag this petition for review', petition_flags_path(@petition), class: 'btn-flag'
+        
+.sign{ @signature.errors.none? ? {style: "display:none;"} : {} }
+  .signthepetition-form.mt10
+    = render partial: 'petitions/view/sign'
+    
+.thanks{style: "display:none;"}
+          
+:javascript
+  $(function() {
+    var History = window.History;
+    
+    function focusOnFirstBlankRequireField() {
+      $("input.required[value='']:first").focus();
+    }
+
+    $('.petition .btn-sign').click(function(){
+      showSignPage();
+      History.pushState({state:1}, "Sign Petition", "?state=sign");
+      return false;
+    });
+
+    $('body').on('click', '.btn-back', function(event) {
+      showPetitionPage();
+      return false;
+    });
+
+    // Bind to StateChange Event
+    History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+      var State = History.getState(); // Note: We are using History.getState() instead of event.state
+      if (State.data.state == 1)
+        showSignPage();
+      else if (State.data.state == 2)
+        showThanksPage();
+      else
+        showPetitionPage();
+      History.log(State.data, State.title, State.url);
+    });
+
+    showSignPage = function() {
+       $('.petition').hide();
+       $('.thanks').hide();
+       $('.sign').show();
+       focusOnFirstBlankRequireField();
+    }
+    
+    showThanksPage = function() {
+       $('.petition').hide();
+       $('.thanks').show();
+       $('.sign').hide();
+       $('html, body').focus();
+    }
+
+    showPetitionPage = function() {
+      $('.sign').hide();
+      $('.thanks').hide();
+      $('.petition').show();
+      $('html, body').focus();
+      $('html, body').animate({ scrollTop: 0 }, 0);
+    }
+  })

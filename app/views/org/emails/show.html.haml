@@ -1,0 +1,64 @@
+- title "Email > #{@email.subject}"
+
+.row
+  .span9
+    .breadcrumbs
+      = link_to 'Emails', org_emails_path, {:class => 'use-pjax'}
+      >
+      = @email.subject
+
+.row{:style => 'padding-top:20px;'}
+  .span9
+    - if @email.available_to_moderate?
+      .admin-toolbox
+        .left.name Administrative Tools
+        .right.moderation-status
+          = simple_form_for @email, url: org_email_path(@email), validate: true, wrapper: :append do |f|
+            = label_tag :moderation_status, "Moderation Status"
+            = f.select :moderation_status, PetitionBlastEmail::MODERATION_STATUSES.map { |s| [s.to_s.capitalize, s.to_s] }, class: "span2"
+            = f.button :submit, 'Moderate', :id=> 'moderate-email-submit'
+            .inappropriate-reason-popover
+              = f.input :moderation_reason, label: false, input_html: { rows: "5", placeholder: "Reason..." }
+        .clear
+
+        :javascript
+          $(function() {
+            show_reason_if_inappropriate = function() {
+              if($("#petition_blast_email_moderation_status").val() == 'inappropriate') {
+                $(".inappropriate-reason-popover").show();
+                $("#petition_blast_email_moderation_reason").focus();
+                $("#petition_blast_email_moderation_reason").attr("data-validate", "true");
+              }
+              else {
+                $("#petition_blast_email_moderation_reason").removeAttr("data-validate");
+              }
+            }
+            show_reason_if_inappropriate();
+            $("#petition_blast_email_moderation_status").change(function() {
+              $(".inappropriate-reason-popover").hide();
+              show_reason_if_inappropriate();
+            });
+          })
+
+
+    - else
+      %h3
+        Status
+      .well
+        = "#{@email.moderation_status.capitalize} and #{@email.delivery_status}."
+
+
+    %h3
+      To
+
+    .well
+      = " #{pluralize(@email.recipient_count, 'signer')} of the \"#{@email.petition.title}\" petition"
+    %h3
+      Subject
+    .well
+      = @email.subject
+
+    %h3
+      Body
+    .well
+      = @email.body.html_safe

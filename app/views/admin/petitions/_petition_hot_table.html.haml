@@ -1,0 +1,12 @@
+- if @petitions.any?
+  = table_for(@petitions) do |t|
+    = t.data do
+      - t.cell(:title) {|p| link_to p.title, petition_path(p), class: petition_class(p) }
+      - t.cell(:created) {|p| p.created_at > 1.week.ago ? distance_of_time_in_words(Time.now, p.created_at) + " ago" :  p.created_at.strftime("%d/%b/%Y")}
+      - t.cell(:user) {| p | p.user.present? ? link_to(p.user.full_name, org_admin? ? edit_org_user_path(p.user) : edit_admin_user_path(p.user)) : "-" }
+      - t.cell('Signatures') {|p| p.total_signatures}
+      - t.cell(:today) {|p| p.today_signatures}
+      - t.cell('Last 7 days (avg)') {|p| p.week_signatures}
+      - t.cell(:hotness_idx) {|p| p.hotness}
+- else
+  No petitions found.

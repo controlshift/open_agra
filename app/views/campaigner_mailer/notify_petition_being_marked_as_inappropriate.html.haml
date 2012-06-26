@@ -1,0 +1,18 @@
+%p Hi #{@petition.first_name},
+
+%p
+  A #{@petition.organisation.name} site administrator has flagged your campaign "#{@petition.title}" as
+  inappropriate. Your campaign has been hidden from other users on the site.
+
+%p A site admin said...
+\----
+= simple_format(@petition.admin_reason)
+\----
+
+%p #{link_to "Edit your petition", petition_manage_url(@petition)} to correct this issue.
+
+%p We'll review any changes you make and approve your campaign if it meets our guidelines.
+
+%p Thanks,
+
+%p The #{@petition.organisation.name} Team

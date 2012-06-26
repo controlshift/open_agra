@@ -1,0 +1,45 @@
+<p>
+Dear {{ recipient.first_name }},
+</p>
+
+<p>
+Just touching base.
+</p>
+
+<p>
+We noticed that there hasn't been any activity {{ 'on your petition' | link_to_manage_petition:petition }} for a little while now, so we wanted to see how you were going.  If you need a hand, we're here to help.
+</p>
+
+<p>
+If you want to increase your supporter base think about what type of person is likely to support your campaign, think about where they would most likely be and then target those areas.
+</p>
+
+<p>
+One of the most effective ways to reach a lot of people at once is to send a link to your petition out to an appropriate 'listserve' or organisational email list that might be interested.
+</p>
+
+<p>
+Think about the groups that you belong to - you may have them for your sports club, neighbourhood group, church, classes, book club, professional associations and more. These are hundreds or even thousands of potential allies for your cause.
+</p>
+
+<p>
+You can also {{ 'spread the word and continue the conversation on social media' | link_to_manage_petition:petition }} – linking to articles about your issue, updating people on how the campaign is going, any responses you've had or plans to deliver your petition.
+</p>
+
+<p>
+Don't be shy! Remember, if you feel strongly about your campaign chances are other people do too! But they can't support your cause unless you tell them about it.
+</p>
+
+{% if petition.organisation.has_campaigner_feedback_link? %}
+  <p>
+  Don't be afraid to ask for help. Post questions or ask for {{ 'advice from other petition creators' | link_for:petition.organisation.campaigner_feedback_link }}.
+  </p>
+{% endif %}
+
+<p>
+Thanks for all that you do,
+</p>
+
+<p>
+The {{ petition.organisation.name }} team
+</p>

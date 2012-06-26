@@ -1,0 +1,1 @@
+Vanity.playground.collecting = ActiveRecord::Base.connection.table_exists?('vanity_experiments')

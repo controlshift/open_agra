@@ -1,0 +1,36 @@
+- cache("v2_header_#{current_organisation.cache_key}#{current_user.cache_key}#{show_login_link}") do
+  .header
+    .navbar
+      .navbar-inner
+        .container
+          %a{ href: root_path }
+            .logo
+          %form.filter.navbar-search.pull-left{ action: search_petitions_path, method: "GET" }
+            %input.search-query{ name: "q", placeholder: "Search" }
+            %a.search-button#search-campaign{ href: "javascript:$('form.navbar-search').submit();" }
+              %i.icon-search
+          %div
+            - if user_signed_in?
+              - cache("v1_logged_in_header_#{current_organisation.cache_key}#{current_user.cache_key}") do
+                %ul.nav.pull-right
+                  %li= link_to 'Start a campaign', new_petition_path(:source => 'header'), id: 'nav-start-petition'
+                  %li.dropdown
+                    %a.dropdown-toggle#nav-user{'data-toggle' => 'dropdown', :href => '#'}
+                      - if current_user.facebook_id.present?
+                        = image_tag "http://graph.facebook.com/#{current_user.facebook_id}/picture", class: 'profile-image'
+                      %span= current_user.full_name
+                      %b.caret
+                    %ul.dropdown-menu
+                      %li= link_to 'My Campaigns', petitions_path, id: 'nav-user-dropdowns-campaigns'
+                      - if current_user.groups.any?
+                        %li= link_to 'My Groups', groups_path
+                      %li.divider
+                      %li= link_to 'Global Admin', admin_path, id: 'nav-global-admin' if can?(:manage, :all)
+                      %li= link_to "#{current_organisation.name} Admin", org_path, id: 'nav-org-admin' if can?(:manage, current_organisation)
+                      %li= link_to 'My Account', account_path, id: 'nav-user-dropdowns-account'
+                      %li= link_to 'Log out', destroy_user_session_path, method: :delete, id: 'nav-user-dropdowns-logout'
+            - elsif show_login_link
+              - cache("v1_logged_out_header") do
+                %ul.nav.pull-right
+                  %li= link_to 'Start a campaign', new_petition_path, id: 'nav-start-petition'
+                  %li= link_to 'Log in', new_user_session_path, id: 'nav-login'

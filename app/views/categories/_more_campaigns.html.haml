@@ -1,0 +1,5 @@
+- if @query.petitions.current_page < @query.petitions.total_pages
+  .more-campaigns-next
+    = link_to @category ? category_path(@category, page: @query.petitions.current_page + 1) : categories_path(page: @query.petitions.current_page + 1) do
+      More Campaigns
+      %span.arrow= "&#9654;".html_safe

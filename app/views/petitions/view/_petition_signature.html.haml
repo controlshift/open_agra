@@ -1,0 +1,4 @@
+%li
+  .name 
+    = petition_signature.full_name_with_mask
+  %abbr.timeago{ title: "#{petition_signature.created_at_iso_8601}" }= petition_signature.created_at

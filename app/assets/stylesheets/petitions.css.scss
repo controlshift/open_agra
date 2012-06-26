@@ -1,0 +1,952 @@
+// Place all the styles related to the petitions controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+@mixin current_step($step, $marg_left: 14px) {
+  .#{$step} {
+    margin-left: $marg_left; margin-right: 14px;
+    .#{$step} {
+      color: $accent-color;
+      .number { background-color: $accent-color; }
+    }
+  }
+}
+
+form.petition {
+  div.clearfix { margin: 15px 0px 0px 0px; }
+  div.clearfix.error { background: none; padding:0px; margin: 15px 0px 0px 0px; }
+  .label-wrapper { margin-bottom:3px; }
+}
+
+#table-input .clearfix {
+  margin: 0px;
+}
+
+.manage-petitions-breadcrumbs {
+  height: 38px;
+  border-bottom: 1px solid $header-border-color;
+  background: image-url("bg-breadcrumbs.png") repeat-x;
+
+  color: $title-color;
+  font-weight: bold;
+  font-family: $description-font-family;
+  line-height: 40px;
+  vertical-align: middle;
+
+  a { color: $title-color; }
+  a.view { color: $accent-color; font-weight: normal; }
+  img { vertical-align: middle; margin: 0 10px; }
+}
+
+.body-petitions, .body-registrations {
+  .chevron {
+    margin-top: 20px; margin-bottom: 40px;
+    font-family: $serif-font-family;
+    font-size: 14pt;
+    text-align: center;
+
+    .number {
+      display: inline-block;
+      width: 22px; height: 22px;
+      margin-left: 0px; margin-right: 10px;
+      color: #ffffff;
+      background-color: $subtle-color;
+      background-image: image-url("step_num.png");
+    }
+  }
+
+  @include current_step(create, 0px);
+  @include current_step(launch);
+  @include current_step(share);
+  @include current_step(manage);
+}
+
+.body-view-show, .body-manage-show, .body-signatures-create {
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: image-url("bg-stripe-black.png");
+    background-color: #333;
+    padding: 0 0 0 40px;
+    margin: 0px;
+
+    .container { width: 220px; padding: 0 !important; margin: 0 }
+    .sidebar-box { margin-bottom: 30px; }
+
+    h2 {
+      display: inline-block;
+      color: #ffffff;
+      font: $title-font;
+      font-size: 38pt;
+      text-transform: uppercase;
+      line-height: 34pt;
+      margin-bottom: 15px;
+    }
+
+  	.titlebar {
+  	  position: relative;
+
+  		.number {
+  		  position: absolute;
+  		  top: 5px;
+  		  left: -40px;
+  		  width:20px;
+  		  height:40px;
+  		  color: $title-color;
+        font: $title-font;
+  		  font-size: 14pt;
+  		  line-height: 40px;
+  		  background-image: image-url("bg-step-number.png");
+  		  vertical-align: middle;
+  		}
+  	}
+
+  	.petition-progress {
+      .progressbar {
+        width: 210px;
+        height: 41px;
+        vertical-align: top;
+
+        .total {
+          height: 29px;
+          margin: 0;
+          background-image: image-url("bg-progress.png");
+          background-repeat: repeat-x;
+          border: 5px solid #404040;
+          padding: 2px 0 0 2px;
+          @include border-radius(0);
+        }
+        .done {
+          height: 26px;
+          margin: 0;
+          background-image: url($bg-progress-done-url);
+          background-repeat: repeat-x;
+        }
+        .text {
+          display: none;
+        }
+      }
+    }
+
+  	.petition-signatures {
+  	  .number {
+        font-size: 30pt;
+        font-weight: bold;
+        color: $accent-color;
+        line-height: 34pt;
+      }
+      color: #ffffff;
+      font-size: 14pt;
+      font-weight: normal;
+      font-style: italic;
+      font-family: $subtitle-font-family;
+      margin-left: 10px;
+    }
+  }
+}
+
+// =============================================
+//	Petition Public Page
+// =============================================
+
+.body-view-show, .body-signatures-create {
+  #contact_user_form .ajax-loader { margin:0px 10px 0px 0px; }
+  #contact_user_form .error { color: red; font-size:$base-font-size }
+
+  .spread-word{
+    color: white;
+    font-size: 1.1em;
+    font-style: italic;
+    font-family: Helvetica;
+  }
+  
+  .btn-flag {
+    margin: 40px 0 0 0;
+  }
+
+  .signatures-box {
+    width: 100%; // required for multi column list on IE7
+
+    li {
+      float: left; // required for multi column list
+      font-size: 10pt;
+      border: 0px;
+      line-height: 15px;
+      width: 190px;
+      height: 46px;
+      color: $fg-color;
+      font-family: $description-font-family;
+      margin-bottom: 20px;
+      margin-right: 10px;
+
+      .name {
+        word-wrap: break-word;
+      }
+
+      abbr {
+        color: $subtle-color;
+        font-size:0.8em;
+        font-style: italic;
+        font-weight: normal;
+        font-family: $subtitle-font-family;
+        text-transform: none;
+      }
+    }
+
+    margin: 20px 0 0 0;
+    list-style: none;
+  }
+  
+  .signthepetition {
+    span.help-inline, .help-block {
+      font-size: 8pt;
+      color: #ffffff !important;
+    }
+    span.help-block {
+      a { color: #ffffff; }
+    }
+    form {
+  	  label {
+  	    color: #ffffff;
+  	    font-size: 8pt;
+  	    font-weight: bold;
+  	    font-family: $description-font-family;
+  	  }
+  	  label.subtle {
+  	    font-size: 9pt;
+  	    font-weight: normal;
+  	  }
+  	  .label-wrapper { height: 20px; }
+  		input.string {
+  		  @include border-radius(0);
+  		  width: 200px;
+  		  margin: 0;
+  		}
+  		input.signature-narrow {
+  	    width: 160px;
+  	  }
+  	  .checkbox {
+  	    width: 160px;
+  	    margin-top: 10px;
+  	  }
+  	}
+
+  	.input-why {
+  	  margin-top: -30px;
+  	}
+
+  	.checkbox-why {
+  	  margin-top: -20px;
+  	}
+
+  	.input-why, .checkbox-why {
+  	  float: left;
+  	  margin-left: 180px;
+    }
+
+    .input-why, .checkbox-why, .help-block {
+
+  	  a {
+        color: #ffffff;
+        font-size: 8pt;
+        font-style: italic;
+        font-family: $subtitle-font-family;
+      }
+  	}
+
+  	.btn-primary { float: left; width: 210px }
+  	
+  	.return-to-petition { display: none; }
+  }
+
+  .social_share { 
+  	a.share {
+  	  margin: 10px 5px 0 0;
+  	}
+  	.petition_url { display: none; }
+  }
+}
+
+// =============================================
+//	Progressbar Styles
+// =============================================
+.progressbar {
+  width:200px;
+  height:100%;
+  display: inline-block;
+  vertical-align: middle;
+
+  .total {
+    width: 100%;
+    height: 15px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-image: image-url("bg-progress.png");
+    border: 3px solid #404040;
+    text-align: left;
+    overflow: hidden;
+  }
+  .done {
+    vertical-align: top;
+    height: 14px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-image: url($bg-progress-done-url);
+    border: 0px solid #ddd;
+  }
+  .text {
+    display: inline;
+  }
+}
+
+// =============================================
+//  Petition Form
+// =============================================
+.petition-form {
+  .controls { padding-bottom: 4px;}
+  .control-label { font-size: 1.2em; }
+  .collection_check_boxes {
+    margin: 0 20px 0 5px;
+    font-size: 1em;
+  }
+  .control-group.check_boxes {
+    span {
+      display: inline-block;
+      margin-bottom: 6px;
+      width: 170px;
+      vertical-align: top;
+    }
+  }
+}
+
+.body-petitions-share, .body-view-thanks {
+  .petition_url {
+    margin-top: 20px;
+    #copy_petition_url_button {
+      width:16px;
+      height: 16px;
+      margin-left: 2px;
+      padding: 1px;
+    }
+  }
+}
+
+// =============================================
+//	Manage petition page
+// =============================================
+
+.body-manage-show {
+  h1.title {
+    display: inline;
+    color: $accent-color;
+    font: $title-font;
+    font-size: 38pt;
+    text-transform: uppercase;
+    line-height: 34pt;
+  }
+  
+  .petition-progress-box {
+    position: relative;
+    width: 100%;
+    margin: 40px 0px;
+    padding: 12px;
+    background: {
+      color: #444444;
+    }
+    @include border-radius(6px);
+
+    .petition_url { display: none; }
+
+    .petition-progress {
+      padding-right: 14px;
+
+      .progressbar {
+        width: 100%;
+
+        .total {
+          height: 29px;
+          background-image: image-url("bg-progress.png");
+          background-repeat: repeat-x;
+          border: 5px solid #404040;
+          padding: 2px 0 0 2px;
+          @include border-radius(0);
+        }
+        .done {
+          height: 26px;
+          background-image: url($bg-progress-done-url);
+          background-repeat: repeat-x;
+        }
+        .text {
+          display: none;
+        }
+      }
+    }
+
+    .petition-signatures {
+  	  .number {
+        font-size: 30pt;
+        font-weight: bold;
+        color: $secondary-accent-color;
+        line-height: 34pt;
+      }
+      color: #ffffff;
+      font-size: 14pt;
+      font-weight: normal;
+      font-style: italic;
+      font-family: $subtitle-font-family;
+      margin-left: 10px;
+    }
+  }
+}
+
+.profile {
+  color: $subtle-color;
+  font-family: $description-font-family;
+  font-size: 8pt;
+  font-weight: lighter;
+  line-height: 8pt;
+  margin-bottom: 10px;
+
+  a { color: $fg-color; font-weight: bold; }
+  img { vertical-align: -25%; margin-left: 5px; }
+}
+
+.share-buttons {
+  position: absolute;
+  right: 15px;
+  bottom: 12px;
+
+  .text { display: none; }
+
+  .desc {
+    display: inline-block;
+    margin-right: 5px;
+    color: #ffffff;
+    font-size: 14pt;
+    text-transform: uppercase;
+    line-height: 1em;
+    vertical-align: middle;
+  }
+
+  a.share {
+    display: inline-block;
+    background-repeat: no-repeat;
+    width: 32px;
+    height: 31px;
+    margin-left: 2px;
+    margin-right: 0;
+    vertical-align: middle;
+  }
+
+  a.share.facebook { @include toggle-bg-image('btn-share-facebook.png') }
+  a.share.twitter { @include toggle-bg-image('btn-share-twitter.png') }
+  a.share.email { @include toggle-bg-image('btn-share-email.png') }
+}
+
+.sidebar.manage, .manage-menu {
+  hr { width: 90%; border: 1px solid #555555; }
+
+  a {
+    &:hover {
+      color: #cccccc;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    height: 32px;
+    padding-left: 40px;
+    padding-top: 3px;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: normal;
+    font-family: serif-font-family;
+    text-transform: uppercase;
+    line-height: 14px;
+
+    .strong { font-size: 14px; line-height: 14px; }
+  }
+
+  a#manage-email    { @include toggle-bg-image('icon-manage-email.png') }
+  a#manage-collect  { @include toggle-bg-image('icon-manage-collect.png') }
+  a#manage-deliver  { @include toggle-bg-image('icon-manage-deliver.png') }
+  a#manage-edit     { @include toggle-bg-image('icon-manage-edit.png') }
+  a#manage-contact  { @include toggle-bg-image('icon-manage-contact.png') }
+  a#manage-hide     { @include toggle-bg-image('icon-manage-close.png') }
+  a#manage-activate { @include toggle-bg-image('icon-manage-activate.png') }
+}
+
+.sidebar.manage {
+  a {
+    display: block;
+    width: 300px;
+    margin-bottom: 15px;
+  }
+}
+
+.manage-menu {
+  height: 70px;
+  background-image: image-url("bg-stripe-black.png");
+  border-bottom: 1px solid $header-border-color;
+
+  .container {
+    line-height: 70px;
+    vertical-align: middle;
+  }
+  a {
+    display: inline-block;
+    margin-top: 18px;
+    margin-left: 18px;
+  }
+  a:first-child {
+    display: inline-block;
+    margin-left: 0;
+    padding-left: 0;
+  }
+  img {
+    vertical-align: top;
+    margin: 15px 10px 0 10px;
+  }
+}
+
+.manage-menu .petition-menu-item a {
+  display: inline-block;
+  margin-top: 14px;
+  margin-left: 7px;
+  margin-right: 10px;
+  padding-left: 40px;
+}
+
+.petition-menu-home-item, .petition-menu-item {
+  display: inline-block;
+  border-color: $border-color;
+  border-top-style: solid;
+  border-width: 0;
+  a { margin-top: 14px; }
+}
+
+.petition-menu-item.active {
+  display: inline-block;
+  border-color: $secondary-accent-color;
+  border-top-style: solid;
+  border-width: 4px;
+  a { background: { position: left bottom; } }
+}
+
+.manage-edit-petition {
+  .preview-image {
+    float: left;
+    display: inline-block;
+    width: 220;
+  }
+  .petition-image {
+    width: 200px;
+    height: auto;
+  }
+}
+
+// =============================================
+//	Launching petition
+// =============================================
+.body-petitions-launching {
+  #category-modal {
+    filter: none;
+    h3 { filter: none; }
+  }
+  
+  .petition-box-actions {
+    margin-bottom: 20px;
+  }
+}
+
+.launching {
+  padding: 10px 35px 20px 35px;
+  border: 1px solid $border-color;
+  @include border-radius(10px);
+}
+
+.upload-image-box-vertical {
+  .preview-image, .preview-image img {
+    width: 100%;
+    height: auto;
+  }
+  .upload-field-wrapper {
+    border: solid 1px $border-color;
+    @include border-radius(5px);
+  }
+  .upload-field {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    position: relative;
+  }
+  .status-text {
+    font-family: $base-font-family;
+    font-size: $base-font-size;
+  }
+  .image-upload-input {
+    position: absolute;
+    top: 22px;
+    left: -153px;
+  }
+}
+
+a#add-categories {
+  margin: 10px 5px;
+}
+
+ul#selected-categories {
+  list-style-type: none;
+  margin: 10px 5px;
+  
+  li {
+    margin: 5px 0;
+  }
+}
+
+// =============================================
+//	Edit petition page
+// =============================================
+.body-manage-edit {
+  #petition-alias-modal {
+    #petition-alias-host {
+      vertical-align:top;
+      line-height: 29px;
+    }
+    #petition-alias-textbox {
+      margin-bottom: 0;
+    }
+    
+    .indicator {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+    }
+    
+    .control-group.error {
+      display: block;
+      
+      .help-inline {
+        font-size: 12px;
+      }
+    }
+    
+    .double-confirm-box {
+      position: relative;
+      display: inline-block;
+      width: 355px;
+      height: 29px;
+      margin-right: 20px;
+      overflow: hidden;
+    }
+    .double-confirm {
+      position: absolute;
+      top: 5px;
+      right: -355px;
+      font-weight: bold;
+      font-size: 1em;
+    }
+  }
+  
+  .upload-image-box-horizontal {
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    .upload-image {
+      .preview-image {
+        float: left;
+        margin-right: 5px;
+        img {
+          height: 122px;
+        }
+      }
+      .petition-image {
+        background-color: white;
+        img {
+          display: block;
+        }
+        padding: 5px;
+        @include box-shadow(rgba(0, 0, 0, 0.5) 1px 1px 5px 0 false);
+      }
+      .arrow {
+        float: left;
+        margin-top: 20px;
+        height: 0px;
+        width: 5px;
+        border: solid 5px transparent;
+        border-right-color: $border-color;
+      }
+      .upload-field {
+        float: left;
+        width: 265px;
+        height: 120px;
+        padding: 0px 10px 10px;
+        border: solid 2px $border-color;
+        @include border-radius(5px);
+      }
+      .status-text {
+        font-family: $base-font-family;
+        font-size: $base-font-size;
+      }
+    }
+  }
+}
+
+// =============================================
+//	Manual input signatures page
+// =============================================
+
+.body-signatures-manual_input {
+  .manual-input-signatures {
+    padding: 20px 30px 10px 30px;
+  }
+}
+
+// =============================================
+//	Delivery page
+// =============================================
+
+.body-manage-deliver {
+  .accordion {
+    margin-bottom: 20px;
+
+    .accordion-toggle {
+      color: #333;
+      background-color: #f6f6f6;
+      text-decoration: none;
+      padding-left: 30px;
+    }
+    
+    .accordion-toggle {
+      background-image: image-url("spindown-closed.gif");
+      background-repeat: no-repeat;
+      background-position: 15px 13px;
+    }
+    
+    .accordion-toggle.open {
+      background-image: image-url("spindown-open.gif");
+    }
+  }
+}
+
+// =============================================
+//	email supporters template list
+// =============================================
+
+.body-emails {
+  ul.email-alerts {
+    margin-bottom: 0px;
+  }
+
+  .email-supporters-form {
+    .label-wrapper { display: inline; margin-right: 10px; }
+    input.string { width: 400px; }
+  }
+
+  .email-supporters-leader {
+    margin: 10px 0;
+  }
+
+  .email-supporters-tips {
+    border: solid 1px $border-color;
+    padding: 15px 15px;
+    @include border-radius;
+  }
+
+  .btn-desc {
+    float: right;
+    padding: 8px 20px;
+  }
+
+  .template-container {
+    position: relative;
+  }
+
+  #template-selector {
+    position: relative;
+    width: 180px;
+    margin: 0px 0px 50px 0px;
+    border: {
+      top: solid 1px $border-color;
+      bottom: solid 1px $border-color;
+      left: solid 1px $border-color;
+    }
+    @include border-top-left-radius(10px);
+    @include border-bottom-left-radius(10px);
+    overflow: hidden;
+
+    li {
+      &:hover {
+        background-color: $bg-color;
+      }
+      border: {
+        bottom: solid 1px $border-color;
+      }
+      padding: 30px 20px;
+      list-style: none;
+    }
+    li.first {
+      @include border-top-left-radius(10px);
+    }
+    li.last {
+      @include border-bottom-left-radius(10px);
+      border-bottom: none;
+    }
+    li.active {
+      background-color: #f2f2f2;
+    }
+  }
+
+  #template-content {
+    position: absolute;
+    top: -0px;
+    left: 180px;
+    width: 680px;
+    height: 235px;
+    min-height: 235px;
+    padding: 30px 30px 50px 30px;
+    border: solid 1px $border-color;
+    @include border-top-right-radius(10px);
+    @include border-bottom-right-radius(10px);
+    overflow: auto;
+  }
+
+  .template {
+    display: none;
+  }
+
+  #apply-template-btn {
+    position: absolute;
+    right: 40px;
+    top: 325px;
+  }
+}
+
+// =============================================
+//	Petition list
+// =============================================
+.body-petitions-index {
+  ul.petition_list {
+  	list-style-type: none;
+  	padding: 0px;
+  	margin: 20px 0;
+
+  	li {
+  	  position: relative;
+    	padding: 10px 20px 10px 0;
+    	margin-bottom: 20px;
+      cursor: pointer;
+      border-bottom: 2px solid #ebebeb;
+
+    	h2 {
+    	  display: inline;
+    	  font-size: 14pt;
+    	  font-family: $description-font-family;
+
+    	  a { color: $title-color; }
+        a.list-item-not-launched { color: #999 }
+        a.list-item-cancelled { color: #A30013 }
+    	}
+  	}
+  }
+
+  .list-item-title {
+    width: 600px;
+  }
+
+  .list-item-progressbar {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    margin-top: -20px;
+  }
+}
+
+// =============================================
+//	Petition search
+// =============================================
+.body-petitions-search {
+  .filter-panel {
+    border: 1px solid #eeeeee;
+    @include border-radius(4);
+  }
+}
+
+// =============================================
+//	Petition public page
+// =============================================
+.body-view-show, .body-petitions-launching, .body-signatures-create {
+  #notes {
+    width: 518px;
+  }
+
+  #admin-notes, #admin-notes a {
+    color: $fg-color;
+  }
+
+  #admin-notes a {
+    text-decoration: none;
+  }
+
+  #notes-toggle {
+    margin-right: 8px;
+    text-decoration: none;
+    font-weight: bold;
+
+    img {vertical-align: middle; margin-top: -5px;}
+  }
+}
+
+.body-view-show, .body-petitions-launching, .body-signatures-create {
+  .petition-box {
+    .upload-field div.input { margin: 10px; }
+    input, select { margin: 0; }
+
+    h1.title {
+      display: inline;
+      color: $accent-color;
+      font: $title-font;
+      font-size: 38pt;
+      text-transform: uppercase;
+      line-height: 34pt;
+    }
+
+    .profile {
+      color: $subtle-color;
+      font-family: $description-font-family;
+      font-size: 8pt;
+      font-weight: lighter;
+      line-height: 1.5em;
+      margin-top: 10px;
+      margin-bottom: 30px;
+
+      img { vertical-align: -25%; margin-left: 5px; }
+    }
+
+    hr { border: 1px solid #ebebeb; }
+  }
+}
+
+#email_template {
+  label { display: block; }
+  #subject-field { margin-top: 4px; }
+}
+
+.thanks-box {
+  padding: 20px;
+  margin: 20px 0px 20px 0px;
+  background-color: $bg-color;
+}
+
+.table th .current {
+  padding-right: 12px;
+  background-repeat: no-repeat;
+  background-position: right center;
+}
+
+.table th .asc {
+  background-image: image-url("up_arrow.png");
+}
+
+.table th .desc {
+  background-image: image-url("down_arrow.png");
+}

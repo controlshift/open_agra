@@ -1,0 +1,9 @@
+= title @invitation.group.title
+
+You have been invited to be an administrator of this group.
+
+= simple_form_for @invitation, url: group_invitation_path(@group, @invitation), wrapper: 'compact' do |form|
+  = form.input :invitation_token, as: :hidden
+
+  .actions
+    = form.button :submit, 'Join Group'

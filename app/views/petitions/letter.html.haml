@@ -1,0 +1,62 @@
+:css
+  body {
+    font-size: 11pt;
+    font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+  }
+  
+  #table-signatures {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+  
+  #table-signatures td {
+    border-top: 1px solid #DDD;
+    padding: 5px 15px;
+  }
+  
+  .odd {
+    background-color: #ffffff;
+  }
+  
+  .even {
+    background-color: #eeeeee;
+  }
+  
+%table{ width: "700px" }
+  %tr
+    %td{ align: "right" }
+      = @petition.user.full_name
+      %br
+      email: #{@petition.user.email}
+      %br
+      phone: #{@petition.user.phone_number}
+  %tr
+    %td
+      To: 
+      = @petition.who
+      %br
+      %br
+      = @petition.what
+      %br
+      %br
+      Signed by #{pluralize(@petition.cached_signatures_size, "person")}:
+      %br
+      %br
+  
+      %table#table-signatures{ width: "100%" }
+        %thead
+          %tr
+            %th Name
+            %th Email
+            %th Postcode
+            %th Phone
+        %tbody
+          - @petition.signatures.each_with_index do |sign, i|
+            %tr{ class: "#{i % 2 == 0 ? 'even' : 'odd'}" }
+              %td=sign.full_name
+              %td=sign.email
+              %td=sign.postcode
+              %td=sign.phone_number
+              
+:javascript
+  //document.body.offsetHeight;window.print();

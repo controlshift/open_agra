@@ -1,0 +1,4 @@
+= form_tag form_action, method: :get, class: 'admin-search' do
+  %input.search-query{ name: search_input_name, placeholder: "Search" }
+  %a.search-button#admin-search-btn{ href: "javascript:$('form.admin-search').submit();" }
+    %i.icon-search

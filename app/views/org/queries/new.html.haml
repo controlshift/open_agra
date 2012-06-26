@@ -1,0 +1,28 @@
+= title 'Query'
+
+.alert.alert-info.fade.in
+  %a.close{ href: "#", "data-dismiss" => "alert" } ×
+  Here's the tables you can query on:
+  %ul
+    - @org_query.white_list_table_names.each do |name|
+      %li #{name}
+
+  %strong Tips
+  %ul
+    %li To know the field's names of a table: select * from table
+    %li Only select queries are allowed
+    %li You cannot use keyword limit. The result is always limited to #{Queries::OrgQuery.limit_size}
+    %li The character ';' is not accepted
+
+%br
+= simple_form_for @org_query, url: org_query_path, validate: true, wrapper: 'compact' do |form|
+  = form.input :query, input_html: { class:  'span9'}
+  .clear
+  .actions
+    = form.button :submit, 'Execute'
+
+- if @org_query.result
+  = table_for(@org_query.result) do |t|
+    = t.data do
+      - @org_query.result.fields.each do |field|
+        = t.cell(field.to_sym, heading: field)

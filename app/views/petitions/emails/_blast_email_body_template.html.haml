@@ -1,0 +1,12 @@
+%p ++++++
+%p Not sure what to write? There are templates on the bottom half of the page that you can use - just scroll down. Remember to delete this message before you send the email.
+%p Tip: What's the secret to people opening your emails? Subject lines - they're like movie trailers.  If your subject lines aren't short, punchy and relevant people won't want to read your emails.
+%p ++++++
+%br
+%p Dear Friends,
+%p Thank you for signing the petition #{@petition.title}, can you help spread the word by forwarding the link below to your friends?
+%p
+  =link_to petition_url(@petition), petition_url(@petition)
+%p Thanks
+%p
+  =@petition.user.full_name

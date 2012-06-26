@@ -1,0 +1,9 @@
+%li.span10
+  %a.thumbnail{ href: petition_path(petition_search_item) }
+    .row
+      .span3
+        = petition_image(petition_search_item, :hero)
+      .span6
+        %h3.title.mt10= petition_search_item.title
+        .why.mt10= petition_search_item.what
+        .campaigner.mt10.mb20 Campaign created by #{petition_search_item.user.full_name} on #{petition_search_item.created_at.strftime('%d %b %Y')}

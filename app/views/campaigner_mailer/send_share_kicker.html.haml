@@ -1,0 +1,31 @@
+%p #{@petition.user.first_name},
+
+%p Want advice on how to build momentum around your campaign?  We asked Sally, who started the Fast Trains for Australia campaign that has more than 700 signatures, to share her experience.
+
+%p ++++
+
+%p When I started the Fast Trains campaign I wasn't sure what people would think of the campaign.  I was worried about putting my name to the campaign, or of making a mistake, but I took a leap of faith and started talking to my friends about it.
+
+%p The result blew me away and I can't believe that almost 700 people have joined the movement.
+
+%p The whole thing was a lot easier than I thought it would be.  When I wanted to send an email to my friends telling them about the campaign, there was already a default email I could use.
+
+%p When I shared the campaign on Facebook, my friends started sharing it too and soon people who I didn't know were supporting it on Twitter. I know it can be a bit scary, but the minute you the minute you start talking to people about your campaign you'll build momentum.
+
+%p
+  #{link_to "Share your campaign on Facebook", "http://www.facebook.com/sharer.php?u=#{CGI::escape(petition_url(@petition, time: @petition.updated_at.to_i))}", target: "_blank"}
+%p
+  #{link_to "Share your campaign on Twitter", "https://twitter.com/share?url=#{petition_url(@petition)}&text=This cause is close to my heart - please sign:"}
+
+%p #{link_to "I don't have either of those, but I'd like to share my campaign", 'https://getup.wufoo.com/forms/z7p9p1/'}
+
+%p Good luck!
+
+%p Sally
+
+%p ++++++
+
+- if @petition.organisation.slug == "getup"
+  %p PS - CommunityRun will be holding a webinar on how to get your campaign to 100 signatures - #{link_to "RSVP for the webinar", "https://getup.wufoo.com/forms/z7p9k5/"}.
+- else
+  %p The #{@petition.organisation.name} team

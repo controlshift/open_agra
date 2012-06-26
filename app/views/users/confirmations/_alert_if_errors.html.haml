@@ -1,0 +1,6 @@
+- if !resource.errors.empty?
+  .alert.alert-error.fade.in
+    %a.close{ :href => "#", "data-dismiss" => "alert" }
+      =image_tag "cross.png"
+    %p
+      #{resource.errors.full_messages.join(". ")}

@@ -1,0 +1,28 @@
+= title "Campaign Admins for '#{@petition.title}'"
+.row.mt20
+  .span5
+    %h4
+      Invite New Campaign Administrator
+    %p.mb10
+      The administrators that you invite will have access to manage this campaign.
+
+    = simple_form_for @campaign_admin, url: petition_admins_path(@petition), wrapper: :compact  do |f|
+      = f.input :invitation_email, label: 'Email'
+      = f.button :submit, 'Send invitation'
+
+.row.mt20
+  .span10
+    %h4
+      Current Campaign Administrators
+
+
+    - if @admins.any?
+      = table_for(@admins) do |t|
+        = t.data do
+          - t.cell(:email)
+          - t.cell(:delete) {|admin| link_to('Remove admin',
+                                             petition_admin_path(@petition, admin),
+                                             confirm: "Are you sure to remove '#{admin.invitation_email}' from admin list?",
+                                             method: :delete, class: 'btn btn-danger') unless admin.is_a?(User)}
+    - else
+      This campaign has no admins.

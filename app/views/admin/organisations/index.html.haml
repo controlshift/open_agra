@@ -1,0 +1,12 @@
+%h2
+  Orgs
+
+= link_to "#{image_tag 'icons/add.png'} New Org".html_safe, new_admin_organisation_path, :id => 'new-org', :class => 'right'
+
+- if @organisations.any?
+  = table_for(@organisations) do |t|
+    = t.data do
+      - t.cell(:name) {| o | link_to(o.name, edit_admin_organisation_path(o)) }
+      - t.cell(:host)
+      - t.cell(:slug)
+  = will_paginate @organisations, class: 'digg_pagination'

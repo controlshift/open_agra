@@ -1,0 +1,15 @@
+.row
+  .span7
+    = title "Groups"
+  .span3
+    = link_to 'New Group', new_org_group_path, class: "btn btn-primary use-pjax", id: 'new-group'
+
+- if @groups.any?
+  = table_for(@groups) do |t|
+    = t.data do
+      - t.cell(:title) { |e| link_to(e.title, org_group_path(e.slug), {:class => 'use-pjax'}) }
+      - t.cell(:petitions) { |e| e.petitions.count }
+      - t.cell(:public_view) {|e | link_to "(public view)", group_path(e)  }
+  = will_paginate @groups
+- else
+  No groups found.

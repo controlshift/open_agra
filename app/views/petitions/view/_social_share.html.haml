@@ -1,0 +1,33 @@
+%a.share.facebook{ href: "#", data: { href: facebook_share_href(@petition) } }
+  .text Share on Facebook
+  
+%a.share.twitter{ href: twitter_share_href(@petition) }
+  .text Share on Twitter
+
+%a.share.email{ href: "#email_template", id: "view_email_template", "data-toggle" => "modal", "data-backdrop" => "true" }
+  .text Share with email
+.petition_url
+  %form{action: "action"}
+    = text_field_tag(:petition_link, "#{petition_url(@petition)}", class: "span5", id: 'petition-url-field')
+    %a.btn#copy_petition_url_button
+      = image_tag 'icon-btn-copy.png'
+
+:javascript
+  $(function() {
+    $('a.facebook').click(function () {
+      targetURL = $(this).data('href')
+      window.open(targetURL,'sharer','toolbar=0,status=0,width=626,height=436');
+      if (_gaq) {
+        _gaq.push(['_trackSocial', 'facebook', 'send', targetUrl]);
+      }
+      return false;
+    });
+
+    ZeroClipboard.setMoviePath( '/ZeroClipboard.swf' );
+
+    initCopyButtons();
+  });
+
+- content_for :end_of_body do
+  / render div at the end of body for fixing IE7 z-index problem
+  = render partial: "petitions/view/email_template"

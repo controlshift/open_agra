@@ -1,0 +1,7 @@
+%h1
+  My Groups
+
+%ul
+  - current_user.groups.each do | group|
+    %li
+      = link_to group.title, group_manage_path(group)

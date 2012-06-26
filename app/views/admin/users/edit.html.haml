@@ -1,0 +1,29 @@
+%h2
+  Edit
+  = @user.email
+
+= simple_form_for org_admin? ? [:org, @user] : [:admin, @user], wrapper: :compact do |form|
+  = form.input :first_name
+  = form.input :last_name
+  = form.input :phone_number
+  = form.input :postcode
+  
+  - if !org_admin?
+    .mt10
+    = check_box_tag(:admin, 1, @user.admin, id: "user_admin", name: "user[admin]", class: "boolean optional")
+    = label_tag(:admin,  "Admin", for: "user_admin")
+  - if @user.groups.any?
+    .strong Groups
+    %ul
+      - @user.groups.each do |group|
+        %li= group.title
+
+
+  .mt10
+  = check_box_tag(:org_admin, 1, @user.org_admin, id: "user_org_admin", name: "user[org_admin]",
+                  class: "boolean optional")
+  = label_tag(:admin,  "Org admin", for: "user_org_admin")
+
+  .actions
+    = form.button :submit
+

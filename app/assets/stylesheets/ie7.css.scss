@@ -1,0 +1,83 @@
+/*
+  Override bootstrap IE6-7 default behavior
+*/
+
+h1, h2, h3, .btn, .navbar .nav li a, .btn-start-petition, .title {
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=#{image-path('blank.png')},sizingMethod=crop);
+  zoom:1;
+}
+
+.getup-member-banner {
+  background-color: #f4f4f4;
+}
+
+/* required to fix dropdown menu z-index problem */
+.navbar .nav {
+  z-index: 900;
+}
+
+.help-inline {
+  top: 0px;
+}
+
+pre {
+  word-wrap: break-word !important;
+  word-break: normal !important;
+  overflow: hidden !important;
+}
+
+.petition-menu-home-item, .petition-menu-item { height: 70px; }
+		  
+/*
+  IE7 does not respect input with span class inside table, need to force it like below
+
+table input.span1 {
+  width: 20px;
+}
+table input.span2 {
+  width: 60px;
+}
+table input.span3 {
+  width: 100px;
+}
+table input.span4 {
+  width: 140px;
+}
+table input.span5 {
+  width: 180px;
+}
+table input.span6 {
+  width: 220px;
+}
+table input.span7 {
+  width: 260px;
+}
+table input.span8 {
+  width: 300px;
+}
+table input.span9 {
+  width: 340px;
+}
+table input.span10 {
+  width: 380px;
+}
+table input.span11 {
+  width: 420px;
+}
+table input.span12 {
+  width: 460px;
+}
+table input.span13 {
+  width: 500px;
+}
+table input.span14 {
+  width: 540px;
+}
+table input.span15 {
+  width: 580px;
+}
+table input.span16 {
+  width: 620px;
+}
+
+*/

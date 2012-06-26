@@ -1,0 +1,16 @@
+%p #{@petition.user.first_name},
+
+%p Your email "#{@blast_email.subject}" has been deemed inappropriate by a moderator because:
+
+%p=@blast_email.moderation_reason
+
+%p The text of the email that you sent was:
+
+%blockquote
+  = raw(@blast_email.body)
+
+%p You can still use this site to #{link_to 'send a different message', new_petition_email_url(@petition)} that meets our guidelines.
+
+%p Thanks for all that you do,
+
+%p The #{@petition.organisation.name} Team.

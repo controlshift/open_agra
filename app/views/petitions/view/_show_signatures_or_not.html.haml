@@ -1,0 +1,12 @@
+- if @petition.cached_signatures_size >= 5
+  %hr
+  .strong.last_signed
+    Last signed by:
+    %ul.signatures-box
+      = render partial: "petitions/view/petition_signature", collection: @petition.recent_signatures
+
+  :javascript
+    jQuery(document).ready(function() {
+      jQuery("abbr.timeago").timeago();
+    });
+

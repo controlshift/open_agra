@@ -1,0 +1,22 @@
+- if @petition.prohibited?
+  .alert.alert-error.fade.in
+    %a.close{ href: "#", "data-dismiss" => "alert" }
+      =image_tag "cross.png"
+    %p
+      We've disabled this petition because we found a problem with it's content.
+      =link_to "Fix This Problem", petition_manage_path(@petition)
+  - if true#!current_user.org_admin? && !current_user.admin?      
+    :javascript
+      $(function() {
+        // dim the content
+        $(".petition-box").css("opacity", 0.3);
+        $(".sidebar").css("opacity", 0.3);
+        
+        // disable and remove form focus
+        $(".sidebar input").attr("disabled", "disabled");
+        $(".sidebar input").blur();
+        // disable all hyperlinks
+        $(".sidebar a").attr("href","#");
+        $(".sidebar a[rel='popover']").removeAttr("rel");
+        $("#view_contact_user_form").removeAttr("data-toggle");
+      })

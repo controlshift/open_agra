@@ -1,0 +1,4 @@
+%p
+  The following petition has been flagged #{pluralize(@petition.flags.count, 'time')}. 
+%p
+  = link_to petition_url(@petition), petition_url(@petition) 

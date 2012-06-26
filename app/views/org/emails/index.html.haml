@@ -1,0 +1,14 @@
+= title "Blast Emails"
+%br
+
+- if @emails.any?
+  = table_for(@emails) do |t|
+    = t.data do
+      - t.cell(:subject) { |e| link_to(e.subject, org_email_path(e), {:class => 'use-pjax'}) }
+      - t.cell(:petition) { |e| e.petition.title }
+      - t.cell(:recipients) { |e| e.recipient_count  }
+      - t.cell(:moderation_status) { |e| e.moderation_status  }
+      - t.cell(:delivery_status) { |e| e.delivery_status  }
+  = will_paginate @emails
+- else
+  No emails found.

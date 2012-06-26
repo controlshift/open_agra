@@ -1,0 +1,11 @@
+- title @petition.title
+
+.alert.alert-error.fade.in
+  %a.close{ :href => "#", "data-dismiss" => "alert" }
+    =image_tag "cross.png"
+  %p
+    This Petition has been disabled because of inappropriate content
+    
+%p
+  If you created this petition, you can sign into the site to access your dashboard, learn more, and ﬁx this issue.
+  =link_to "Login", new_user_session_path

@@ -1,0 +1,12 @@
+%li
+  %a{ href: petition_path(petition_list_item) }
+    - unless petition_list_item.image_file_name.blank?
+      .list-item-image
+        =image_tag petition_list_item.image.url
+    - else
+      .list-item-image
+        =image_tag "petition-image-placeholder-home.png"
+  .list-item-desc-box
+    .list-item-desc
+      %span.list-item-title= petition_list_item.title
+      %span.list-item-why= petition_list_item.why

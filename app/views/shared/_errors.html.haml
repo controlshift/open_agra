@@ -1,0 +1,12 @@
+- if error_obj.errors.any?
+  - if error_obj.errors.size == 1
+    .alert.alert-error.fade.in
+      %a.close{ href: "#", "data-dismiss" => "alert" }
+        =image_tag "cross.png"
+      %p= error_obj.errors.full_messages.first
+  - else
+    .alert.alert-error.fade.in
+      %ul.email-alerts
+        - error_obj.errors.full_messages.each do |msg|
+          %li
+            %p= msg

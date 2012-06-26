@@ -1,0 +1,37 @@
+%h1 #{current_organisation.name} Settings
+
+.mt20
+= simple_form_for current_organisation, url: org_path, wrapper: :compact do |form|
+  %h3 General
+  %hr
+    .row
+      .span3
+        = form.input :contact_email, input_html: { type: 'email' }, hint: 'For public email'
+      .span3
+        = form.input :admin_email, input_html: { type: 'email' }, hint: 'For receiving alert email'
+
+
+  %h3 Options
+  %hr
+    .row
+      .span3
+        = form.input :show_petition_category_on_creation, as: :boolean
+      .span3
+        = form.input :requires_user_confirmation_on_sign_up, as: :boolean
+      .span3
+        = form.input :requires_location_for_campaign, as: :boolean
+    .row
+      .span3
+        = form.input :always_join_parent_org_when_sign_up, as: :boolean
+      .span3
+        = form.input :show_share_buttons_on_petition_page, as: :boolean, label: 'Show share buttons (Petition page)'
+
+  %h3 Social Media
+  %hr
+    .row
+      .span3
+        = form.input :twitter_account_name
+      .span3
+        = form.input :facebook_url
+  .actions
+    = form.button :submit, 'Save'

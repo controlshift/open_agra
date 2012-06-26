@@ -1,0 +1,80 @@
+.admin-toolbox
+  .left.name Administrative Tools
+  .right.moderation-status
+    = simple_form_for @petition, url: org_petition_path(@petition), validate: true, wrapper: :append do |f|
+      %a{ id: "notes-toggle", "data-toggle" => "modal", "data-target" => "#admin-notes", "data-backdrop" => 'true', "data-keyboard" => "true"} 
+        = succeed 'Notes' do
+          - unless @petition.admin_notes.blank?
+            %img{src: '/assets/icons/page_white.png'}
+      = label_tag :admin_status, "Status"
+      = f.select :admin_status, Petition::ADMINISTRATIVE_STATUSES.map { |s| [s.to_s.capitalize, s.to_s] }, class: "span2"
+      - button_text = Petition.awaiting_moderation(current_organisation.id).size > 1 ? "Save & next petition" : "Save"
+      = f.button :submit, button_text, id: 'save-and-next'
+      .inappropriate-reason-popover
+        = f.input :admin_reason, label: false, input_html: { rows: "5", placeholder: "Reason..." }
+  .clear
+  .modal.hide#admin-notes
+    .modal-header
+      %a.close{ href: "#", "data-dismiss" => "modal" } ×
+      %h3 Notes
+    .modal-body
+      = text_area_tag 'notes', @petition.admin_notes, rows: 10, cols: 50
+    .modal-footer
+      .left.error.hide{ id: "label-notes-error" }
+        Something's wrong, please try again.
+      %a.btn{ id: "btn-save-notes" } Save
+      .right
+        %img.ajax-loader.hide{ id: "img-notes-loader", src: "/assets/ajax-loader-24.gif" }
+  
+:javascript
+  $(function() {
+
+    show_reason_if_inappropriate = function() {
+      if($("#petition_admin_status").val() == 'inappropriate') {
+        $(".inappropriate-reason-popover").show();
+        $("#petition_admin_reason").focus();
+        $("#petition_admin_reason").attr("data-validate", "true");
+      }
+      else {
+        $("#petition_admin_reason").removeAttr("data-validate");
+      }
+    }
+
+    show_reason_if_inappropriate();
+
+    $("#petition_admin_status").change(function() {
+      $(".inappropriate-reason-popover").hide();
+      show_reason_if_inappropriate();
+    });
+  })
+
+  $("#btn-save-notes").click(function() {
+    var form = $("#notes");
+    
+    $("#btn-save-notes").hide();
+    $("#img-notes-loader").show();
+    $("#label-notes-error").hide();
+  
+    var request = $.ajax({
+      url: "#{org_petition_note_path(@petition)}",
+      type: "POST",
+      dataType: "json",
+      data: {_method:'PUT', admin_notes: $("#notes").val()},
+      success: function(resp) {
+        $("#btn-save-notes").show();
+        $("#img-notes-loader").hide();
+        $("#label-notes-error").hide();
+        $("#admin-notes").modal('hide');
+        alert_message("Your notes have been saved.");
+        form.resetForm();
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        $("#btn-save-notes").show();
+        $("#img-notes-loader").hide();
+        $("#label-notes-error").show();
+      
+        json = eval('(' + jqXHR.responseText + ')');
+        $("#label-notes-error").html(json['message']);
+      }
+    });
+  });

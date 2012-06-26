@@ -1,0 +1,41 @@
+=title "Complete registration"
+.mb20.mt20
+
+.row
+  .span3
+    #register
+      = simple_form_for(@user, :as => resource_name, :url => registrations_complete_path(@user), :wrapper => :compact, :validate => false, :html => { :id => 'user_registration' }) do |f|
+        = f.input :first_name, as: 'hidden'
+        = f.input :last_name, as: 'hidden'
+        = f.input :email, as: 'hidden'
+        = f.input :facebook_id, as: 'hidden'
+        = hidden_field_tag 'user[password]', Devise.friendly_token[0,20]
+    
+        = f.input :phone_number, :required => true
+        .input-why
+          %a{ :rel=>"popover", 'data-original-title'=>"Why?", 'data-content'=>"Not publicly visible. We may call to offer help, or pass on media inquiries about your campaign." } Why?
+        .clearall
+        = f.input :postcode, :required => true
+
+        .mt10
+          - resource.join_organisation = true
+          = check_box_tag(:join_organisation, 1, true, id: "user_join_organisation", name: "user[join_organisation]")
+          %label.subtle.mr10
+            = join_label
+        .checkbox-why
+          %a{ :rel=>"popover", 'data-original-title'=>"Why?", 'data-content'=>"Leave this ticked, and we'll be in touch with the best new features and campaigns on #{current_organisation.name}, and campaign updates from #{parent_name_punctuation(current_organisation)}" } Why?
+      
+        .mt10#agree-toc
+          = f.check_box(:agree_toc, :required => true)
+          %label{:for => 'user_agree_toc', :class => 'subtle'} I agree to #{current_organisation.name}'s
+          = succeed "." do
+            = link_to "Terms and Conditions", tos_path, target: "_blank"
+          = f.error "agree_toc"
+      
+        = hidden_field_tag 'token', @token
+        .submit_button
+          = f.button :submit, "Continue", :class => 'btn-primary', id: "user_registration_submit"
+        .clearall
+    
+      :javascript
+        email_suggest("#user_registration #user_email");

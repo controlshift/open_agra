@@ -1,0 +1,7 @@
+- if @petition.cancelled?
+  .alert.alert-error.fade.in
+    %a.close{ :href => "#", "data-dismiss" => "alert" }
+      =image_tag "cross.png"
+    %p
+      This petition has been hidden.
+      = link_to "Reactivate it?", activate_petition_manage_path(@petition), method: :put, confirm: "Are you sure you want to reactivate this petition?"

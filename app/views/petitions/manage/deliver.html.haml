@@ -1,0 +1,29 @@
+- content_for :before_content do
+  = render partial: "petition_manage_breadcrumbs"
+  = render partial: "petition_manage_menu", locals: {highlight_id: "manage-deliver"}
+  
+.row
+  .span8.offset2
+    = title "Deliver Your Petition"
+    
+    %br
+
+    .row
+      .span5
+        = link_to "Download Printable Petition PDF", download_letter_petition_manage_path, class: "btn btn-primary left", id: 'download-letter'
+
+      .span3
+        or download a
+        = link_to "csv export of signatures", petition_signatures_path(@petition, format: :csv), id: 'export-signatures'
+
+    %br
+    %hr
+    =cf('petition_manage_delivery_content')
+    
+    :coffeescript
+      $('.accordion-toggle').on 'click', ->
+        parent = $(this).closest(".accordion")
+        isExpanded = $(this).closest(".accordion-heading").siblings(".accordion-body").hasClass('in')
+        $(".accordion-toggle", parent).removeClass('open')
+        if !isExpanded
+          $(this).addClass('open')

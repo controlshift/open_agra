@@ -1,0 +1,38 @@
+.row
+  .span12
+    = title @group.title
+    - if can?(:manage, @group)
+      %i.icon-pencil
+      = link_to "Manage this group", org_group_path(@group), class: "admin-link"
+
+.mt20
+.row
+  - unless @group.image_file_name.blank?
+    .span3
+      .group-image
+        = image_tag(@group.image.url(:hero))
+    .span5
+      = @group.description
+  - else
+    .span7
+      = @group.description
+
+.featured-petitions
+  - if @petitions.any?
+    .row
+      .span6
+        %h3 Campaigns
+      .span6
+        = link_to 'New Campaign', new_group_petition_path(@group),  class: 'btn btn-primary'
+        .clear
+        
+    %hr
+    %ul.thumbnails
+      = render partial: "/groups/featured_petition", collection: @petitions
+    = render "groups/more_campaigns"
+
+  - else
+    %h3 No campaign has been started yet
+    %br
+    Be the first
+    = link_to 'to create one.', new_group_petition_path(@group)

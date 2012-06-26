@@ -1,0 +1,43 @@
+= simple_form_for @signature, url: petition_signatures_path(@petition), validate: true, wrapper: :compact, remote: true do |f|
+  - if ab_test :sign_petition_helper_text
+    = f.input :first_name, label: 'First name', input_html: { validate: { format: false }, class: 'signature-narrow' }
+    .input-why
+      %a{ rel:'popover', 'data-placement'=> 'left', 'data-offset' => 190, 'data-original-title'=>'Why?', 'data-content'=> 'Petitions that don’t use real names get taken less seriously. Using your real name adds power to the petition and makes it more effective.' } Why?
+  - else
+    = f.input :first_name, label: 'First name', input_html: { validate: { format: false } }
+
+  = f.input :last_name, label: 'Last name', input_html: { validate: { format: false } }
+  = f.input :email, label: 'Email', input_html: { type: 'email' , validate: {uniqueness: false }}, hint: ''
+  - if ab_test :sign_petition_helper_text
+    = f.input :phone_number, label: 'Phone Number', input_html: {class: 'signature-narrow'}
+    .input-why
+      %a{ rel: 'popover', 'data-placement'=> 'left', 'data-offset' => 190, 'data-original-title'=>'Why?', 'data-content'=>'Not publicly visible. The creator of this petition may contact you about important moments in this campaign.' } Why?
+  - else
+    = f.input :phone_number, label: 'Phone Number'
+
+  = f.input :postcode, label: 'Postcode'
+
+  - if current_organisation.always_join_parent_org_when_sign_up?
+    = f.input :join_organisation, as: :hidden, input_html: {value: '1'}
+  - else
+    .checkbox
+      = check_box_tag(:join_organisation, 1, true, id: 'signature_join_organisation', name: 'signature[join_organisation]', class: 'boolean')
+      %label.subtle.mr10{ for: 'signature_join_organisation' }
+        = join_label
+    - if ab_test :sign_petition_helper_text
+      .checkbox-why
+        %a{ rel: 'popover', 'data-placement'=> 'left', 'data-offset' => 190, 'data-original-title'=>'Why?', 'data-content'=>"Leave this ticked, and we'll be in touch with the best new features and campaigns on #{current_organisation.name}, and campaign updates from #{parent_name_punctuation(current_organisation)}" } Why?
+
+  = f.button :submit, 'Sign', class: 'btn-primary btn-border-dark mt10', disable_with:  'Signing…'
+
+  .return-to-petition
+    = link_to '#', class: 'btn-secondary btn-back' do
+      =image_tag 'bullet-pointer-left.png', class: 'mr5'
+      Return to petition
+
+  .clearall
+
+  :coffeescript
+    $ ->
+      email_suggest("#signature_email")
+

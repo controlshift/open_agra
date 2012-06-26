@@ -1,0 +1,33 @@
+- popover_location = highlight_id.nil??  'left' : 'bottom'
+- popover_offset = highlight_id.nil?? '0' : '9'
+- menu_item_class = highlight_id.nil?? '' : 'petition-menu-item'
+
+- unless @petition.suppressed?
+  %span{class: "#{highlighted('manage-email', highlight_id)} #{menu_item_class}" }
+    = link_to new_petition_email_path(@petition), id: 'manage-email', rel: 'popover', data: { placement: popover_location, offset: popover_offset, content: cf('petition_manage_email_popover') } do
+      = cf('petition_manage_email_label')
+%span{class: "#{highlighted('manage-collect', highlight_id)} #{menu_item_class}" }
+  = link_to offline_petition_manage_path(@petition), id: 'manage-collect', rel: 'popover', data: { placement: popover_location, offset: popover_offset, content: cf('petition_manage_offline_popover') } do
+    = cf('petition_manage_offline_label')
+%span{class: "#{highlighted('manage-deliver', highlight_id)} #{menu_item_class}" }
+  = link_to deliver_petition_manage_path(@petition), id: 'manage-deliver', rel: 'popover', data: { placement: popover_location, offset: popover_offset, content: cf('petition_manage_delivery_popover') } do
+    = cf('petition_manage_delivery_label')
+- if highlight_id.nil?
+  %hr
+%span{class: "#{highlighted('manage-edit', highlight_id)} #{menu_item_class}" }
+  = link_to edit_petition_manage_path(@petition), id: 'manage-edit', rel: 'popover', data: { placement: popover_location, offset: popover_offset, content: cf('petition_manage_edit_popover') } do
+    = cf('petition_manage_edit_label')
+%span{class: "#{menu_item_class}" }
+  = link_to contact_admin(@petition), id: 'manage-contact' do
+    .strong
+      Contact
+    = current_organisation.name
+- if highlight_id.nil?
+  %hr
+%span{class: "#{menu_item_class}" }
+  - if @petition.cancelled?
+    = link_to activate_petition_manage_path(@petition), id: 'manage-activate', method: :put, confirm: 'Are you sure you want to reactivate this petition?' do
+      = cf('petition_manage_reactivate_label')
+  - else
+    = link_to cancel_petition_manage_path(@petition), id: 'manage-hide', rel: 'popover', data: { placement: popover_location, offset: popover_offset, content: cf('petition_manage_hide_popover'), method: :put, confirm: 'Are you sure you want to hide this petition from public view?'} do
+      = cf('petition_manage_hide_label')

@@ -1,0 +1,11 @@
+# Autotest.add_hook(:initialize) do |at|
+#   at.add_mapping(%r%^scenarios/.*.rb$%, true) { |filename, _|
+#     filename
+#   }
+#   
+#   at.add_exception('scenarios/scenario_helper.rb')
+#   at.add_exception(/scenarios\/helpers\/.*/)
+# end
+
+require 'autotest/fsevent'
+require 'autotest/growl'

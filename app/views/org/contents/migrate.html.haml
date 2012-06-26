@@ -1,0 +1,35 @@
+= title "Content Migration"
+%br
+.row
+  .span4
+    %h2 Import
+    = form_tag import_org_contents_path, method: "post", multipart: true do
+      = file_field_tag "upload"
+      %br
+      = submit_tag "Import", class: "btn"
+    %br
+  .span4
+    %h2 Export
+    = form_tag export_org_contents_path, method: "get" do
+      %dl
+        %dd
+          %label{ class: "checkbox" }
+            = check_box_tag "select_all_checkbox", "", false, id: "select_all_checkbox"
+            All
+        - Content::CATEGORIES.each do |category|
+          %dt=category
+          - Content.where(organisation_id: nil, category: category).each do |content|
+            %dd
+              %label{ class: "checkbox" }
+                = check_box_tag "slug[]", content.slug
+                = content.name
+      = submit_tag "Export", class: "btn"
+      :javascript
+        $("#select_all_checkbox").click(function() {
+          $("input[name='slug[]']").attr('checked', $("#select_all_checkbox").is(':checked'));
+        });
+        $("input[name='slug[]']").click(function() {
+          var total = $("input[name='slug[]']").length;
+          var checked_count = $("input[name='slug[]']:checked").length; 
+          $("#select_all_checkbox").attr('checked', checked_count == total);
+        });

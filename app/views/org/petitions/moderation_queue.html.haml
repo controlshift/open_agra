@@ -1,0 +1,37 @@
+= title "Admin Moderation Queue"
+
+%br
+
+.admin_major_stat#num_of_petitions_to_moderate
+  .number
+    = @petitions.total_entries
+  .subtle
+    Petitions left to moderate
+
+.admin_minor_stat#num_of_new_petitions
+  .number
+    = @num_of_new_petitions
+  .subtle
+    New Petitions
+
+.admin_minor_stat#num_of_edited_petitions
+  .number
+    = @num_of_edited_petitions
+  .subtle
+    Edited Petitions
+    
+.clear
+%br
+%br
+
+- if @petitions.any?
+  = table_for(@petitions) do |t|
+    = t.data do
+      - t.cell(:title) { |p| link_to(p.title, petition_path(p), class: petition_class(p)) + (p.effort ? " (#{link_to(p.effort.title, org_effort_path(p.effort))})".html_safe : "") }
+      - t.cell(:status) { |p| p.admin_status.to_s.titleize }
+      - t.cell(:flags) { |p| p.flags_count }
+      - t.cell(:created_at) { |p| p.created_at.strftime("%Y-%m-%d %H:%M") }
+      - t.cell(:updated_at) { |p| p.updated_at.strftime("%Y-%m-%d %H:%M") }
+  = will_paginate @petitions
+- else
+  No petitions found.

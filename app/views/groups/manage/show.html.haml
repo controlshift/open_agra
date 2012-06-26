@@ -1,0 +1,26 @@
+- content_for :sidebar do
+  = render partial: 'group_admin_sidebar'
+
+=title @group.title
+
+.row
+  .span7
+    .admin_major_stat#total_petitions_count
+      .number
+        = number_with_delimiter(@group.petitions.not_orphan.size, :delimiter => ",")
+      .subtle
+        Petitions Created
+
+
+    .admin_major_stat#total_signatures_count
+      .number
+        = number_with_delimiter(@group.signatures.size, :delimiter => "," )
+      .subtle
+        Signatures Collected
+
+.row
+  .span7
+    %h4{class: 'mt20'}
+      Public URL
+    .well
+      = group_url(@group)

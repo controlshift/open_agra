@@ -1,0 +1,14 @@
+= title "My Campaigns", class: "left"
+
+= link_to "Start a Campaign", new_petition_path, :class => "btn btn-primary mt10"
+
+.clear
+
+%ul.petition_list
+  = render partial: "petition_list_item", collection: @petitions
+
+:javascript
+  $("ul.petition_list li").click(function() {
+    var path = $(this).find("a").attr("href");
+    window.location.href = path;
+  })

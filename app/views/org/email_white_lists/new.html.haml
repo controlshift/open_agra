@@ -1,0 +1,7 @@
+= title "New Email for White List"
+%br
+
+= simple_form_for [:org, @whitelist], validate: true, :wrapper => 'compact' do |form|
+  = form.input :email, input_html: { class:  'span9', type: 'email'}
+  .actions
+    = form.button :submit

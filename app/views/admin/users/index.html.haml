@@ -1,0 +1,14 @@
+= title  "#{org_admin? ? current_organisation.name : 'Global'} Users"
+
+.right.search-box
+  = form_tag  org_admin? ? email_org_users_path : email_admin_users_path, :method => :get, class: 'search' do
+    %input.search-query{ name: "email", placeholder: "email" }
+    %a.search-button#search-btn{ href: "javascript:$('form.search').submit();" }
+      %i.icon-search
+
+- if @users.any?
+  = table_for(@users) do |t|
+    = t.data do
+      - t.cell(:email) {| u | link_to(u.email, org_admin? ? edit_org_user_path(u) : edit_admin_user_path(u)) }
+      - t.cell(:organisation) {| u | u.organisation.name  }
+  = will_paginate @users

@@ -1,0 +1,11 @@
+= title "Log in"
+%p
+.row
+  .span3
+    = render :partial => "users/shared/login"
+  - if current_organisation.enable_facebook_login?
+    .span1.offset1.center
+      = image_tag 'seperator-or.png'
+    .span3.offset1
+      %div{ style: "margin-top: 85px;" }
+        = render :partial => "users/shared/facebook_login"

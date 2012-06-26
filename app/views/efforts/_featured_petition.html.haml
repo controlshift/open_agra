@@ -1,0 +1,12 @@
+%li.span4
+  - if featured_petition.effort.ask_for_location?
+    - if featured_petition.location
+      .ml5
+        %i.icon-globe
+        = featured_petition.location.locality
+    - else
+      = "&nbsp;".html_safe
+  %a.thumbnail{ href: petition_path(featured_petition) }
+    = petition_image(featured_petition, :hero)
+    .caption
+      %h5= featured_petition.title

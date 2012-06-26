@@ -1,0 +1,60 @@
+.body-efforts-show {
+  .effort-location-search {
+    margin: 0 -20px 0 0;
+    
+    .search-query {
+      width: 250px;
+    }
+  }
+  
+  .admin-link {
+    color: $fg-color;
+    text-decoration: underline;
+  }
+  
+  .btn-create-effort-petition {
+    padding: 12px 50px 15px 50px;
+    font-size: 1.5em;
+  }
+  
+  .featured-petitions {
+    margin-top: 50px;
+  }
+  
+  .effort-image {
+    width: 100%;
+  }
+  
+  .petition-image {
+    width: 290px !important;
+    height: 190px !important;
+
+    img {
+      width: 290px !important;
+      max-width: 290px !important;
+    }
+  }
+
+  .caption {
+    width: 290px !important;
+  }
+}
+
+.big-efforts-search{
+  input.query-box{
+    height: 2em;
+    font-size: 2em;
+    line-height: 2em;
+    margin: 0px;
+    width: 400px;
+  }
+
+  .search-btn{
+    margin:0px 0px 0px 5px;
+    padding: 4px 25px 4px 25px;
+    font-size: 2em;
+    line-height: 2em;
+    height: 2em;
+    float:none;
+  }
+}

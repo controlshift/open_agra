@@ -1,0 +1,27 @@
+%p
+  = "Dear #{@user.first_name},"
+
+%p 
+  Congratulations - you've just started a petition on: 
+  = @petition.title
+
+%p Now let's get it to a 100 signatures. Here’s how:
+
+%p Step 1: Email your friends about the campaign.
+  
+%p There’s a handy email below that you can forward to your friends or family asking them to join your campaign.
+  
+%p Step 2: Share on Facebook and Twitter
+  
+%p The great thing about social media is that people start sharing your campaign! For each person that clicks share an average of 100 more people will see your campaign.
+  
+%p= link_to 'Share your campaign on facebook or twitter.', petition_manage_url(@petition)
+
+%p Good luck with the campaign,
+
+%p The #{@petition.organisation.name} team
+
+%hr
+%pre= render :partial => 'petitions/email_body_template', :locals => { :petition => @petition, :name => @user.first_name, :verb => "added" }
+
+%hr

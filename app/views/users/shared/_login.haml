@@ -1,0 +1,18 @@
+= simple_form_for(resource, :as => resource_name, :url => session_path(resource_name), :validate => false, :wrapper => :compact) do |f|
+  = f.input :email, input_html: { type: 'email' }, :required => true
+  = f.input :password, :required => true
+  = hidden_field_tag 'token', params[:token] if params.key?(:token)
+
+  .clear
+  .row.mt10
+    .span3
+      = check_box_tag(:remember_me, 1, true, :id => "user_remember_me", :name => "user[remember_me]")
+      %label.subtle Remember me
+      = f.button :submit, "Log in", :class => 'btn btn-primary'
+
+  .row.mt20
+    .span3
+      .left
+        = link_to "Forgot password?", new_password_path(resource_name)
+      .right
+        = link_to "Need account?", new_registration_path(resource_name)

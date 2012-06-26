@@ -1,0 +1,41 @@
+!!! 5
+%html{"xmlns:og" => "http://ogp.me/ns#"}
+  %head
+    = render partial: 'layouts/common_html_head'
+    = yield :head
+
+  %body{ class: "body-#{controller_name} body-#{controller_name}-#{action_name}" }
+    .main
+      = render partial: 'layouts/header'
+
+      = yield :before_content
+
+      .main-content
+        .container
+          .row
+            .span2
+              = content_for?(:sidebar) ? content_for(:sidebar) : render(partial: 'layouts/org_admin_sidebar')
+                      
+            .span10.relative
+              %div{'data-pjax-container' => true}
+                .loader{style: "display:none;"}
+                  =image_tag 'ajax-loader-16.gif'
+                .alert.alert-success.fade.in{ class: (notice ? "" : "hide") }
+                  %a.close{ href: "#", "data-dismiss" => "alert" }
+                    =image_tag "tick.png"
+                  %p= notice
+
+                .alert.alert-error.fade.in{ class: (alert ? "": "hide")}
+                  %a.close{ href: "#", "data-dismiss" => "alert" }
+                    =image_tag "cross.png"
+                  %p= alert
+
+                = yield :specific_alerts
+                = yield
+
+    = render partial: 'layouts/footer'
+    
+    = yield :end_of_body
+
+    = render partial: 'layouts/vendor_scripts', locals: { exclude_uservoice: true }
+    

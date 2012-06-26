@@ -1,0 +1,21 @@
+
+- if params[:category]
+  = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
+  >
+  = params[:category]
+
+- if params[:category]
+  = title params[:category]
+- else
+  = title "Manage Content"
+
+- if params[:category]
+  %ul
+  - @contents.each do |content|
+    %li
+      = link_to content.name, edit_org_content_path(content), :id => "#{content.slug}-edit-link", :class => 'use-pjax'
+- else
+  %ul
+    - Content::CATEGORIES.each do |c|
+      %li
+        = link_to c, org_contents_path(:category => c), {:class => 'use-pjax'}

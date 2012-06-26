@@ -1,0 +1,24 @@
+- if @query.petitions.blank?
+  .row
+    .span10.offset1
+      %h3 No campaign can be found for "#{params[:q]}".
+      %hr
+    
+    .span10.offset1
+      You might be interested in these petitions
+      %ul.thumbnails.mt20
+        = render partial: "petitions/petition_search_item", collection: @featured_petitions
+- else
+  .row
+    .span10.offset1
+      %h3 Search result for "#{params[:q]}".
+      
+      %ul.thumbnails.mt20
+        = render partial: "petitions/petition_search_item", collection: @query.petitions
+    
+    - if @query.petitions.current_page < @query.petitions.total_pages
+      .span10.offset1
+        .more-campaigns-next
+          = link_to search_petitions_path(q: params[:q], page: @query.petitions.current_page + 1) do
+            More Campaigns
+            %span.arrow= "&#9654;".html_safe

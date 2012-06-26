@@ -1,0 +1,11 @@
+%p Hi,
+
+%p You've been invited to help administer the group "#{@invitation.group.title}" on #{@organisation.name}.
+
+%p
+  = link_to 'Accept the Invitation to Get Started', group_invitation_url(@invitation.group, @invitation, group_member: {invitation_token: @invitation.invitation_token} )
+
+
+%p Sincerely,
+
+%p The #{@organisation.name} Team

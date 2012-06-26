@@ -1,0 +1,52 @@
+<h1>About Us</h1>
+<h3>What is this?</h3>
+<p>This is a new project to allow you to start, run and deliver your own campaign on just about anything, with the technology you need at your fingertips.</p>
+<p>It can be big or small, heroic or ordinary. This is about power to the people. If you have an idea to make your community, your school, your local playground or the planet a better place, we offer this platform to assist you.</p>
+
+<h3>What can I run a campaign on?</h3>
+<p>What have you noticed that needs fixing? Where do you see an opportunity for positive change? Your campaign need not be limited to particular issues or locations. Your audience can be global or local.</p>
+<p>When starting a campaign the most important step is to get the ball rolling - don't worry about getting everything 100% right. Even experienced, professional campaigners make mistakes and often change tack as things develop. You don't need to be an expert to launch a campaign, you just need to be willing to learn new things along the way.</p>
+<h3>What can't I campaign on?</h3>
+<p>We expect we'll probably see campaigns we don't agree with, campaigns that might seem a bit random and or just plain kooky. That's fine with us, as long as it's not defamatory, discriminatory, illegal you get the idea.</p>
+<p>It comes down to this: does your campaign promote or incite violence? Does it promote bullying, or advocate discrimination based on someone's gender, sex, religion, ethnicity, nationality or sexual orientation? Is it defamatory? No? Excellent. We're all good.</p>
+<p>We reserve the right to use our judgment and take something down if it crosses a line of common decency, so take responsibility for your campaign.</p>
+<h3>How do you decide which campaigns go on the homepage?</h3>
+<p>A number of factors contribute to what campaigns are highlighted on the homepage.  These include campaigns that are on the edge of winning, campaigns that have shown rapid growth and campaigns that are particularly timely.</p>
+
+<h3>What is your privacy policy?</h3>
+<p>These things take up a lot of space, so please <a href="/privacy_policy">read our privacy policy in full</a>.</p>
+
+<h3>Who controls the data on the site?</h3>
+<p>While you are able to email your supporters through the website, privacy laws prevent us from sharing your supporters' email addresses with you.  The data collected on and through the site will remain our property.</p>
+
+<h3>Besides starting a petition, what else can I do in my campaign?</h3>
+<p>On CommunityRun you can start a petition, share it with your network and communicate further with your supporters via email.</p>
+<p>CommunityRun also helps you take your campaign to the street.  For instance, you can download a blank copy of your petition, collect signatures in person and then enter your data easily into the system.  You can also download a finished copy of your petition to print and deliver to your target.</p>
+<p>You can access all of these features from the <a href="/petitions">manage page</a></p>
+<p>This is a tool that allows anyone, anywhere to take a campaign from start to finish.</p>
+<h3>Can I cancel my petition?</h3>
+<p>Yes.</p>
+
+<h3>How will signing petitions make a difference?</h3>
+<p>Petitions provide a useful snapshot of the level of public support for an issue and put forward a list of people who all share a common commitment or concern. And they don't always need a big number to make a big impact - think about a local issue where a petition of 20 neighbours on one street would require someone to sit up and take notice.</p>
+<p>Petitions can be the catalyst for conversations that change how people think conversations with your friends, family, colleagues, neighbours, church group, school, fellow consumers, local club; political representative or business leader. It's most effective when you make a point of delivering your petition to your target in personal, high-profile or creative way, explaining why supporters feel the way they do.  But it probably won't do much if you just start a petition and walk away.</p>
+
+<h3>I'm loving this and I want to learn more. Where do I go from here?</h3>
+<p>Ah, grasshopper. You have understood the principles of campaigning 101 and are ready for more advanced teachings. Excellent.</p>
+<p>Here's the thing. Sometimes your campaign is won pretty quickly, and that's an amazing feeling. Other times, a campaign needs a movement of supporters behind it to really succeed. When the barriers to change are high this tends to be the case.</p>
+<p>And that's when you need to build a movement.</p>
+<p>Movements are diverse groups of people who probably have different skills, professions and interests but are united around a common purpose. These individuals can communicate why an issue is important to them and will often experiment together with different tactics over time to build power and instigate long lasting change.</p>
+<p>You can't build a movement alone. A movement is born from a team of people with complementary strengths and diverse skill sets. Real movements grow through collaboration and skill sharing, and while some may step forward more naturally to be leaders, everyone has a part to play.</p>
+<p>
+  To build a movement, you need to find other people who care about the issue but have different skills from you. If you're a great writer, find someone who's good at accounting.  If you're not a people person find someone who is. Build and invest in those personal relationships to ensure your team is strong and diverse.
+  <br>
+  <a href="http://neworganizing.com">http://neworganizing.com</a>
+  <br>
+  <a href="http://www.thechangeagency.org">http://www.thechangeagency.org</a>
+</p>
+
+
+<h3>I no longer wish to receive updates on a campaign I signed up to. How do I unsubscribe?</h3>
+<p>It's sad to see you go, but you can unsubscribe by clicking the 'unsubscribe' link in site emails you receive.</p>
+
+

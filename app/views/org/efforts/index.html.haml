@@ -1,0 +1,15 @@
+.row
+  .span7
+    = title "Efforts"
+  .span3
+    = link_to 'New Effort', new_org_effort_path, class: "btn btn-primary use-pjax"
+
+- if @efforts.any?
+  = table_for(@efforts) do |t|
+    = t.data do
+      - t.cell(:title) { |e| link_to(e.title, org_effort_path(e.slug), {:class => 'use-pjax'}) }
+      - t.cell(:petitions) { |e| e.petitions.count }
+      - t.cell(:public_view) {|e | link_to "(public view)", effort_path(e)  }
+  = will_paginate @efforts
+- else
+  No efforts found.

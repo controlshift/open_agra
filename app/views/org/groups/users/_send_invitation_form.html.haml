@@ -1,0 +1,3 @@
+= simple_form_for GroupMember.new, url: org_group_invitations_path(@group), wrapper: :compact  do |f|
+  = f.input :invitation_email, label: "Email Address to Invite"
+  = f.button :submit, 'Send invitation'

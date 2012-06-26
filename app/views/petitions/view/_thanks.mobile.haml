@@ -1,0 +1,11 @@
+.mb20
+  Thanks for signing. Now share with your friends.
+
+.panel.win-petition
+  .share-buttons
+    = render partial: 'petitions/view/social_share.mobile'
+    
+.return-to-petition
+  = link_to '#', class: 'btn-secondary btn-back' do
+    =image_tag "bullet-pointer-left.png", class: "mr5"
+    Return to petition

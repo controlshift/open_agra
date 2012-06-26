@@ -1,0 +1,7 @@
+= simple_form_for [:org, @category], validate: true, :wrapper => 'compact' do |form|
+  = form.input :name, input_html: { class:  'span3' }
+  .clear
+  .actions
+    = form.button :submit
+    - if @category.persisted?
+      = link_to('Delete', org_category_path(@category), confirm: "Delete #{@category.name}?", method: :delete, class: "btn btn-danger ml10")

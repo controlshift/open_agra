@@ -1,0 +1,112 @@
+// Place all the styles related to the petitions controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+@import "compass/css3";
+
+$fg-color: #252525;
+$bg-color: #ffffff;
+$title-color: #252525;
+$content-color-light: #7d7d7d;
+$subtle-color: #666666;
+$accent-color: #ff5000;
+$accent-color-light: #fc4f00;
+$accent-color-medium: #ff5000;
+$accent-color-dark: #cb3f00;
+$secondary-accent-color: #ff5000;
+$link-color: #0069D6;
+$header-border-color: #e3e3e3;
+$footer-bg-color: #ffffff;
+$border-color: #dddddd;
+$search-color: #666;
+$search-bg-color: #f3f3f3;
+
+$base-font-size: 10pt;
+$base-font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+$helvetica-font-family: Helvetica;
+$serif-font-family: 'Bree Serif', serif;
+$georgia-font-family: Georgia;
+$title-font-family: $serif-font-family;
+$title-font: normal 100% $title-font-family;
+$description-font-family: $helvetica-font-family;
+$subtitle-font-family: $georgia-font-family;
+$h1-font-size: 2.2em; 
+$h2-font-size: 1.6em;
+$h3-font-size: 1.2em;
+$subtle-font-size: 0.8em;
+$button-font-size: 1em;
+$label-font-size: 1em;
+$label-subtle-font-size: 1em;
+$error-font-size: 0.9em;
+$footer-font-size: 0.8em;
+$letter-font-family: Georgia, Serif;
+
+$btn-home-main-url: image-path("btn-home-main.png");
+$nav-global-admin-url: image-path("btn-icon-user.png");
+$nav-org-admin-url: image-path("btn-icon-user.png");
+$nav-start-petition-url: image-path("btn-icon-start-petition.png");
+$nav-login-url: image-path("btn-icon-login.png");
+$btn-flag-url: image-path("btn-icon-flag.png");
+$bg-progress-done-url: image-path("bg-progress-done.png");
+$bg-progress-done-s-url: image-path("bg-progress-done-s.png");
+
+@mixin toggle-bg-image($url) {
+  background: {
+    image: image-url($url);
+    repeat: no-repeat;
+  }
+  &:hover, &:focus {
+    background: {
+      position:left bottom;
+    }
+  }
+}
+
+@mixin bg-image($url) {
+  background: {
+    image: image-url($url);
+    repeat: no-repeat;
+  }
+}
+
+@mixin font-smoothing($smoothing) {
+  font-smooth: always;
+  -webkit-font-smoothing: $smoothing;
+  -moz-font-smoothing: $smoothing;
+  -o-font-smoothing: $smoothing;
+  font-smoothing: $smoothing;
+}
+
+@mixin input-placeholder-color($color: #666) {
+  ::-webkit-input-placeholder {
+      color: $color;
+  }
+  :-moz-placeholder {
+      color: $color;
+  }
+}
+
+@mixin remove-shadow() {
+  -moz-box-shadow: 0px 0px 0px #fff;
+  -webkit-box-shadow: 0px 0px 0px #fff;
+  -o-box-shadow: 0px 0px 0px #fff;
+  box-shadow: 0px 0px 0px #fff;
+  filter: progid:DXImageTransform.Microsoft.Shadow(enabled = false);
+}
+
+@mixin remove-text-shadow() {
+  text-shadow: none !important;
+  //filter: dropshadow(color=$color, offX=$offsetX, offY=$offsetY); IE ignores text shadow
+}
+
+@mixin remove-gradient() {
+  background-image: none;
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+}
+
+@mixin border-box-sizing() {
+  box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+}

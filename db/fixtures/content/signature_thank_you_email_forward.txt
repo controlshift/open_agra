@@ -1,0 +1,31 @@
+<p>
+Dear Friends,
+</p>
+
+<p>
+I just signed the campaign: {{ signature.petition.title | escape }}
+</p>
+
+<p>
+It would mean the world to me if you could also add your name to this important issue.
+Every name that is added builds momentum around the campaign and makes it more likely for us to get the change we want to see.
+</p>
+
+<p>
+Will you join me by taking action on this campaign?
+</p>
+
+<p>
+{% petition_url %}
+<p>
+
+<p>
+After you've signed the petition please also take a moment to share it with others.  It's super easy – all you need to do is forward this email.
+</p>
+
+
+<p>
+Thank you!
+<p>
+
+{{ signature.first_name }}

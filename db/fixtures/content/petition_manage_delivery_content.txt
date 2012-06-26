@@ -1,0 +1,129 @@
+<p>
+  Delivering the signatures you've collected is a powerful way to show your target the amount of people who care about your issue. Here's a few tips on delivering your petition:
+</p>
+<h4>
+  Email your Target
+</h4>
+<p>
+  You can deliver your petition by emailing it to your target. Here's how:
+</p>
+<div class='accordion' id='accordion-email-your-target'>
+  <div class='accordion-group'>
+    <div class='accordion-heading'>
+      <a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion-email-your-target' href='#email-step1'>
+        Step 1: Download the printable petition PDF below
+      </a>
+    </div>
+    <div class='accordion-body collapse' id='email-step1'>
+      <div class='accordion-inner'>
+        This will have the names and postcodes of everyone who signed your petition on it
+      </div>
+    </div>
+  </div>
+  <div class='accordion-group'>
+    <div class='accordion-heading'>
+      <a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion-email-your-target' href='#email-step2'>
+        Step 2: Find the contact address for your target.
+      </a>
+    </div>
+    <div class='accordion-body collapse' id='email-step2'>
+      <div class='accordion-inner'>
+        Most parliaments and legislatures have online directories of their members. Search engines can help you find contact info for other targets.
+      </div>
+    </div>
+  </div>
+  <div class='accordion-group'>
+    <div class='accordion-heading'>
+      <a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion-email-your-target' href='#email-step3'>
+        Step 3: Send an email introducing yourself and the issue.
+      </a>
+    </div>
+    <div class='accordion-body collapse' id='email-step3'>
+      <div class='accordion-inner'>
+        You will need to do this from your own email account. While there are many times that we feel outraged, nothing shuts down an argument like anger - so make sure to keep your tone polite and calm.
+      </div>
+    </div>
+  </div>
+</div>
+<h4>
+  Follow Up
+</h4>
+<p>
+  If you don't get a response, call your target and use the opportunity to tell them about your petition, and talk with them about the issue and why it is important.
+</p>
+<h4>
+  In Person Delivery
+</h4>
+<p>
+  If you live nearby, you can deliver your petition by printing it and bringing your target the petition in person. This makes a bigger impact than delivering via email.
+</p>
+<div class='accordion' id='accordion-in-person-delivery'>
+  <div class='accordion-group'>
+    <div class='accordion-heading'>
+      <a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion-in-person-delivery' href='#delivery-step1'>
+        Step 1: Find your target's contact details and book an appointment.
+      </a>
+    </div>
+    <div class='accordion-body collapse' id='delivery-step1'>
+      <div class='accordion-inner'>
+        Many elected officials have both offices in the capital and in your electorate.
+      </div>
+    </div>
+  </div>
+  <div class='accordion-group'>
+    <div class='accordion-heading'>
+      <a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion-in-person-delivery' href='#delivery-step2'>
+        Step 2: Invite your supporters
+      </a>
+    </div>
+    <div class='accordion-body collapse' id='delivery-step2'>
+      <div class='accordion-inner'>
+        If you're delivering the petition in person send an email to your supporters and ask them to come along – after all it wouldn't have been possible without them.
+      </div>
+    </div>
+  </div>
+  <div class='accordion-group'>
+    <div class='accordion-heading'>
+      <a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion-in-person-delivery' href='#delivery-step3'>
+        Step 3: Take Photos and share them
+      </a>
+    </div>
+    <div class='accordion-body collapse' id='delivery-step3'>
+      <div class='accordion-inner'>
+        Document the fact that you delivered your petition. This builds the credibility of your campaign, builds momentum and helps bring more people to your campaign. So remember to send the photos to your supporters after the event.
+      </div>
+    </div>
+  </div>
+  <div class='accordion-group'>
+    <div class='accordion-heading'>
+      <a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion-in-person-delivery' href='#delivery-step4'>
+        Step 4: Think outside the box
+      </a>
+    </div>
+    <div class='accordion-body collapse' id='delivery-step4'>
+      <div class='accordion-inner'>
+        <p>
+          Delivering your petition doesn't have to be about delivering a printout of signatures. You can make it as creative as you want.
+        </p>
+        <p>
+          You can also make it funny, dress up in costumes or take props. Remember the media is far more likely to come along if they can take interesting photos.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class='accordion-group'>
+    <div class='accordion-heading'>
+      <a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion-in-person-delivery' href='#delivery-step5'>
+        Step 5: Invite local journalists
+      </a>
+    </div>
+    <div class='accordion-body collapse' id='delivery-step5'>
+      <div class='accordion-inner'>
+        Getting local media to come along means that you can reach a whole new audience and attracts attention to your issues.
+      </div>
+    </div>
+  </div>
+</div>
+<p>
+  Good luck – and congratulations!
+</p>

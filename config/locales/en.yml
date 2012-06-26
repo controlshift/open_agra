@@ -1,0 +1,14 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  unauthorized:
+    default: You are not authorized to view that page.
+
+  helpers:
+    submit:
+      create: Save
+      update: Save
+  devise:
+    confirmations:
+      confirmed: Your email was successfully confirmed. You can now send email to your supporters.

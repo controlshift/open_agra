@@ -1,0 +1,11 @@
+- content_for :specific_alerts do
+  = render "users/passwords/alert_if_errors"
+
+= title "Change your password"
+= simple_form_for(resource, :as => resource_name, :url => password_path(resource_name), :wrapper => :compact, :html => { :method => :put }) do |f|
+  = f.input :reset_password_token, :as => :hidden
+  .mt10
+    = f.input :password, :label => "New password", :required => true
+    = f.input :password_confirmation, :label => "Confirm your new password", :required => true
+  .submit_button.left
+    = f.button :submit, "Change my password", :id => 'change-my-password', :class => 'btn btn-primary'

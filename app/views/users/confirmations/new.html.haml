@@ -1,0 +1,22 @@
+- content_for :specific_alerts do
+  = render "users/confirmations/alert_if_errors"  
+
+= title "Confirm Email Address"
+
+%p
+  For security reasons, we need to confirm your email address before allowing you to send a message to your campaign's supporters.
+%ul
+  %li We'll send you a confirmation email
+  %li Click the link in the email we send 
+  %li You'll be ready to send messages 
+
+= simple_form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :wrapper => :inline, :html => { :method => :post }) do |f|
+  = f.error_notification
+  .inputs
+    - if current_user
+      = f.input :email, :as => :hidden, :input_html => {:value => current_user.email}
+    - else
+      = f.input :email, required: true, input_html: { type: 'email' }
+    = f.input :organisation_id, :as => :hidden, :input_html => {:value => current_user.organisation_id}
+  .actions
+    = f.button :submit, "Email me confirmation instructions"

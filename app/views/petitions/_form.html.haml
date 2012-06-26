@@ -1,0 +1,103 @@
+.row
+.right.subtle
+  %abbr * required field
+
+= simple_form_for @petition, url: post_path, validate: true, wrapper: :compact, html: {multipart: true, class: "petition-form", novalidate: "true"} do |f|
+  = f.input :effort_id, as: 'hidden', input_html: { value: @effort.id } if @effort
+  = f.input :group_id,  as: 'hidden', input_html: { value: @group.id } if @group
+
+  = f.input :source,    as: 'hidden', input_html: { value: params[:source] } if @petition.source.nil?
+
+  = input_field(f, :title, "Petition title", cf('petition_form_title_help'))
+
+  - if show_details
+    .upload-image-box-horizontal
+      .upload-image{'data-changed-placeholder-url' => asset_path('petition-image-placeholder-form-changed.png') }
+        .preview-image
+          = petition_image(@petition, :form)
+        .arrow
+        .upload-field
+          = f.input :image,
+            as: :file,
+            label: 'Upload an image', input_html: { accept: 'image/jpeg,image/gif,image/png' }
+        .clear
+
+  = input_field(f, :who, 'Whom are you petitioning?',  cf('petition_form_whom_help'))
+  = input_field(f, :what, 'What do you want them to do?', cf('petition_form_what_help'), {rows: 6, maxlength: 5000})
+  = input_field(f, :why, 'Why is this important?', cf('petition_form_why_help'), {rows: 6, maxlength: 5000})
+
+  - if show_details
+    = input_field(f, :delivery_details, 'How do you plan to deliver the petition?', 'Will you email the signatures, deliver them in person or stage a press conference?', {rows: 6, maxlength: 5000})
+  - if current_organisation.show_petition_category_on_creation? || show_details
+    = render partial: '/petitions/form_categories', locals: { f: f }
+
+  - if show_details
+    .mt10.controls
+      .control-label
+        Settings
+    = check_box(:petition, :campaigner_contactable)
+    = label_tag(:campaigner_contactable,  'Allow supporters to contact me', for: 'petition_campaigner_contactable')
+
+    .mt10.mb10
+      = link_to 'Manage Campaign Administrators', new_petition_admin_path(@petition)
+
+
+  - if ask_for_location?
+    - content_for :head do
+      %script{ type: 'text/javascript', src:'http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true'}
+
+    = simple_fields_for :location, wrapper: :compact do |lf|
+      = lf.input :query, label: 'Where?', input_html: { class: 'span7', rel: 'popover', 'data-title'=> 'Where?', 'data-content' => 'What location does your petition relate to? Postal code or full address' }
+
+  .mt30
+  .actions
+    = f.button :submit, class: 'btn-primary', disable_with: 'Saving…'
+    - if @petition.id
+      = link_to 'Cancel', cancel_path, class: 'btn btn-secondary', id: 'cancel-edit-btn'
+
+.row.mt20
+
+%script $(petitions.initForm);
+
+- if ask_for_location?
+  :coffeescript
+    $("#location_query").keydown (event) ->
+      if event.keyCode == 13
+        event.preventDefault()
+        false
+
+    petition_form = $('#new_petition')
+
+    autocomplete = new google.maps.places.Autocomplete(document.getElementById('location_query'))
+    google.maps.event.addListener autocomplete, 'place_changed', ->
+      place = autocomplete.getPlace()
+      if place.geometry != undefined
+        (new PlaceHelper(place)).bind_to_form(petition_form, "location")
+
+    add_location_error = (message) ->
+      element = $('#location_query')
+      wrapper = element.closest('div.control-group')
+      wrapper.addClass('error')
+
+      errorElement = $("<span class='help-inline'>\#{message}</span>")
+      inputLabel = $('label[for=location_query]')
+
+      wrapper.find('span.help-inline').remove()
+      errorElement.insertAfter(inputLabel)
+
+    remove_location_error = ->
+      element = $('#location_query')
+      wrapper = element.closest('div.control-group')
+      wrapper.removeClass('error')
+      wrapper.find('span.help-inline').remove()
+
+    $('.btn-primary').click ->
+      petition_form.isValid(window[petition_form.attr('id')].validators)
+      if !$("input[name='location[query]']").val() || !$("input[name='location[latitude]']").val() || !$("input[name='location[longitude]']").val()
+        petition_form.trigger('form:validate:fail')
+        add_location_error('Invalid location')
+      else
+        if petition_form.validate()
+          remove_location_error()
+          petition_form.submit()
+      false

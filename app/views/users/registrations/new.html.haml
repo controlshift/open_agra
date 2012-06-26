@@ -1,0 +1,114 @@
+- if params[:token]
+  .row
+    .span8.offset2
+      .create
+        = render partial: 'petitions/petition_chevron'
+
+      .center.mb20
+        We need some information about you before we can launch your petition. We'll use this to create a
+        = current_organisation.name
+        account for you.
+
+.row
+  .span8.offset2
+          
+    %ul.nav.nav-tabs
+      %li.active.register.ml20
+        %a{ href: '#register', 'data-toggle' => 'tab' }
+          %h1 Join
+          .subtle For first time users
+        
+      %li.login
+        %a{ href: '#login', 'data-toggle' => 'tab' }
+          %h1 Login
+          .subtle For existing users
+        
+    .clearall
+    .tab-content
+      .tab-pane.row.active#register
+        .span3
+          .mt20
+          = simple_form_for(resource, as: resource_name, url: registration_path(resource_name), wrapper: :compact, validate: false, html: { id: 'user_registration' }) do |f|
+            = f.input :first_name, required: true
+            .input-why
+              %a{ rel:'popover', 'data-original-title'=>'Why?', 'data-content'=>"If someone handed you a petition that didn't have people's real names would you take it seriously? Writing your real name adds power to the petition and makes it more effective. <br><br> As the petition creator, your first and last name will appear on the petition web-page, but your email address, phone number, postcode and other personal details will <i>not</i> be publicly visible." } Why?
+            = f.input :last_name, required: true
+            = f.input :email, required: true, input_html: { type: 'email' }, hint: ''
+            = f.input :phone_number, required: true
+            .input-why
+              %a{ rel:'popover', 'data-original-title'=>'Why?', 'data-content'=>'Not publicly visible. We may call to offer help, or pass on media inquiries about your campaign.' } Why?
+            .clearall
+            = f.input :postcode, required: true
+            = f.input :password, required: true
+            .mt10
+              = check_box_tag(:remember_me, 1, true, id: 'user_remember_me', name: 'user[remember_me]')
+              %label.subtle Remember me
+            .mt10
+              - if current_organisation.always_join_parent_org_when_sign_up?
+                = f.input :join_organisation, as: :hidden, input_html: {value: '1'}
+              - else
+                = check_box_tag(:join_organisation, 1, true, id: 'user_join_organisation', name: 'user[join_organisation]')
+                %label.subtle.mr10
+                  = join_label
+                  .checkbox-why
+                    %a{ rel:'popover', 'data-original-title'=>'Why?', 'data-content'=>"Leave this ticked, and we'll be in touch with the best new features and campaigns on #{current_organisation.name}, and campaign updates from #{parent_name_punctuation(current_organisation)}" } Why?
+            .mt10#agree-toc
+              = f.check_box(:agree_toc, required: true)
+              %label{for: 'user_agree_toc', class: 'subtle'} I agree to #{current_organisation.name}'s
+              = succeed '.' do
+                = link_to 'Terms and Conditions', tos_path, target: '_blank'
+              = f.error 'agree_toc'
+            = hidden_field_tag 'token', params[:token] if params.key?(:token)
+            .submit_button
+              = f.button :submit, 'Register', class: 'btn-primary', id: 'user_registration_submit'
+            .clearall
+          :javascript
+            email_suggest('#user_registration #user_email');
+        - if current_organisation.enable_facebook_login?
+          .span1.offset1
+            .mt20
+            = image_tag 'seperator-or.png'  
+          .span3
+            %div{ style: 'margin-top: 105px;' }
+              = render partial: 'users/shared/facebook_login'
+              
+      .tab-pane.row#login
+        .span3
+          .mt20
+          = render partial: 'users/shared/login'
+        - if current_organisation.enable_facebook_login?
+          .span1.offset1
+            .mt20
+            = image_tag 'seperator-or.png'  
+          .span3
+            %div{ style: 'margin-top: 105px;' }
+              = render partial: 'users/shared/facebook_login'
+
+  :javascript
+    $(function() {  
+      $('#user_first_name').focus();
+      if ( LoginFailed() )
+      {
+        $('li.register').removeClass('active');
+        $('#register').removeClass('active');
+        $('li.login').addClass('active');
+        $('#login').addClass('active');
+      }
+      $(function () {
+          $("a[data-toggle='tab']").on('shown', function (e) {
+            $("[data-alert = 'alert']").hide();
+            $("[class ~= 'control-group']").removeClass('error');
+            $('.help-inline').empty();
+          })
+      });
+    });
+
+    function LoginFailed()
+    {
+      var urlPathname = window.location.search;
+      var matchPos = urlPathname.search(/login/);
+      if (matchPos == -1 )
+        return false;
+      else return true;  
+    }
+

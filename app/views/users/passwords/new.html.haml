@@ -1,0 +1,7 @@
+= title "Reset password"
+= simple_form_for(resource, :as => resource_name, :url => password_path(resource_name), :wrapper => :compact, :html => { :method => :post }) do |f|
+  .mt10
+    .inputs
+      = f.input :email, :required => true, :label => "Enter your email address", :input_html => {:class => "span5", type: 'email'}
+  .submit_button.left
+    = f.button :submit, "Next", :id => 'send-password-reset', :class => "btn btn-primary"

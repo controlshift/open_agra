@@ -1,0 +1,114 @@
+.mt20
+= simple_form_for [:admin, @organisation], wrapper: :compact do |form|  
+  %h3 General
+  %hr
+    .row
+      .span3
+        = form.input :name
+      .span3
+        = form.input :parent_name
+      .span3
+        = form.input :contact_email, input_html: { type: 'email' }, hint: 'For public email'
+      .span3
+        = form.input :slug
+    .row
+      .span3
+        = form.input :host
+      .span3
+        = form.input :parent_url
+      .span3
+        = form.input :admin_email, input_html: { type: 'email' }, hint: 'For receiving alert email'
+      .span3
+        = form.input :uservoice_widget_link
+    .row
+      .span3
+        = form.input :join_label
+
+  %h3 Options
+  %hr
+    .row
+      .span3
+        = form.input :use_white_list, as: :boolean  
+      .span3
+        = form.input :show_petition_category_on_creation, as: :boolean
+      .span3
+        = form.input :requires_user_confirmation_on_sign_up, as: :boolean
+      .span3
+        = form.input :requires_location_for_campaign, as: :boolean
+    .row
+      .span3
+        = form.input :always_join_parent_org_when_sign_up, as: :boolean
+  %br
+  %h3 Visual Appearance
+  %hr
+    .row
+      .span3= form.input :show_share_buttons_on_petition_page, as: :boolean, label: 'Show share buttons (Petition page)'
+  %br
+  %h3 External Accounts
+  %hr
+    .row
+      .span3
+        = form.input :blog_link
+      .span3
+        = form.input :campaigner_feedback_link, hint: 'Forum where campaigners can give feedback'
+      .span3
+        = form.input :user_feedback_link, hint: 'Forum where public users can give feedback'
+    .row
+      .span3
+        = form.input :twitter_account_name
+      .span3
+        = form.input :facebook_url
+      .span3
+        = form.input :google_analytics_tracking_id, hint: ''
+      .span3
+        = form.input :google_maps_key
+  %br
+  %h3 Sendgrid
+  %hr
+    .row
+      .span3= form.input :sendgrid_username
+      .span3= form.input :sendgrid_password, as: :string
+  %br
+  %h3 Facebook App
+  %hr
+    .row
+      .span3= form.input :enable_facebook_login, as: :boolean, label: 'Enable Facebook Login'
+      .span3= form.input :fb_app_id, as: :string, label: 'Facebook API ID'
+      .span3= form.input :fb_app_secret, as: :string, label: 'Facebook API Secret'
+  %br
+  %h3 CRM Notification
+  %hr
+    .row
+      .span3
+        = form.input :notifiers, hint: 'e.g. Tijuana, BlueStateDigital, ActionKit. Comma separated.'
+
+
+  %h3 Getup!
+  %hr
+    .row
+      .span3
+        = form.input :notification_url
+
+  %h3 Blue State Digital
+  %hr
+    .row
+      .span3= form.input :bsd_host, label: 'BSD Host'
+      .span3= form.input :bsd_api_id, label: 'BSD API ID'
+      .span3= form.input :bsd_api_secret, label: 'BSD API Secret'
+  %br
+
+  %h3 Action Kit API
+  %hr
+    .row
+      .span3= form.input :action_kit_host, label: 'Host'
+      .span3= form.input :action_kit_username, label: 'Username', as: :string
+      .span3= form.input :action_kit_password, label: 'Password', as: :string
+
+    .row
+      .span3= form.input :action_kit_country, label: 'Country', as: :string, hint: 'e.g. Australia, United States'
+      .span3= form.input :action_kit_signature_page, label: 'Signature Page'
+      .span3= form.input :action_kit_petition_page, label: 'Petition Page'
+  %br
+  
+  .actions
+    = form.button :submit

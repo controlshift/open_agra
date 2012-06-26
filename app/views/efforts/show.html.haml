@@ -1,0 +1,50 @@
+- content_for :head do
+  %script{ type: "text/javascript", src:"http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"}
+  = javascript_include_tag 'efforts_location'
+
+.row
+  .span12
+    = title @effort.title
+    - if can?(:manage, @effort)
+      %i.icon-pencil
+      = link_to "Manage this effort", org_effort_path(@effort), class: "admin-link"
+
+.mt20
+.row
+  - unless @effort.image_file_name.blank?
+    .span3
+      .effort-image
+        =image_tag(@effort.image.url(:hero))
+    .span5
+      = @effort.description
+    .span4
+      = link_to 'Start A Campaign', new_effort_petition_path(@effort),  class: 'btn btn-primary btn-create-effort-petition'
+  - else
+    .span7
+      = @effort.description
+    .span4.offset1
+      = link_to 'Start A Campaign', new_effort_petition_path(@effort),  class: 'btn btn-primary btn-create-effort-petition'
+
+.featured-petitions
+  - if @petitions
+    .row
+      .span6
+        %h3 Campaigns
+      .span6
+        - if @effort.ask_for_location?
+          .right
+            %form.filter.effort-location-search.pull-left{ action: effort_path{@effort}, method: 'GET' }
+              %input.search-query#location_query{ name: 'location_query', placeholder: 'Search by location', value: params[:location_query] }
+              %a.search-button#search-effort{ href: "#" }
+                %i.icon-globe
+          .clear
+    %hr
+    %ul.thumbnails
+      = render partial: "/efforts/featured_petition", collection: @petitions
+
+  - else
+    %h3 There's no campaign being started yet
+    %br
+    Be the first
+    = link_to 'to create one.', new_effort_petition_path(@effort)
+

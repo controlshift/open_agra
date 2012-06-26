@@ -1,0 +1,106 @@
+.admin-toolbox {
+  background-color: #424242;
+  @include border-radius(4px);
+  @include background-image(linear-gradient(#5f5f5f 0%, #424242 100%));
+  @include box-shadow(rgba(0, 0, 0, 0.2) 2px 2px 4px 0 false);
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  color: white;
+
+  a { color: #ffffff; text-decoration: underline; }
+
+  .name {
+    color: #ffffff;
+    font-weight: bold;
+    line-height: 28px;
+  }
+
+  .moderation-status {
+    position: relative;
+    z-index: 1000; // this is required to fix IE7 z-index problem with child elements
+  }
+
+  .inappropriate-reason-popover {
+    position: absolute;
+    background-color: #424242;
+    @include border-bottom-left-radius(4px);
+    @include border-bottom-right-radius(4px);
+    @include box-shadow(rgba(0, 0, 0, 0.2) 2px 2px 2px 0 false);
+    top: 38px;
+    left: 106px;
+    z-index: 1001;
+    display: none;
+    margin: 0;
+    padding: 0px 10px 10px 10px;
+
+    div.clearfix { margin: 0; }
+
+    textarea { width: 180px;  }
+  }
+
+  .next-petition {
+    margin: 0px 20px 0px 0px;
+    padding: 10px 0px;
+  }
+
+  form {
+    input, select { margin: 0px; }
+    label { color: #ffffff; margin-right: 5px; }
+    textarea { margin: 0; }
+    margin-bottom: 0px;
+  }
+
+  .form-stacked {
+    .help-inline {
+      margin: 0 !important;
+      padding: 0 !important;
+      line-height: 12px;
+    }
+  }
+}
+
+.admin_major_stat {
+  float: left;
+  
+  .number {
+    font-size: 4em; 
+    display: inline-block; 
+    line-height: 1em; 
+    margin-right: 5px;
+  }
+  .subtle {
+    width: 70px; 
+    display: inline-block; 
+    vertical-align: top; 
+    line-height: 16px;
+    margin-top: 5px;
+  }
+}
+
+.admin_minor_stat {
+  float: right;
+  text-align: center;
+  width: 80px;
+  margin-left: 30px;
+  
+  .number { font-size: 1.4em; }
+  .subtle { line-height: 16px; }
+}
+
+.moderation-status {
+  select { width: 150px; }
+}
+
+.admin-search {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 8px -20px 0 0;
+}
+
+.loader {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 8px -20px 0 0;
+}

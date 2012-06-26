@@ -1,0 +1,26 @@
+- if @query.categories.blank?
+  .row
+    .span10.offset1
+      %ul.thumbnails
+        = render partial: "home/campaign", collection: @query.petitions
+      = render "categories/more_campaigns"
+- else
+  .tabbable.tabs-left
+    %ul.nav.nav-tabs
+      %li{ class: "#{@category.nil? ? 'active' : ''}" }
+        =link_to "Featured", categories_path
+      -  @query.categories.each do |c|
+        %li{ class: "#{@category == c ? 'active' : ''}" }
+          =link_to c.name, c
+    .tab-content
+      .tab-pane.active#categories
+        - if @query.petitions.blank?
+          We do not have campaign in this category yet.
+          %br
+          %br
+          Be the first to #{link_to "create", new_petition_path}?
+        - else
+          %ul.thumbnails
+            = render partial: "home/campaign", collection: @query.petitions
+        = render "categories/more_campaigns"
+

@@ -1,0 +1,6 @@
+- content_for :sidebar do
+  = render partial: 'groups/manage/group_admin_sidebar'
+
+= title "#{ @group.title } Petitions"
+
+= render partial: 'admin/petitions/petition_list_table'

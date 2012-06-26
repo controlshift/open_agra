@@ -1,0 +1,11 @@
+.breadcrumbs
+  = link_to 'Manage Content', org_contents_path
+  >
+  = link_to @content.category, org_contents_path(category: @content.category)
+  >
+  Edit
+  = @content.name
+
+= title "Edit #{@content.name}"
+
+= render :partial => 'form'

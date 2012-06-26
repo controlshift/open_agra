@@ -1,0 +1,12 @@
+- if @petition.cached_signatures_size >= 10
+  .petition-progress
+    = render partial: "petitions/view/petition_progress", locals: { petition: @petition }
+  .petition-signatures
+    %span.number= number_with_delimiter(@petition.cached_signatures_size)
+    %br
+    of
+    %span= number_with_delimiter(@petition.goal)
+    signatures
+- else
+  = "&nbsp;".html_safe
+

@@ -1,0 +1,29 @@
+<p>
+  Think of us like a campaign office.  You're welcome to come in and use the space as long as we're working towards the same goals and you respect the people around you.  This means...
+</p>
+<ul class='community'>
+  <li>
+    This is a space for people who want to create a more progressive world.  At time we might disagree with what is and isn't progressive – that's healthy but we reserve the right to remove campaigns that aren't progressive.
+  </li>
+  <li>
+    We believe in climate change.  If you'd like to debate the science behind it that's fine, the internet is a big place and you can easily do it somewhere else.
+  </li>
+  <li>
+    We believe in women's, minority and gay rights and won't stand for racist, sexist or homophobic campaigns in our building.
+  </li>
+  <li>
+    This isn't a hotel but more of a share house.  You're responsible for keeping your campaign up to a reasonable standard and doing the work to make it a success.
+  </li>
+  <li>
+    Not all campaigns will be treated equally.  This is a conspiracy of limited time and resources.  We have a shoe string budget and overworked staff and will invest more in campaigns who we think are going to make a big impact or are close to winning.
+  </li>
+  <li>
+    If you leave nasty comments lying around you'll be asked to leave.
+  </li>
+  <li>
+    There might be glitches, bugs and inconveniences along the way as we live together.  If this happens please be patient - we'll try to fix things as soon as we can.
+  </li>
+  <li>
+    If all that sounds good then welcome, have a look around and make yourself at home.  We can't wait to work with you!
+  </li>
+</ul>

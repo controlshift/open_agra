@@ -1,0 +1,15 @@
+.row
+  .span8.offset2
+    .share
+      = render :partial => "petitions/petition_chevron"
+      
+    .center
+      = title "Spread the word - share your petition!"
+      %br
+
+      .panel.win-petition
+        .share-buttons
+          = render partial: 'petitions/view/social_share'
+
+      =link_to "Manage your petition",  petition_manage_path(@petition), class: "btn btn-primary"
+      .clear

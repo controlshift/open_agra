@@ -1,0 +1,7 @@
+.breadcrumbs
+  = link_to 'Manage Categories', org_categories_path
+  > Edit
+.word-wrap
+  = title "Edit #{@category.name}"
+%br
+= render partial: 'form'

@@ -1,0 +1,20 @@
+= simple_form_for [:org, @story], validate: true, :wrapper => 'compact' do |form|
+  = form.input :featured
+  = form.input :title, input_html: { class:  'span9' }
+  = form.input :link, input_html: { class:  'span9' }
+  = form.input :content, input_html: { class:  'span9', rows: "5" }
+  .upload-image-box-horizontal
+    .upload-image{"data-changed-placeholder-url" => asset_path("story-image-placeholder-changed.png") }
+      .preview-image
+        = story_image(@story, :hero)
+      .arrow
+      .upload-field
+        = form.input :image, 
+          as: :file, 
+          label: "Upload an image", input_html: { accept: "image/jpeg,image/gif,image/png" }
+      .clear
+  
+  .actions
+    = form.button :submit
+    
+%script $(stories.initForm);

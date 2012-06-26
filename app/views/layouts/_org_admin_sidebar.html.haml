@@ -1,0 +1,83 @@
+- cache("v4_org_admin_sidebar_#{current_organisation.cache_key}") do
+  .org-admin-sidebar.well{ style: "padding: 8px 0" }
+    %ul.nav.nav-list
+      %li
+        = link_to org_path, {:class => 'use-pjax'} do
+          %i.icon-home
+          Home
+      %li.nav-header Petitions
+      %li
+        = link_to org_petitions_path, {:id => 'all-petitions', :class => 'use-pjax'} do
+          %i.icon-comment
+          All
+      %li
+        = link_to hot_org_petitions_path, {:class => 'use-pjax', :id => 'hot-petitions'} do
+          %i.icon-fire
+          Hot
+      %li
+        = link_to moderation_queue_org_petitions_path, {:class => 'use-pjax'} do
+          %i.icon-eye-open
+          Moderation
+      %li
+        = link_to org_categories_path, {:id => 'all-categories', :class => 'use-pjax'} do
+          %i.icon-tags
+          Categories
+
+      %li.nav-header Manage
+      %li
+        = link_to org_groups_path, {:id => 'manage-groups', :class => 'use-pjax'} do
+          %i.icon-map-marker
+          Groups
+      %li
+        = link_to org_efforts_path, {:id => 'all-efforts', :class => 'use-pjax'} do
+          %i.icon-road
+          Efforts
+      %li
+        = link_to org_users_path, {:id => 'manage-users', :class => 'use-pjax'} do
+          %i.icon-user
+          Users
+      %li
+        = link_to settings_org_path, {:id => 'settings', :class => 'use-pjax'} do
+          %i.icon-tasks
+          Settings
+
+      %li.nav-header Blast Emails
+      %li
+        = link_to org_emails_path, {:id => 'all-emails', :class => 'use-pjax'} do
+          %i.icon-envelope
+          All
+      %li
+        = link_to moderation_org_emails_path, {:class => 'use-pjax'} do
+          %i.icon-eye-open
+          Moderation
+
+      - if current_organisation.use_white_list?
+        %li
+          = link_to new_org_email_white_list_path, {:id => 'manage-users', :class => 'use-pjax'} do
+            %i.icon-user
+            Whitelist
+
+
+      %li.nav-header CMS
+      %li
+        = link_to org_stories_path, {:id => 'all-stories', :class => 'use-pjax'} do
+          %i.icon-comment
+          Stories
+      %li
+        = link_to org_contents_path, {:id => 'manage-contents', :class => 'use-pjax'} do
+          %i.icon-edit
+          Content
+      %li
+        = link_to migrate_org_contents_path, {:class => 'use-pjax'} do
+          %i.icon-plane
+          Migrate
+
+      %li.nav-header Data
+      %li
+        = link_to export_org_users_path, id: 'export-people-link' do
+          %i.icon-download
+          People
+      %li
+        = link_to new_org_query_path, id: 'query-link' do
+          %i.icon-th-list
+          Query

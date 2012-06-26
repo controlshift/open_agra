@@ -1,0 +1,12 @@
+= title "Unsubscribe from '#{@petition.title}'"
+%br
+
+  = render :partial => 'shared/errors', :locals => {:error_obj => @unsubscribe}
+
+.span5
+  = simple_form_for(@unsubscribe, url: unsubscribe_petition_signature_path(@unsubscribe.petition, @unsubscribe.signature), method: :put,
+                                wrapper: :compact) do |f|
+    .inputs
+      = f.input :email, required: true, label: "Enter your email address", input_html: {value: "", class: "span5", type: 'email'}
+    .submit_button
+      = f.button :submit, "Confirm", id: 'unsubscribe_me_btn', class: "btn btn-primary"

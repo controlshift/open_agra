@@ -1,0 +1,14 @@
+.row
+  %a.share.facebook{ href: "#", data: {href: facebook_share_href(@petition) }}
+    .text Share on Facebook
+.row
+  %a.share.twitter{ href: "#", data: { href: twitter_share_href(@petition) }}
+    .text Share on Twitter
+
+:javascript
+  $(function() {
+    $('a.facebook, a.twitter').click(function () {
+      window.open($(this).data('href'),'sharer','toolbar=0,status=0,width=626,height=436');
+      return false;
+    });
+  });

@@ -1,0 +1,48 @@
+!!! 5
+%html{"xmlns:og" => "http://ogp.me/ns#"}
+  %head
+    = render partial: 'layouts/common_html_head'
+    = render partial: 'layouts/customised_html_head'
+    = yield :head
+
+  %body{ class: "body-#{controller_name} body-#{controller_name}-#{action_name}" }
+    .main
+      = render partial: 'layouts/header'
+
+      = yield :before_content
+      
+      .main-content-sidebar
+        .container
+          .row
+            .span8
+              .content-wrapper
+                = render 'layouts/page_banner'
+                = render 'layouts/flash_messages'
+                = yield
+              
+            .span4
+              .sidebar-wrapper
+                = yield :sidebar
+      
+    = render partial: 'layouts/footer'
+    
+    = yield :end_of_body
+
+    = render partial: 'layouts/vendor_scripts'
+    
+    :javascript
+      function resizeSidebarBackground() {
+        $(".sidebar").width($(document).width() - $(".sidebar-wrapper").position().left - 40);
+        var contentHeight = $(".footer").position().top - $(".main-content-sidebar").position().top;
+        if ($(".sidebar").height() < contentHeight) {
+          $(".sidebar").height(contentHeight);
+        }
+      }
+  
+      $(function() {
+        resizeSidebarBackground();
+      });
+  
+      $(window).resize(function() {
+        resizeSidebarBackground();
+      });

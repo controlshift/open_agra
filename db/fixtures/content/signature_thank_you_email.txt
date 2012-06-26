@@ -1,0 +1,35 @@
+<p>
+{{ signature.first_name}},
+</p>
+
+<p>
+Thank you for signing the campaign: {{ signature.petition.title | escape }}.
+</p>
+
+<p>
+The more people are behind an issue - the more likely it is that decision makers will pay attention.  Each name that is added to a campaign takes it one step closer to succeeding.
+</p>
+
+<p>
+Can you help spread the word about the campaign by sharing it with your friends and family?
+</p>
+
+<p>
+<a href="{% facebook_share_url %}">Share on facebook.</a>
+</p>
+
+<p>
+<a href="{% twitter_share_url %}">Share on twitter.</a>
+</p>
+
+<p>
+You can also share the campaign by forwarding the email below.
+</p>
+
+<p>
+Thanks for all that you do,
+</p>
+
+<p>
+The {{ signature.petition.organisation.name | escape}} team.
+</p>

@@ -1,0 +1,22 @@
+.row
+  .span8.offset2
+    .center
+      = title "Thanks for signing!"
+      %br
+
+      .panel.win-petition
+        .center.mb20
+          Share "#{@petition.title}" petition with your network
+        .clear
+        .share-buttons
+          = render partial: 'petitions/view/social_share'
+
+      %p
+        #{ current_organisation.name } is a site that allows anyone to create a campaign for progressive social change.
+
+      %p
+        = link_to "Create your own campaign", new_petition_path(:source => 'signature_thank_you'), {:class => 'btn'}
+
+      %p
+        We'll connect you to help and tools every step of the way.
+      .clear

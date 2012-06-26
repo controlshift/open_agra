@@ -1,0 +1,23 @@
+!!! 5
+%html{"xmlns:og" => "http://ogp.me/ns#"}
+  %head
+    = render partial: 'layouts/common_html_head'
+    = render partial: 'layouts/customised_html_head'
+    = yield :head
+
+  %body{ class: "mobile body-#{controller_name} body-#{controller_name}-#{action_name}" }
+    = render partial: 'layouts/header'
+    
+    .main
+      
+      = yield :before_content
+
+      .main-content
+        .container
+          = render 'layouts/flash_messages'
+          = yield
+
+    = render partial: 'layouts/footer'
+    = yield :end_of_body
+    = render partial: 'layouts/vendor_scripts'
+

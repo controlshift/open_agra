@@ -1,0 +1,21 @@
+.well{ style: "padding: 8px 0" }
+  %ul.nav.nav-list
+    %li
+      = link_to group_manage_path(@group) do
+        %i.icon-home
+        = @group.title
+    %li.nav-header Petitions
+    %li
+      = link_to group_petitions_path, {:id => 'all-group-petitions'} do
+        %i.icon-comment
+        All
+    %li
+      = link_to hot_group_petitions_path do
+        %i.icon-fire
+        Hot
+
+    %li.nav-header Export
+    %li
+      = link_to export_group_manage_path do
+        %i.icon-download
+        People

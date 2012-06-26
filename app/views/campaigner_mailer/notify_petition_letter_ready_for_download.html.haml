@@ -1,0 +1,11 @@
+%p Hi #{@petition.first_name},
+
+%p
+  The petition delivery letter for #{@petition.title} is ready.
+
+%p  
+  #{link_to "Download the PDF of all signatures to deliver", @petition.petition_letter.url}
+
+%p Thanks,
+
+%p The #{@petition.organisation.name} Team

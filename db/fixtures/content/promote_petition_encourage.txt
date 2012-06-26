@@ -1,0 +1,49 @@
+<p>
+Dear {{ recipient.first_name }},
+</p>
+
+<p>
+Your petition only needs another 10 signatures before it hits 100. Congratulations – that's a massive achievement. The {{ petition.organisation.name }} team will keep an eye on those campaigns that are building momentum, so if you can get to 100 signatures, a campaigner with our team will get in touch to talk to you about your campaign and how we might be able to help you take it further.
+</p>
+
+<p>
+Why not email your supporters and ask them to share the petition through their networks so you can get even more people on board?  Remember this isn't just about getting names – it's about building a movement and a power base that will help you create the change you want to see.
+</p>
+
+<p>
+{{ 'Email your current supporters' | link_to_new_petition_email:petition }}
+</p>
+
+<p>
+There is a template email you can send your supporters below – just edit the text and copy it into the {{ 'email blasting tool' | link_to_new_petition_email:petition }}.
+</p>
+
+<p>
+Good luck!
+</p>
+
+<p>
+The {{ petition.organisation.name }} team
+</p>
+
+{% if petition.organisation.has_campaigner_feedback_link? %}
+  <p>
+  PS – Do you have feedback about the site or need help? {{ 'Post your suggestion or query on our feedback page.' | link_for:petition.organisation.campaigner_feedback_link, true }}.
+  </p>
+{% endif %}
+
+<hr/>
+
+<pre>
+Dear Friend,
+
+We almost have 100 signatures on '{{ petition.title }}' - that's phenomenal.
+
+Thanks so much for your support so far. We’re really building momentum, and this is a great chance to spread the word further. Can you help get the campaign up to 100 signatures by sharing this link to the petition on Facebook or Twitter?
+
+{{ '' | link_to_petition:petition }}
+
+Thank you!
+
+{{ recipient.full_name }}
+</pre>

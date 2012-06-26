@@ -1,0 +1,81 @@
+#!/bin/bash
+if [ $# -ne 2 ]; then
+  echo "Usage: ci2_deploy <ruby_version> <revision_number>"
+  echo "Example: ci2_deploy 1.9.3-p0 5c44efc5ffe6a0d8b108067887c8cb5ea23cf37d"
+  exit 1
+fi
+ruby_version=$1
+revision_number=$2
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+if [ $? -ne 0 ]; then
+  echo An error occur with rvm script
+  exit 1
+fi
+
+# Installing ruby if it does not exist
+echo checking ruby version $ruby_version
+rvm use $ruby_version
+if [ $? -ne 0 ]; then
+  rvm install $ruby_version
+  rvm use $ruby_version
+fi
+
+# Installing bundler if it does not exit
+echo checking bundler
+bundle -v
+if [ $? -ne 0 ]; then
+  gem install bundler
+fi
+
+# if there is any error, the script will terminate
+set -e
+
+workspace=$PWD
+cd ..
+rvm rvmrc untrust $workspace
+
+cd "$workspace"
+
+rvm use --create ruby-$ruby_version@agra_deployment
+
+bundle check || bundle install --without staging production
+
+echo "Deploying tagged build $revision_number..."
+
+bundle exec rake heroku:deploy ENVIRONMENT=test-deploy TAG=$revision_number
+echo tagged build $revision_number deployed successfully!
+
+sleep 15s
+
+# in case the web is not finish rendering yet, we don't want to terminate it, but try again
+set +e
+
+echo "Checking http://agra-test-deploy.herokuapp.com/ for OK status..."
+response=$(curl -I --write-out %{http_code} --silent --output /dev/null http://agra-test-deploy.herokuapp.com/)
+
+if [ ${response} == 200 ]
+  then
+    echo "Done."
+else
+  echo "Expected response code: 200"
+  echo "  Actual response code: ${response}"
+
+  echo "Have a rest and Try again."
+  sleep 20s
+
+  # if there is any error, the script will terminate
+  set -e
+
+  echo "Checking http://agra-test-deploy.herokuapp.com/ for OK status..."
+  response=$(curl -I --write-out %{http_code} --silent --output /dev/null http://agra-test-deploy.herokuapp.com/)
+
+  if [ ${response} == 200 ]
+    then
+      echo "Done."
+  else
+    echo "Expected response code: 200"
+    echo "  Actual response code: ${response}"
+  fi
+fi
+

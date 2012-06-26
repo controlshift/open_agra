@@ -1,0 +1,6 @@
+= simple_form_for [:org, @group], validate: true, :wrapper => 'compact' do |form|
+  = form.input :title,  input_html: { class:  'span9'}
+  = form.input :description,  input_html: { class:  'span9'}
+  = form.input :image, as: :file
+  .actions
+    = form.button :submit

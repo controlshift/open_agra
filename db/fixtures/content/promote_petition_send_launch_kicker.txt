@@ -1,0 +1,35 @@
+<p>
+Dear {{ recipient.first_name }},
+</p>
+
+<p>
+I noticed that you haven't launched your campaign. This means you started a draft of a campaign, but you haven't saved it to the site yet.
+</p>
+
+<p>
+Launch your campaign: {{ '' | link_to_launch_petition:petition }}.
+</p>
+
+<p>
+Launching your campaign doesn't automatically make it public. No one will be able to see your campaign until you share the link via Facebook, Twitter or by emailing your contacts.
+</p>
+
+<p>
+You can launch your campaign, preview how it looks and explore the site, and even change the text of your campaign after you've launched it. Once you're ready you can start spreading the word about your campaign through social media, your email contacts, or offline in your community.
+</p>
+
+<p>
+Why not launch the campaign and explore the site:
+</p>
+
+<p>
+{{ '' | link_to_launch_petition:petition }}
+</p>
+
+<p>
+If you have any other questions or comments about {{ petition.organisation.name }} and launching your campaign please contact {{ petition.organisation.contact_email }}.
+</p>
+
+<p>
+The {{ petition.organisation.name }} team
+</p>

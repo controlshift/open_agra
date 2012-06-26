@@ -1,0 +1,7 @@
+%h3
+  Make #{@user.email} an administrator of #{@group.title}?
+
+= form_for [:org, @group, @user], :wrapper => 'compact' do |form|
+  .actions
+    = form.button 'Yes'
+

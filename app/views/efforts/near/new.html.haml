@@ -1,0 +1,14 @@
+- content_for :head do
+  %script{ type: "text/javascript", src:"http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"}
+  = javascript_include_tag 'efforts_location'
+
+.center
+  .row
+    .span12.mt30
+      = title "Find Your Closest #{@effort.title} Campaign"
+  .row
+    .span12.mt30
+      %form.big-efforts-search.effort-location-search{ action: effort_path(@effort), method: 'GET' }
+        %input.query-box#location_query{ name: 'location_query', placeholder: 'Address, City or Postcode', value: params[:location_query] }
+        %a.btn.btn-primary.search-btn#search-effort{ href: "#" }
+          Search

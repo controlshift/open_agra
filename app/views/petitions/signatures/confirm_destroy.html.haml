@@ -1,0 +1,9 @@
+= title "Are you sure?"
+%br
+
+%p
+  Are you sure you would like to remove your signature from
+  = @petition.title
+  ?
+
+= button_to 'Remove Signature', petition_signature_path(@petition, @signature.token), :method => :delete, :class => "btn btn-primary"

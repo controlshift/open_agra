@@ -1,0 +1,19 @@
+<% if is_mobile_device? %>
+
+  $('.thanks').html('<%= escape_javascript(render(:partial => "petitions/view/thanks.mobile")) %>');
+  History.pushState({state:2}, "Share Campaign", "?state=thanks");
+  showThanksPage();
+  
+<% else %>
+
+  $(".sidebar-box.share").html('<%= escape_javascript(render(:partial => "create")) %>');
+
+  $('body').append('<%= escape_javascript(render(partial: "petitions/view/email_template")) %>');
+
+  setInterval(function() {
+    $('.petition-signatures .number').text('<%= number_with_delimiter(@petition.cached_signatures_size) %>');
+  }, 100);
+
+  $('.sidebar-box.sign').slideUp(300);
+  
+<% end %>

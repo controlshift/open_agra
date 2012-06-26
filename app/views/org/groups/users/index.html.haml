@@ -1,0 +1,33 @@
+.breadcrumbs
+  = link_to 'Groups', org_groups_path, {:class => 'use-pjax'}
+  >
+  = link_to @group.title, org_group_path(@group), {:class => 'use-pjax'}
+  >
+  Users
+
+= title 'Group Admin Users'
+
+.row.mt20
+  .span5
+    %h4
+      Invite New Group Administrator
+    %p.mb10
+      The administrators that you invite will have access to a special admin area where they will be able to see
+      all of the petitions that are created inside the group
+      and export a CSV of all the signatures that includes email address.
+
+    = render partial: 'send_invitation_form'
+
+.row.mt20
+  .span10
+    %h4
+      Current Group Administrators
+
+    - if @users.any?
+      = table_for(@users) do |t|
+        = t.data do
+          - t.cell(:email) {| u | link_to(u.email, org_admin? ? edit_org_user_path(u) : edit_admin_user_path(u)) }
+          - t.cell(:organisation) {| u | u.organisation.name  }
+          - t.cell(:delete) {|u| button_to 'remove admin', org_group_user_path(@group, u), :method => :delete }
+    - else
+      This group has no administrators.

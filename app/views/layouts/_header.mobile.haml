@@ -1,0 +1,25 @@
+.header
+  .navbar
+    .navbar-inner
+      .container
+        %a.btn.btn-navbar{ 'data-toggle' => 'collapse', 'data-target' => '.nav-collapse' }
+          %span.icon-bar
+          %span.icon-bar
+          %span.icon-bar
+    
+        %a.brand{ href: root_path }= '&nbsp;'.html_safe
+  
+        .nav-collapse
+          %ul.nav.pull-right
+            - if user_signed_in?
+              - if can?(:manage, @petition)
+                %li=link_to "Manage #{@petition.title}", petition_manage_path(@petition)
+              %li= link_to 'My Campaigns', petitions_path
+              %li= link_to 'Start a campaign', new_petition_path(source: 'header')
+              %li.divider
+              %li= link_to 'Global Admin', admin_path if can?(:manage, :all)
+              %li= link_to 'Org Admin', org_path if can?(:manage, current_organisation)
+              %li= link_to 'Log out', destroy_user_session_path, method: :delete
+            - elsif show_login_link
+              %li= link_to 'Start a campaign', new_petition_path(source: 'header')
+              %li= link_to 'Log in', new_user_session_path, id: 'nav-login'

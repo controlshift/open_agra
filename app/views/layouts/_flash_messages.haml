@@ -1,0 +1,11 @@
+.alert.alert-success.fade.in{ class: (notice ? "" : "hide") }
+  %a.close{ href: "#", "data-dismiss" => "alert" }
+    =image_tag "tick.png"
+  %p= notice
+
+.alert.alert-error.fade.in{ class: (alert ? "": "hide")}
+  %a.close{ href: "#", "data-dismiss" => "alert" }
+    =image_tag "cross.png"
+  %p= alert
+
+= yield :specific_alerts

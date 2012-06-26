@@ -1,0 +1,58 @@
+- title "Manage Campaign"
+
+- content_for :head do
+  = stylesheet_link_tag "facebook_share_widget/application"
+  = javascript_include_tag "facebook_share_widget/application"
+  :css
+    body { overflow-x: hidden; }
+
+- if can?(:manage, @petition)
+  - content_for :before_content do
+    = render partial: "petitions/manage/petition_manage_breadcrumbs"
+
+- content_for :specific_alerts do
+  = render partial: "petitions/view/alert_if_petition_cancelled"
+
+.profile
+  Petition created on #{@petition.created_at.strftime("%B %d, %Y")}
+  = "&nbsp;&nbsp;|&nbsp;&nbsp;".html_safe
+  = link_to content_tag(:span, "Edit Petition") + image_tag("icon-edit.png"), edit_petition_manage_path(@petition)
+
+.row
+  .span6
+    %h1.title= @petition.title
+
+.row
+  .span7
+    .petition-progress-box
+      .petition-progress
+        = render partial: 'petitions/view/petition_progress',
+                 locals: { petition: @petition }
+      .petition-signatures
+        %span.number= number_with_delimiter(@petition.cached_signatures_size)
+        of
+        %span= number_with_delimiter(@petition.goal)
+        signatures
+      .share-buttons
+        %span.desc Share
+        = render partial: 'petitions/view/social_share'
+
+    %p
+      =cf('petition_manage_forum')
+      
+/ .row
+/   .span12
+/     - if session[:facebook_access_token].present?
+/       = render "/facebook_share_widget/facebook/widget"
+
+- content_for :sidebar do
+  .sidebar.manage
+    .container
+      .sidebar-box
+        = '&nbsp;'.html_safe
+      .sidebar-box
+        .signthepetition
+          .titlebar
+            %span.number= '>&nbsp;'.html_safe
+            %h2 Manage
+          = render partial: 'petitions/manage/manage_menu_bar', locals: {highlight_id: nil}

@@ -1,0 +1,16 @@
+.bundle
+db/*.sqlite3
+log/*.log*
+tmp/
+.sass-cache/
+.idea/
+*.swp
+*.tmproj
+.DS_Store
+./pg
+pg/
+public/system/
+solr/data
+solr/pids
+log/*log.lck
+tags

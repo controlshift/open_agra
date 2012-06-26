@@ -1,0 +1,14 @@
+- if @list.petitions.any?
+  = table_for(@list.petitions) do |t|
+    = t.data do
+      - t.cell(:title, heading: sortable(:title)) { |p| link_to(p.title, petition_path(p), class: petition_class(p)) }
+      - t.cell(:signatures, heading: sortable(:signatures_count, "Signatures"), cell_html: { class: "center" }) { |p| p.signatures_count }
+      - t.cell(:flags, heading: sortable(:petition_flags_count, "Flags"), cell_html: { class: "center" }) { |p| p.petition_flags_count }
+      - t.cell(:cancelled, heading: sortable(:cancelled), cell_html: { class: "center" }) { |p| p.cancelled? ? "&#10003".html_safe : "" }
+      - t.cell(:created_by) { |p| p.user.nil? ? "Nil" : link_to(p.user.full_name, org_admin? ? edit_org_user_path(p.user) : edit_admin_user_path(p.user)) }
+      - t.cell(:email) { |p| p.user.present? ? p.user.email : "-" }
+      - t.cell(:phone) { |p| p.user.present? ? p.user.phone_number : "-" }
+      - t.cell(:admin_status, heading: sortable(:admin_status))
+  = will_paginate @list.petitions
+- else
+  No petitions found.

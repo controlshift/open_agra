@@ -1,0 +1,2 @@
+- if Category.active(current_organisation.id).count > 0
+  = f.association :categories, as: :check_boxes, collection: Category.active(current_organisation.id), label: local_assigns.has_key?(:label) ? label : "Categories"

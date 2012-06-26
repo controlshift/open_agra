@@ -1,0 +1,195 @@
+body.mobile {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.main-content {
+  min-height: 240px;
+  
+  .container, .container-fluid {
+    padding: 0 12px 20px 12px;
+  }
+}
+
+.header {
+  .navbar {
+    background-color: #ffffff;
+  }
+  .nav li {
+    a {
+      @include remove-text-shadow();
+      &:hover {
+        background-color: #666666;
+      }
+    }
+  }
+  
+  .navbar-inner {
+    padding-right: 12px;
+    padding-left: 12px;
+    background-color: #fff;
+    @include background-image(linear-gradient(#ffffff 0%, #ffffff 100%));
+    @include border-radius(0);
+    @include box-shadow(rgba(0, 0, 0, 0.25) 0 0 8px 0 false);
+  }
+  
+  .btn-navbar {
+    background-color: #ffffff;
+    @include background-image(linear-gradient(#ffffff 0%, #eeeeee 100%));
+    &:hover {
+      background-position: 0 0;
+      background-color: #ffffff;
+    }
+    padding: 7px 10px;
+  }
+  
+  .icon-bar {
+    background-color: #eee;
+  }
+  
+  .brand {
+    margin-left: 0;
+    color: $fg-color;
+    width: 154px;
+    background: image-url('logo_mobile.png') no-repeat;
+    background-position: 0 12px;
+  }
+}
+
+.footer {
+  @include box-shadow(rgba(0, 0, 0, 0.25) 0 0 8px);
+  padding: 20px 12px 20px 12px;
+  color: $title-color;
+  font-size: 0.8em;
+  
+  a.parent-org {
+    color: $title-color;
+  }
+  
+  a.footer-link {
+	  padding: 0 4px;
+	}
+}
+
+// =============================================
+//	Share Buttons Styles
+// =============================================
+.btn-primary {
+  float: none;
+  padding: 10px 0 13px 0;
+  width: 100% !important;
+  font-size: 1.5em;
+}
+
+.btn-secondary {
+  font-size: 1em;
+  color: #999999;
+  float: none;
+  padding: 0;
+}
+
+.btn-back {
+  img {
+    vertical-align: -1px;
+  }
+}
+
+// =============================================
+//	Form Styles
+// =============================================
+
+label {
+  font-size: 1.1em;
+}
+
+input, textarea {
+  font-size: 1.1em;
+}
+
+// =============================================
+//	Petition show page
+// =============================================
+.mobile.body-view-show {
+  input[type=text], input[type=email] {
+    float: none;
+    margin-left: 0;
+    display: block;
+    width: 100%;
+    min-height: 28px;
+    @include box-sizing(border-box);
+  }
+  
+  .input-why, .checkbox-why {
+    display: none;
+  }
+  
+  .checkbox {
+    margin: 20px 0;
+  }
+  
+  .return-to-petition {
+    margin: 20px 0 10px 0;
+    display: block;
+  }
+  
+  .btn-border-dark {
+    border: 0;
+  }
+}
+
+// =============================================
+//	Thanks for signing page
+// =============================================
+
+a.share.facebook { @include bg-image('btn-share-facebook.png') }
+a.share.twitter { @include bg-image('btn-share-twitter.png') }
+a.share.email { @include bg-image('btn-share-email.png') }
+
+.win-petition {
+  padding: 15px 0px;
+
+  .row {
+    text-align: left;
+  }
+
+  .share-buttons {
+    margin:0 auto;
+    width: 160px;
+
+    .facebook {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.petition-box {
+  h1.title {
+    margin: 0 0 10px 0;
+  }
+  h2.who {
+    margin: 0 0 10px 0;
+    line-height: 1.2em;
+  }
+  h3.subtitle {
+    margin-top: 30px;
+    font-size: 1.1em;
+  }
+  .petition-text {
+    pre.what {
+      font-style: normal;
+    }
+    pre.why {
+      font-size: 1.1em;
+    }
+    pre.delivery {
+      font-size: 1.1em;
+    }
+  }
+  img {
+    @include border-radius(5px);
+  }
+}
+
+.popover-inner {
+  width: 210px;
+}

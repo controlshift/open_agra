@@ -1,0 +1,17 @@
+.manage-petitions-breadcrumbs
+  .container
+    = link_to "My Campaigns", petitions_path
+    
+    = image_tag "bullet-pointer.png"
+    - if controller.controller_name == "view" && controller.action_name == "show"
+      = truncate(@petition.title, length: 25)
+      = link_to "(Manage the petition)", petition_manage_path(@petition), class: "view"
+    - elsif controller.controller_name == "manage" && controller.action_name == "show"
+      = truncate(@petition.title, length: 25)
+      = link_to "(View the petition)", petition_path(@petition), class: "view"
+    - else
+      = link_to truncate(@petition.title, length: 25), petition_manage_path(@petition)
+      
+    - if controller.controller_name == "signatures" && controller.action_name == "manual_input"
+      = image_tag "bullet-pointer.png"
+      = link_to "Collect Signatures on Paper", offline_petition_manage_path(@petition)

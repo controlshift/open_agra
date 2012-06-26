@@ -1,0 +1,10 @@
+.manage-menu
+  .container
+    %span.petition-menu-home-item
+      = link_to petition_manage_path(@petition) do
+        .strong Manage
+        petition
+      
+    = image_tag 'bullet-pointer-large.png'
+
+    = render partial: 'petitions/manage/manage_menu_bar', locals: {highlight_id: highlight_id}

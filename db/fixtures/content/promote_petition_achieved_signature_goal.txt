@@ -1,0 +1,61 @@
+<p>
+Dear {{ recipient.first_name }},
+</p>
+ 
+<p>
+Congratulations.
+</p>
+
+<p>
+Your petition ('{{ petition.title }}') just hit 100 signatures.  That's an incredible achievement.
+</p>
+
+<p>
+This is a huge turning point and an important opportunity to build on your campaign's momentum and take it to the next level.  Someone from our team will be in touch with you soon to talk about your campaign and how it's going.
+</p>
+
+Meanwhile, here are some potential next steps to mull over: 
+ 
+<p>
+Spread the word by holding an event:
+</p>
+
+<p>
+Bring your supporters together to brainstorm different ways you can spread the word within your community. You could do a stunt to attract local media attention, or you could set up a stall with flyers and petition sheets. It's really just about getting out there and talking to people about why your campaign is important and how they can make a meaningful difference.
+</p>
+
+<p>
+Deliver your petition:
+</p>
+
+<p>
+Now that you have a solid amount of support, why not contact your petition's target to organise a time to meet?
+</p>
+
+<p>
+You can read tips about delivering your petition here and you can {{ 'download a copy of your petition' | link_to_deliver_petition_manage:petition }}, complete with signatures.
+</p>
+
+<p>
+Contact local media:
+</p>
+
+<p>
+This might sound scary – but the truth is that local media are always looking for feel good, local stories that are relevant to your area.
+</p>
+ 
+<p>
+Call or email your local newspaper and let them know about the issue you're working on and the success of your campaign. The trick is to keep it simple and concise.  Let them know a bit about what's motivating you and the other supporters to take action, and how you've now hit an important milestone that shows a strong level of community support. If you plan on holding an event or delivering your petition, make sure you tell them the details so they can cover that too.
+</p>
+
+<p>
+No matter what step you decide to take remember that your petition blossomed because your supporters helped share and spread the word about the campaign.  You can {{ 'send them an email' | link_to_new_petition_email:petition }} to thank them, let them know the good news and talk about what the next steps of the campaign are.
+</p>
+ 
+<p>
+Congratulations and good luck with the next stage of the campaign.
+</p>
+ 
+<p>
+The {{ petition.organisation.name }} team
+</p>

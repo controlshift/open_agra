@@ -1,0 +1,32 @@
+= title "My Account"
+
+%br
+
+.row
+  .span5
+    %h3 Account Details
+    %br
+    = simple_form_for @user, url: account_path, wrapper: :compact, html: { method: :put } do |f|
+      = f.input :first_name, label: "First name", input_html: { validate: { format: false } }
+      = f.input :last_name, label: "Last name", input_html: { validate: { format: false } }
+      = label_tag :email
+      %br
+      %div= @user.email
+      %br
+      = f.input :phone_number, label: "Phone Number"
+      = f.input :postcode, label: "Postcode"
+      = check_box :user, :opt_out_site_email
+      = label_tag :opt_out_site_email, "Opt out site email", for: "user_opt_out_site_email"
+
+      .actions.mt20
+        = f.button :submit, "Save"
+        
+  .span5
+    %h3 Change Password
+    %br
+    = simple_form_for @user, as: "user_password", url: account_update_password_path, wrapper: :compact, html: { method: :put } do |f|
+      = f.input :current_password, label: "Current password", required: true
+      = f.input :password, label: "New password", required: true
+      = f.input :password_confirmation, label: "Confirm your new password", required: true
+      .actions
+        = f.button :submit, "Change my password"

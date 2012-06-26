@@ -1,0 +1,25 @@
+%title= content_for?(:title) ? content_for(:title) : current_organisation.name
+
+- cache("v1_common_html_head_#{current_organisation.cache_key}", expires_in: 10.seconds) do
+  / this changes on each deploy, so short expiry.
+  %link{rel: 'stylesheet', type: 'text/css', href: 'http://fonts.googleapis.com/css?family=Bree+Serif' }
+  - if Agra::Application.assets.find_asset("organisations/#{current_organisation.slug}/application")
+    = stylesheet_link_tag  "organisations/#{current_organisation.slug}/application"
+  - else
+    = stylesheet_link_tag  'organisations/default/application'
+  /[if IE 8]
+    = stylesheet_link_tag  'ie8'
+  /[if IE 7]
+    = stylesheet_link_tag  'ie7'
+
+  - if Rails.env.production?
+    %script{ type: 'text/javascript', src: 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js' }
+  - else
+    = javascript_include_tag 'jquery'
+
+  = javascript_include_tag 'application'
+
+
+= csrf_meta_tags
+
+%meta{name: 'google-site-verification', content: 'VFiKo1LFZ91jj-NyqqMNTmKqMTim1ndqee8JCFeAbi4'}

@@ -1,0 +1,35 @@
+- title "Manage Campaign"
+
+- if can?(:manage, @petition)
+  - content_for :before_content do
+    = render partial: "petition_manage_breadcrumbs"
+    
+%h1 We Found A Problem With "#{@petition.title}"
+%br
+
+.row
+  .span7
+    %p We're concerned that the content of your petition might be inappropriate.
+    %p.strong A site admin said...
+    .well
+      = simple_format(@petition.admin_reason)
+      
+    .center
+      .inline-block.vmiddle
+        Edit your petition to correct this issue.
+        %br
+        We'll review any changes you make.
+      =link_to "Edit Petition", edit_petition_manage_path(@petition), class: "btn"
+    
+    %br
+    %hr
+    %p You can also get in touch to tell us more about the fight you're trying to win, and we may have a second look and re-enable your petition.
+    %br
+    = render partial: 'shared/errors', locals: { error_obj: @email }
+    = simple_form_for @email, :url => contact_admin_petition_manage_path(@petition), :validate => true, :wrapper => :compact do |f|
+      %label To: The #{current_organisation.name} Team
+      %br
+      %br
+      = f.input :subject, :label=>"Subject", :input_html => { :class => 'span7' }
+      = f.input :content, :as => :text, :label=>"Content", :input_html => { :class => 'span7', :rows => 8 }
+      = f.button :submit, "Send", class: 'btn-primary', disable_with:  "Sending…"

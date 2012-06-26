@@ -1,0 +1,5 @@
+- if @petitions.next_page
+  .more-campaigns-next
+    = link_to group_path(@group, page: @petitions.next_page) do
+      More Campaigns
+      %span.arrow= "&#9654;".html_safe

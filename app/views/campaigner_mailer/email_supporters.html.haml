@@ -1,0 +1,8 @@
+= raw(@content)
+
+- unless @is_campaign_admin
+  %br
+  %br
+  If you don't want to receive emails from the '#{@petition.title}' campaign in the future, please
+  #{link_to "unsubscribe", unsubscribing_petition_signature_url(@petition, "___token___")}.
+

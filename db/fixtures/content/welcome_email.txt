@@ -1,0 +1,61 @@
+<p> {{ recipient.first_name}}, </p>
+
+<p>
+Congratulations - you've just started a petition on: {{ petition.title }}
+</p>
+
+<p>
+Now let's get it to a 100 signatures. Here’s how:
+</p>
+
+<p>
+Step 1: Email your friends about the campaign.
+</p>
+
+
+<p>
+There’s a handy email below that you can forward to your friends or family asking them to join your campaign.
+</p>
+
+
+<p>
+Step 2: Share on Facebook and Twitter
+</p>
+
+<p>
+The great thing about social media is that people start sharing your campaign! For each person that clicks share an average of 100 more people will see your campaign.
+</p>
+
+<p>
+{{ 'Share your campaign on facebook or twitter.' | link_to_manage_petition:petition }}
+</p>
+
+<p>
+Good luck with the campaign,
+</p>
+
+<p>
+The {{ organisation.name }} team
+</p>
+
+<hr />
+
+
+<pre>
+  Dear Friends,
+
+  I just added the petition: {{petition.title}}.
+
+  It would mean a lot to me if you took a moment to add your name because:
+  {{ petition.why }}
+
+  {% petition_url %}
+
+  Real change happens when everyday people like you and I come together and stand up for what we believe in.  Together we can reach heaps of people and help create change around this important issue.
+
+  After you've signed the petition please also take a moment to share it with others.  It's super easy – all you need to do is forward this email.
+
+  Thank you!
+
+  {{ recipient.name }}
+</pre>

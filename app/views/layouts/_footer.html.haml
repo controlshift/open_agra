@@ -1,0 +1,19 @@
+- cache("v2_footer_#{current_organisation.cache_key}") do
+  .footer
+    .container
+      .logo-footer
+      - if current_organisation.parent_name.present?
+        .left.power-by
+          Powered by
+          %strong
+            = link_to current_organisation.parent_name, current_organisation.parent_url, class: "parent-org"
+          .mt10
+
+      .right
+        = link_to "Terms & Conditions", tos_path, class: "footer-link"
+        = link_to "Community", community_path, class: "footer-link"
+        = link_to "Privacy", privacy_policy_path, class: "footer-link"
+        = link_to "About us", about_us_path, class: "footer-link"
+        = link_to "Media", media_path, class: "footer-link"
+        = facebook_image_link
+        = twitter_image_link

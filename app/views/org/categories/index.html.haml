@@ -1,0 +1,13 @@
+.row
+  .span7
+    = title "Categories"
+  .span3
+    = link_to 'New Category', new_org_category_path, class: "btn btn-primary"
+
+%br
+- if @categories.any?
+  = table_for(@categories) do |t|
+    = t.data do
+      - t.cell(:name) { |c| link_to(c.name, edit_org_category_path(c), {:class => 'use-pjax'}) }
+- else
+  No categories found.

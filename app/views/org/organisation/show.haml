@@ -1,0 +1,21 @@
+= title "#{current_organisation.name} Admin"
+%br
+
+.admin_major_stat#total_petitions_count
+  .number
+    = number_with_delimiter(current_organisation.petitions.not_orphan.size, :delimiter => ",")
+  .subtle
+    Petitions Created
+
+
+.admin_major_stat#total_signatures_count
+  .number
+    = number_with_delimiter(current_organisation.signatures.size, :delimiter => "," )
+  .subtle
+    Signatures Collected
+
+.admin_major_stat#total_signatures_count
+  .number
+    = number_with_delimiter(current_organisation.blast_emails.size, :delimiter => ",")
+  .subtle
+    Emails Sent

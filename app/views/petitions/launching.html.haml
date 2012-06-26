@@ -1,0 +1,114 @@
+.row
+  .span9.offset1
+    .launch
+      = render partial: "petitions/petition_chevron"
+      
+    .mb20
+      .center
+        Like what you see?  Click Edit to make changes or Launch to make your petition live.
+    .petition-box-actions
+      = link_to ab_test(:launch_petition_button_label), launch_petition_path(@petition), id: 'launch-petition', class: "btn btn-primary", method: :put
+      = link_to "Edit", edit_petition_path(@petition), class: "btn btn-secondary"
+      .clear
+
+    .petition-box.launching
+      %h2.who To: #{@petition.who}
+      = title @petition.title
+      .profile
+        Campaign created by
+        %span.strong #{@petition.user.nil? ? "<blank>" : @petition.user.full_name}
+        on #{@petition.created_at.strftime('%d %b %Y')}
+      
+      .row
+        .span3
+          .upload-image-box-vertical
+            = form_for @petition, html: { id: "upload-image-form", multipart: true, class: 'form-stacked' }, remote: true do |f|
+              .upload-image{"data-changed-placeholder-url" => asset_path("petition-image-placeholder-form-changed.png") }
+                .preview-image
+                  = petition_image(@petition, :form)
+                .upload-field-wrapper
+                  .upload-field
+                    .label-wrapper
+                      %label{ for: 'petition_image' } Upload an image
+                    %button#fake-upload-btn Choose File
+                    .image-upload-input.transparent
+                      = f.file_field :image, accept: "image/jpeg,image/gif,image/png"
+                    .mt10
+                      = image_tag "ajax-loader-16.gif", id: "status-img", class: "hide", style: "vertical-align:middle"
+                      %span#status-text.status-text
+          
+          #add-category.mt20
+            %a#add-categories{ href: "#category-modal", "data-toggle" => "modal" } Select Categories...
+            %ul#selected-categories
+            
+        .span5
+          .petition-text
+            %pre.what= auto_link(h(@petition.what), :html => { :target => '_blank' })
+            %h3.subtitle Why is this important?
+            %pre.why= auto_link(h(@petition.why), :html => { :target => '_blank' })
+
+- content_for :end_of_body do
+  / render div at the end of body for fixing IE7 z-index problem
+  .modal.hide.fade#category-modal
+    .modal-header
+      %button.close x
+      %h3 Categories
+    .modal-body.petition-form
+      = simple_form_for @petition, validate: false, wrapper: :compact do |f|
+        = render partial: "/petitions/form_categories", locals: { f: f, label: "" }
+    .modal-footer
+      %a.btn.btn-primary{ href: "#" } Save
+      
+  :coffeescript
+    selectedCategories = #{@petition.categories.order('name').to_json(only: [:id, :name])}
+    
+    $ ->
+      updateSelectedPetitionCategories()
+      
+    $("#category-modal .btn-primary").click ->
+      categories = []
+      $(".petition-form input:checked").each ->
+        categories.push({ id: $(this).val(), name: $(this).siblings('label').text() })
+      selectedCategories = categories
+      updateSelectedPetitionCategories()
+      $('#category-modal').modal('hide')
+      return false
+      
+    $("#category-modal .close").click ->
+      $(".petition-form input").attr('checked', false)
+      for category in selectedCategories
+        $("#petition_category_ids_" + category.id).attr('checked', true)
+      $('#category-modal').modal('hide')
+    
+    updateSelectedPetitionCategories = ->
+      html = ""
+      categoryIds = []
+      for category in selectedCategories
+        html += "<li>\#{category.name}</li>"
+        categoryIds.push category.id
+        
+      $("#selected-categories").html(html)
+      
+      if categoryIds.length == 0
+        categoryIds.push("")
+        
+      $.ajax
+        type: 'POST'
+        url: '#{petition_path(@petition)}'
+        data: { 'petition': { 'category_ids': categoryIds }, '_method': 'PUT' }
+    
+    beginUpload = ->
+      $('.btn.primary, .btn-secondary').click(-> return false)
+      $('.btn.primary, .btn-secondary').attr('disabled', 'disabled')
+
+      $('#status-text').text('uploading...')
+      $('#status-img').show()
+      $('#upload-image-form').submit()
+
+    $('#petition_image').change ->
+      if $('#petition_image').val() != ''
+        beginUpload()
+
+    $('#fake-upload-btn').click ->
+      $('#petition_image').click()
+      return false

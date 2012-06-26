@@ -1,0 +1,32 @@
+.body-groups-show {
+  .admin-link {
+    color: $fg-color;
+    text-decoration: underline;
+  }
+  
+  hr {
+    margin: 10px 0 18px 0;
+  }
+  
+  .featured-petitions {
+    margin-top: 50px;
+  }
+  
+  .group-image {
+    width: 100%;
+  }
+  
+  .petition-image {
+    width: 290px !important;
+    height: 190px !important;
+
+    img {
+      width: 290px !important;
+      max-width: 290px !important;
+    }
+  }
+
+  .caption {
+    width: 290px !important;
+  }
+}

@@ -1,0 +1,99 @@
+- title @petition.title
+
+/ facebook meta tags
+- content_for :head do
+  %meta{property: "og:title", content: "#{@petition.title}"}
+  %meta{property: "og:url", content: "#{petition_url(@petition)}"}
+  %meta{property: "og:description", content: "#{@petition.title}. #{@petition.why}"}
+  %meta{property: "og:image", content:"#{petition_image_for_share(@petition)}"}
+  :css
+    body { overflow-x: hidden; }
+
+- if can?(:manage, @petition)
+  - content_for :before_content do
+    = render partial: "petitions/manage/petition_manage_breadcrumbs"
+
+- content_for :specific_alerts do
+  = render partial: "petitions/view/alert_if_petition_cancelled"
+  = render partial: "petitions/view/alert_if_petition_prohibited"
+
+- is_org_admin = can?(:manage, @petition.organisation)
+- if is_org_admin
+  = render partial: "petitions/view/petition_admin_tools"
+
+.petition-box
+  %h2.who To: #{@petition.who}
+  .row
+    .span6
+      %h1.title= @petition.title
+  .profile
+    Campaign created by
+    %span.strong #{@petition.user.full_name}
+    on #{@petition.created_at.strftime('%d %b %Y')}
+    - if @petition.campaigner_contactable && !is_org_admin
+      - content_for :end_of_body do
+        / render div at the end of body for fixing IE7 z-index problem
+        = render partial: "shared/contact_user_form", locals: { user: @petition.user, url: contact_petition_path(@petition) }
+      %a{ href: "#contact_user_form", id: "view_contact_user_form", "data-toggle" => "modal", "data-backdrop" => 'true', "data-keyboard" => "true" }
+        = image_tag "icon-email.png"
+        
+    - if is_org_admin
+      %br
+      %b.icon-envelope
+      = @petition.user.email
+      %br
+      %b.icon-bullhorn
+      = @petition.user.phone_number
+
+  - cache("v1_petition_show_#{@petition.cache_key}") do
+    .row
+      - content_span_size = "span6"
+      - unless @petition.image_file_name.blank?
+        - content_span_size = "span5"
+        .span3.mb20
+          = petition_image(@petition, :hero)
+
+      %div{ class: "#{content_span_size}" }
+        .petition-text
+          %pre.what= auto_link(h(@petition.what), :html => { :target => '_blank' })
+          %h3.subtitle Why is this important?
+          %pre.why= auto_link(h(@petition.why), :html => { :target => '_blank' })
+          - if @petition.delivery_details && !@petition.delivery_details.blank?
+            %h3.subtitle How it will be delivered
+            %pre.delivery= auto_link(h(@petition.delivery_details), :html => { :target => '_blank' })
+          - if @petition.categories.count > 0
+            .mb20
+              %strong Category:
+              - @petition.categories.each do |category|
+                %span.label= link_to category.name, category
+        .clear
+      
+  = button_to "Flag this petition for review", petition_flags_path(@petition), class: "btn-flag"
+
+  - cache("v1_petition_show_#{current_organisation.id}_signatures_#{@petition.cache_key}", expires_in: 30.seconds) do
+    = render partial: "petitions/view/show_signatures_or_not"
+  
+- content_for :sidebar do
+  - show_share_buttons = current_organisation.show_share_buttons_on_petition_page?
+  .sidebar
+    .container
+      - cache("v1_petition_show_#{current_organisation.id}_progress_bar_#{@petition.cache_key}", expires_in: 30.seconds) do
+        .sidebar-box
+          = render "petitions/view/show_progress_bar_or_not"
+
+      .sidebar-box.sign
+        .signthepetition
+          .titlebar
+            %h2 Sign
+          .signthepetition-form
+            - if @signature.errors.any? || user_signed_in?
+              = render partial: "petitions/view/sign"
+            - else
+              = render partial: "petitions/view/sign"
+      
+      .sidebar-box.share
+        - if show_share_buttons
+          .social_share
+            .titlebar
+              %h2 Share
+            = render partial: '/petitions/view/social_share'

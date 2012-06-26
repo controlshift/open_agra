@@ -1,0 +1,14 @@
+- title "Collect Signatures"
+
+- content_for :before_content do
+  = render partial: "petition_manage_breadcrumbs"
+  = render partial: "petition_manage_menu", locals: {highlight_id: "manage-collect"}
+  
+.row
+  .span8.offset2
+    =cf('petition_manage_offline_content')
+    
+    .mt20
+      = link_to "Printable Blank Form", download_form_petition_manage_path, class: "btn btn-primary left"
+      = link_to "Enter Petition Signatures", manual_input_petition_signatures_path(@petition), class: "btn btn-primary"
+

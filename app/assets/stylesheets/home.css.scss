@@ -1,0 +1,277 @@
+// Place all the styles related to the home controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.body-home {
+  .home-banner {
+    position: relative;
+    width: 100%;
+    height: 525px;
+    overflow: hidden;
+
+    .overlay-left {
+      position: absolute;
+      width: 45%;
+      height: 100%;
+      left: 0;
+      z-index: 40;
+      background: image-url("bg-stripe-black.png");
+      opacity: 0.9;
+      filter: alpha(opacity=90);
+    }
+
+    .overlay-right {
+      position: absolute;
+      width: 1%;
+      height: 100%;
+      right: 0;
+      z-index: 41;
+      background: image-url("bg-stripe-black.png");
+      opacity: 0.8;
+      filter: alpha(opacity=80);
+    }
+
+    .wordings {
+      position: absolute;
+      left: 45%;
+      width: 420px;
+      z-index: 50;
+      text-align: right;
+      margin-left: -450px;
+
+      .highlight {
+        color: #ffffff;
+        font: $title-font;
+        font-size: 30pt;
+        line-height: 32pt;
+        margin-top: 100px;
+        text-transform: uppercase;
+        min-height: 210px;
+      }
+
+      .number {
+        font-family: $georgia-font-family;
+        font-weight: bold;
+        font-style: italic;
+        font-size: 38pt;
+      }
+
+      .subtle {
+        color: #a1a1a1;
+        font-family: $subtitle-font-family;
+        font-style: italic;
+        font-size: 10pt;
+        line-height: 10pt;
+      }
+
+      .about-and-contact, .about-and-contact a {
+        margin-top: 60px;
+        color: #a1a1a1;
+        font-family: $description-font-family;
+        font-weight: bold;
+        font-size: 10pt;
+      }
+      
+      .btn-start-petition {
+        display: inline-block;
+        position: relative;
+        width: 278px;
+        height: 58px;
+        margin-top: 40px;
+        @include toggle-bg-image($btn-home-main-url);
+        text-decoration: none;
+        .text {
+          position: absolute;
+          top: 14px;
+          left: 65px;
+          color: #fff;
+          @include text-shadow(rgba(0, 0, 0, 0.25) 0 1px 0);
+          font: $title-font;
+          font-size: 20px;
+          text-transform: uppercase;
+        }
+      }
+
+      .btn-register-your-interest {
+        display: inline-block;
+        width: 278px;
+        height: 58px;
+        margin-top: 40px;
+        @include toggle-bg-image('btn-register-your-interest.png');
+      }
+    }
+
+    .spotlight {
+      position: absolute;
+      z-index: 30;
+      display: inline-block;
+      left: 45%;
+    }
+  }
+
+  .featured-petitions-logo {
+    position: absolute;
+  }
+
+  .featured-more {
+    width: 300px;
+    float: right;
+    margin-top: 20px;
+    font-size: 10pt;
+    font-weight: normal;
+    font-style: italic;
+    font-family: $subtitle-font-family;
+    line-height: 8pt;
+
+    a { width: 240px; }
+    img { vertical-align: baseline; margin-left: 2px; }
+  }
+
+  .happening-now {
+    margin-top: 10px;
+
+    h3 {
+      color: $title-color;
+      font: $title-font;
+      font-size: 14pt;
+      text-transform: uppercase;
+    }
+  }
+
+  .explain-site {
+    h3, h4 {
+      color: $title-color;
+    }
+    h3 {
+      font: $title-font;
+      font-size: 14pt;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    h4 {
+      font-size: 10pt;
+      font-family: $description-font-family;
+    }
+    p {
+      color: $content-color-light;
+      font-family: $description-font-family;
+    }
+    p.important {
+      img { vertical-align: top; margin-right: 10px; }
+    }
+  }
+
+  .jcarousel-container-horizontal {
+    width: 590px;
+
+    .jcarousel-clip-horizontal {
+      overflow: visible;
+      width: 590px;
+      height: 525px;
+    }
+
+    .jcarousel-prev {
+      position: absolute;
+      top: 372px;
+      left: 50px;
+      width: 20px;
+      height: 34px;
+      @include toggle-bg-image('petition-carousel-prev.png');
+      cursor: pointer;
+    }
+
+    .jcarousel-next {
+      position: absolute;
+      top: 372px;
+      right: 50px;
+      width: 20px;
+      height: 34px;
+      @include toggle-bg-image('petition-carousel-next.png');
+      cursor: pointer;
+    }
+  }
+
+  .petition_carousel {
+    li {
+      position: relative;
+      width: 590px;
+      height: 525px;
+      line-height: 0;
+    }
+
+    .list-item-image {
+      position: absolute;
+      margin: 0px;
+      overflow: hidden;
+      width: 590px;
+      height: 525px;
+    }
+
+    .list-item-image img {
+      width: 100%;
+      min-width: 590px;
+      min-height: 525px;
+      height: auto;
+    }
+
+    .list-item-desc-box {    
+      position: absolute;
+      display: none;
+      top: 350px;
+      width: 590px;
+      height: 80px;
+      background-color: #000000;
+      opacity: 0.8;
+      filter: alpha(opacity=80);
+    }
+
+    .list-item-desc {
+      margin-left: 90px;
+      margin-top: 10px;
+      width: 410px;
+      height: 60px;
+      line-height: 20px;
+      overflow: hidden;
+      text-overflow:ellipsis;
+
+      .list-item-title {
+        color: $accent-color;
+        font-weight: bold;
+        word-wrap: break-word;
+        word-break: normal;
+      }
+
+      .list-item-why {
+        color: #ffffff;
+        word-wrap: break-word;
+        word-break: normal;
+      }
+    }
+  }
+}
+
+.body-categories {
+  .nav-tabs {
+    width: 140px;
+    max-width: 140px;
+  }
+  
+  .nav-tabs {
+    a {
+      color: #999999;
+    }
+    .active > a {
+      font-weight: bold;
+      color: $accent-color;
+    }
+    .active > a, .active > a:hover {
+      border-left: solid 3px $accent-color;
+    }
+    .active > a:hover {
+      background-color: #fff;
+    }
+    a:hover {
+      background-color: rgba($accent-color, 0.1);
+    }
+  }
+}

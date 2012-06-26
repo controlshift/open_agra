@@ -1,0 +1,520 @@
+@import "home.css.scss";
+@import "petitions.css.scss";
+@import "efforts.css.scss";
+@import "groups.css.scss";
+@import "admin.css.scss";
+
+html, body {
+  height: 100%;
+}
+
+a { cursor: pointer; }
+[class^="icon-"] { background-image: image-url("glyphicons-halflings.png") !important; }
+
+.shadow { @include box-shadow(#000000 0 0 20px 0 false); }
+
+.arrow-link{
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-right: 20px;
+  padding-right: 10px;
+  background: image-url("header-arrow.png") no-repeat center right;
+}
+
+.word-wrap {
+  word-wrap: break-word;
+  word-break: normal;
+}
+
+// =============================================
+//	Header and Footer Styles
+// =============================================
+
+.main {
+  position: relative;
+  height: 100%;
+  height: auto;
+  min-height: 100%;
+  margin-bottom: -60px;
+
+  background: {
+    color: #ffffff;
+    image: image-url("bg-footer-stripe.png");
+    repeat: repeat-x;
+    position: left bottom;
+  }
+}
+
+.navbar {
+  margin-bottom: 0;
+
+  .navbar-inner {
+    background: {
+      color: #ffffff;
+      image: none;
+    }
+    @include border-radius(0);
+    @include remove-shadow;
+    
+    .container {
+      width: 940px;
+    }
+  }
+
+  .logo {
+    width: 154px;
+    height: 50px;
+    float: left;
+    background: image-url("logo-controlshift.png") no-repeat;
+    position: relative; top: 0px;
+  }
+
+  .nav > li > a {
+    padding-top: 10px;
+  }
+  
+  .nav li a {
+    display: inline-block;
+    background-repeat: no-repeat;
+    font: $title-font;
+    text-transform: uppercase;
+    color: $title-color;
+    line-height: 28px;
+    padding-left: 32px;
+    margin-left: 12px;
+    @include remove-text-shadow;
+
+    &:hover {
+      color: #7d7d7d;
+    }
+  }
+
+  .dropdown.open .dropdown-toggle {
+    color: #999;
+  }
+  
+  #nav-start-petition { @include toggle-bg-image($nav-start-petition-url) }
+  #nav-login { @include toggle-bg-image($nav-login-url) }
+
+  #nav-user {
+    color: $accent-color;
+    padding-left: 10px;
+    
+    .caret {
+      position: relative;
+      border-top-color: $title-color !important;
+      top: 4px;
+      left: 4px;
+    }
+  }
+  
+  .profile-image {
+    width: 28px;
+    height: 28px;
+    margin-right: 5px;
+    vertical-align: top;
+  }
+
+  ul.dropdown-menu {
+    li a {
+      padding-left: 10px;
+      color: $accent-color;
+      font-family: $base-font-family;
+      text-transform: none;
+
+      &:hover {
+        color: #7d7d7d;
+        background-color: #ffffff;
+      }
+    }
+  }
+}
+
+.navbar-search {
+  margin: 11px 0 11px 30px;
+}
+
+.navbar-search, .admin-search, .effort-location-search {
+  .search-query {
+    width: 150px;
+    color: $search-color;
+    background-color: $search-bg-color;
+    border: 0;
+    padding: 4px 25px 4px 9px;
+
+    &:focus {
+      border: 0;
+      color: $search-color;
+      background-color: $search-bg-color;
+      padding: 4px 25px 4px 9px;
+    }
+  }
+  .search-button {
+    position: relative;
+    left: -30px;
+    top: 1px;
+    padding: 5px;
+
+    &:hover {
+      i {
+        opacity: 0.8;
+        // filter: alpha(opacity=80); don't do this IE filter thing, it screws up IE7,8
+      }
+    }
+    i {
+      opacity: 0.3;
+      // filter: alpha(opacity=30); don't do this IE filter thing, it screws up IE7,8
+    }
+  }
+}
+
+.main-content {
+  position: relative;
+  height: 100%;
+  
+  .container, .container-fluid {
+    position: relative;
+    height: 100%;
+    padding: 40px 0 120px 0;
+  }
+
+  background: {
+    image: image-url("bg-header-stripe.png");
+    repeat: repeat-x;
+    position: left top;
+  }
+}
+
+.main-content-sidebar {
+  position: relative;
+  height: 100%;
+  background: {
+    image: image-url("bg-header-stripe.png");
+    repeat: repeat-x;
+    position: left top;
+  }
+
+  .container {
+    height: 100%;
+    padding: 0 0 120px 0;
+  }
+
+  .content-wrapper {
+    padding-top: 40px;
+  }
+
+  .sidebar-wrapper {
+    position: relative;
+    min-height: 800px;
+  }
+}
+
+.footer {
+  position: relative;
+  clear: both;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  color: $fg-color;
+  font-size: $footer-font-size;
+  background-color: #ffffff;
+
+  .container {
+    position: relative;
+    top: 20px;
+  }
+
+  .power-by {
+    font-family: $description-font-family;
+    color: $subtle-color;
+  }
+  
+  .follow {
+    margin-top: -8px;
+  }
+
+  a.parent-org {
+    color: $subtle-color;
+  }
+
+  a.footer-link, .footer-link a, span.footer-text {
+    font-family: $subtitle-font-family;
+    font-style: italic;
+    color: $title-color;
+    padding: 0 8px;
+  }
+}
+
+.hidden {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
+
+// =============================================
+//	Popover Styles
+// =============================================
+.popover.top .arrow { border-top-color:$accent-color; }
+.popover.right .arrow { border-right-color:$accent-color; }
+.popover.bottom .arrow { border-bottom-color:$accent-color; }
+.popover.left .arrow { border-left-color:$accent-color; }
+.popover .popover-inner {
+  background-color: $accent-color;
+  .content { background-color: $bg_color; }
+}
+
+// =============================================
+//	Share Buttons Styles
+// =============================================
+a.share {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+
+  .text { display: none; }
+}
+
+a.share.facebook { @include toggle-bg-image('btn-icon-facebook.png') }
+a.share.twitter { @include toggle-bg-image('btn-icon-twitter.png') }
+a.share.email { @include toggle-bg-image('btn-icon-email.png') }
+
+.table th a {
+  color: #333;
+}
+
+//pagination styles - to be inline with bootstrap settings
+.pagination em, .pagination span {
+  float: left;
+  line-height: 34px;
+  padding: 0 14px;
+  border-right: 1px solid;
+  border-right-color: #ddd;
+  border-right-color: rgba(0, 0, 0, 0.15);
+  *border-right-color: #ddd;
+/* IE6-7 */
+
+  text-decoration: none;
+}
+
+// =============================================
+//	Registration and Login
+// =============================================
+.body-registrations, .body-sessions {
+  .btn-facebook-login {
+    position: relative;
+    font: normal 1.1em "Helvetica Neue",Helvetica,Arial,sans-serif;;
+    line-height: 1em;
+  	float: left;
+  	text-transform: none;
+  	@include border-radius(6px);
+  	@include background-image(linear-gradient(#5181c5 20%, #315d9b 100%));
+  	background-color: #315d9b;
+  	border-color: #7b9fd4 #5181c5 #315d9b;
+  	color: #ffffff;
+  	@include text-shadow(rgba(0, 0, 0, 0.25) 0 -1px 0);
+  	white-space: nowrap;
+  	padding: 5px 20px 8px 45px;
+  	filter: none;	//blanks out this IE8 specific fill... sass does not seam to process the filter parameters correctly
+
+  	&:hover {
+  	  background-color: #315d9b;
+  	  color: #ffffff;
+  	}
+
+  	img {
+  	  position: absolute;
+  	  bottom: 1px;
+  	  left: 10px;
+  	}
+
+  	.logo-seperator {
+  	  position: absolute;
+  	  top: 0;
+  	  left: 30px;
+  	  height: 100%;
+  	  width: 1px;
+  	  background-color: #7b9fd4;
+  	  border-right: solid 1px #315d9b;
+  	}
+  }
+}
+
+.body-registrations {
+  .nav-tabs {
+    margin-bottom: 0px;
+
+    h1 { font-size: 12pt; font-family: $description-font-family; margin: 0px; line-height: 25px; }
+
+    .active > a, .active > a:hover {
+      border-top: solid 3px $accent-color;
+    }
+  }
+  .nav-tabs > li div.title { margin: 5px 10px 0px 10px; }
+  .nav-tab-content { padding: 10px 10px 10px 20px; }
+  
+  input, textarea {
+    margin-bottom: 0;
+  }
+
+  .input-why {
+    float: left;
+    margin-top: -30px;
+    margin-left: 230px;
+  }
+
+  #agree-toc .help-inline {
+    color: #B94A48;
+  }
+
+  .checkbox-why {
+    float: left;
+    margin-top: -20px;
+    margin-left: 230px;
+  }
+}
+
+// =============================================
+//	Search Page
+// =============================================
+.body-petitions-search {
+  .thumbnails {
+    a { text-decoration: none; }
+    
+    .thumbnail {
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        border: 1px solid $accent-color;
+      }
+    }
+
+    .petition-image {
+      overflow: hidden;
+      max-height: 180px;
+
+      img {
+        min-width: 220px;
+        max-width: 220px;
+      }
+    }
+
+    .title {
+      color: $accent-color;
+      text-transform: uppercase;
+    }
+    .why {
+      color: $fg-color;
+      max-height: 65px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      line-height: 1.2em;
+    }
+    .campaigner {
+      color: $subtle-color;
+      font-size: $subtle-font-size;
+    }
+  }
+}
+
+// =============================================
+//	Categories Page
+// =============================================
+.body-categories, .body-petitions-search, .body-groups-show {
+  .more-campaigns-next {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 10pt;
+    font-weight: normal;
+    font-style: italic;
+    font-family: $subtitle-font-family;
+    line-height: 1em;
+
+    a { color: $fg-color; text-decoration: none; }
+    .arrow { color: $accent-color; font-style: normal; font-size: 8pt; margin-left: 5px; }
+    img { vertical-align: baseline; margin-left: 2px; }
+  }
+}
+
+.body-categories, .body-efforts-show, .body-groups-show {
+  .thumbnails {
+    .thumbnail {
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        border: 1px solid $accent-color;
+      }
+    }
+
+    .petition-image {
+      width: 230px;
+      height: 176px;
+      overflow: hidden;
+
+      img {
+        min-width: 230px;
+        max-width: 230px;
+      }
+    }
+
+    .caption {
+      position: absolute;
+      bottom: 4px;
+      background-color: #000000;
+      opacity: 0.8;
+      filter: alpha(opacity=80);
+      margin: 0;
+      padding: 0;
+      width: 230px;
+    }
+    h5 {
+      color: #fff;
+      padding: 8px;
+    }
+  }
+}
+
+.effort {
+  .petition-image-wrapper .caption {
+    background-color: #000000;
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+
+    h5 {
+      color: #ffffff;
+      padding: 8px;
+    }
+  }
+}
+
+.body-home .featured-petitions .effort .petition-signatures {
+  text-align: left;
+}
+
+// =============================================
+//	Static Pages
+// =============================================
+.body-home-privacy_policy .body-home-tos {
+  ul {
+    list-style-type: none;
+    margin: 0;
+  }
+
+  li {
+    margin: 4px 0px;
+  }
+}
+
+.body-home-community, .body-home-about_us, .body-home-privacy_policy .body-home-tos {
+  h1 { margin: 0 0 20px 0; }
+  h3 { margin: 25px 0 8px 0; }
+  ul {
+    margin-left: 0;
+
+    li{
+      list-style-type: none;
+      margin-bottom: 8px;
+    }
+  }
+}
