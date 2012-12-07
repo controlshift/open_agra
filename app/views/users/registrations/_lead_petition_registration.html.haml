@@ -1,0 +1,4 @@
+= render partial: "efforts/petitions/what_I_am_leading_for", locals: {petition: petition}
+- content_for :sidebar do
+  = render partial: 'efforts/petitions/leading_sidebar', locals: {effort: petition.effort, petition: petition}
+= render partial: "form"

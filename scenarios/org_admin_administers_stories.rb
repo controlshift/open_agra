@@ -20,7 +20,7 @@ describe "Org admin administers stories", :type => :request, :nip=> true do
     
     page.should have_content "Story Name"
     page.should have_content "Story Content"
-    page.find(".petition-image img")[:src].should match "white.jpg"
+    page.find(".story-image img")[:src].should match "white.jpg"
 
     click_on "Edit"
 

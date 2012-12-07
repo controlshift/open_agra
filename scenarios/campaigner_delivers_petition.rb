@@ -11,10 +11,10 @@ describe "Deliver petition", :type => :request do
     visit deliver_petition_manage_path('save-the-whales')
 
     click_on "download-letter"
-    page.should have_content "You will receive an email with download instructions shortly."
+    page.should have_content "PDF" #actual PDFs have this string
 
     visit deliver_petition_manage_path('save-the-whales')
     click_on "export-signatures"
-    page.response_headers['Content-Type'].should == "text/csv"
+    page.response_headers['Content-Type'].should == "text/csv; charset=utf-8; header=present"
   end
 end

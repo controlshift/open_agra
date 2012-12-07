@@ -19,9 +19,8 @@ describe Groups::ManageController do
 
     describe "#export" do
       it "should send_data to the user" do
-        controller.should_receive(:send_data).and_return(:success)
-        controller.stub(:render)
         get :export, group_id: @group.slug
+        response.should be_success
       end
     end
   end

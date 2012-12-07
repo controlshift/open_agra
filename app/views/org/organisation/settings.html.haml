@@ -2,7 +2,7 @@
 
 .mt20
 = simple_form_for current_organisation, url: org_path, wrapper: :compact do |form|
-  %h3 General
+  %h3.mt20 General
   %hr
     .row
       .span3
@@ -11,7 +11,7 @@
         = form.input :admin_email, input_html: { type: 'email' }, hint: 'For receiving alert email'
 
 
-  %h3 Options
+  %h3.mt20 Options
   %hr
     .row
       .span3
@@ -22,16 +22,26 @@
         = form.input :requires_location_for_campaign, as: :boolean
     .row
       .span3
-        = form.input :always_join_parent_org_when_sign_up, as: :boolean
+        = form.input :always_join_parent_org_when_sign_up, as: :boolean, label: "Always join the org on sign up"
       .span3
         = form.input :show_share_buttons_on_petition_page, as: :boolean, label: 'Show share buttons (Petition page)'
+      .span3
+        = form.input :hide_signatures_csv_download_link, as: :boolean
 
-  %h3 Social Media
+    .row
+      .span9
+        = form.input :signature_disclaimer, as: :text, hint: "Disclaimer will not be used if left blank", input_html: {rows: 3, class:'span7'}
+
+
+
+  %h3.mt20 Social Media
   %hr
     .row
       .span3
         = form.input :twitter_account_name
       .span3
         = form.input :facebook_url
+
+
   .actions
     = form.button :submit, 'Save'

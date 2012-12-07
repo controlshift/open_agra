@@ -10,7 +10,7 @@ development:
 # Do not set this db to the same as development or production.
 test: &test
   adapter: postgresql
-  database: agra_test
+  database: <%= ENV['TEST_DB_NAME'] || 'agra_test' %>
   pool: 5
   timeout: 5000
 

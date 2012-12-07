@@ -6,9 +6,44 @@
       width: 250px;
     }
   }
+
+  .effort-content {
+    border-right: 1px solid #EBEBEB;
+    margin-right: -1px;
+  }
+
+  .title {
+    font-size: 1.5em;
+  }
+  .subtitle {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    background: url(/assets/local-campaign-marker.png) no-repeat;
+    padding-top: 35px;
+    margin-top: -15px;
+  }
+
+  .local-campaign-search {
+    .icon-globe {
+      display: none;
+    }
+    .search-query {
+      @include border-radius(6px);
+      width: 150px;
+      height: 25px;
+    }
+    .search-btn {
+      float: none;
+      height: 1.5em;
+      padding: 4px 15px;
+      line-height: 21px;
+      margin-top: 10px;
+    }
+  }
   
   .admin-link {
-    color: $fg-color;
+    color: $text-color;
     text-decoration: underline;
   }
   
@@ -38,23 +73,307 @@
   .caption {
     width: 290px !important;
   }
-}
 
-.big-efforts-search{
-  input.query-box{
-    height: 2em;
-    font-size: 2em;
-    line-height: 2em;
-    margin: 0px;
-    width: 400px;
+  .effort-progress .progressbar {
+    width:218px;
   }
 
+  .featured-petitions {
+    margin-top: 40px;
+  }
+}
+
+@mixin collapse-arrow {
+  display: inline-block;
+  height: 11px;
+  width: 15px;
+  margin-left: 10px;
+}
+
+.collapse-arrow-up {
+  background: image-url('arrow-up.png') no-repeat;
+  @include collapse-arrow;
+}
+
+.collapse-arrow-down {
+  background: image-url('arrow-down.png') no-repeat;
+  @include collapse-arrow;
+}
+
+.radio-label {
+  margin-left: 5px;
+  margin-top: 3px;
+}
+
+.big-efforts-search {
+  .query-box {
+    height: 1.5em;
+    font-size: 1.5em;
+    line-height: 1.5em;
+    margin: 0px;
+  }
+  .query-container {
+    margin-left: 0;
+  }
   .search-btn{
+    font-size: 1.5em;
     margin:0px 0px 0px 5px;
     padding: 4px 25px 4px 25px;
-    font-size: 2em;
-    line-height: 2em;
-    height: 2em;
+    line-height: 1.5em;
+    height: 1.5em;
     float:none;
+  }
+}
+
+.location-label {
+  border-bottom: $separator-line;
+  border-top: $separator-line;
+  margin: 20px 0;
+  padding: 20px 0;
+  .title {
+    line-height: 38px;
+    font-size: 1.5em;
+    margin-right: 50px;
+  }
+}
+
+.collection_radio_buttons {
+  margin-left: 5px;
+}
+
+.find-target-form abbr[title='required'] {
+  display: none;
+}
+
+.edit-target, .remove-target, a:hover.remove-target, a:hover.edit-target {
+  color: $text-color;
+  text-decoration: none;
+}
+
+
+
+.sidebar {
+  .title {
+    font-size: 12pt;
+  }
+  ul {
+    color: $accent-color;
+    margin-left: 1.2em;
+    li {
+      margin-top: 10px;
+      span {
+        color: $text-color-light;
+      }
+    }
+  }
+  .progressbar {
+    .text {
+      font-size: 13pt;
+    }
+  }
+  .petition-information {
+    margin-bottom: 20px;
+    line-height: 20px;
+    .target-name {
+      font-size: 12pt;
+    }
+    .location-text {
+      color: $text-color-light;
+    }
+  }
+
+  .petition-map {
+    position: relative;
+    .shadow {
+      width: 200px;
+      height: 180px;
+    }
+  }
+}
+
+ul.ui-autocomplete {
+  width: 210px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: solid 1px $border-color;
+  cursor: default;
+  box-shadow: 2px 2px 3px $border-color;
+  li {
+    background-color: $bg-color;
+    border-top: solid 2px $border-color;
+    margin: 0;
+    padding: 0;
+    a {
+      color: $input-text-color;
+      display: block;
+      padding: 3px;
+    }
+    a.ui-state-hover, a.ui-state-active {
+      color: $bg-color;
+      background-color: $link-color;
+    }
+  }
+}
+
+.effort-petition-location {
+  font: normal 100% "Bree Serif", serif;
+  font-size: 1.1em;
+  text-transform: uppercase;
+  padding-top: 5px;
+}
+
+.closest-petition-text {
+  font-size: 18px;
+  line-height: 24px;
+}
+.closest-petition-container {
+  margin-bottom: 40px;
+  margin-top: 25px;
+  .closest-petition-panel {
+    width: 260px;
+    height: 360px;
+    background: image-url("grey-box.png") no-repeat;
+    .title {
+      font-size: 1.1em;
+      color: $text-color-white;
+      width: 220px;
+      padding-left: 20px;
+      padding-top: 25px;
+      text-align: center;
+    }
+    .action {
+      text-align: center;
+      a {
+        padding: 6px 20px 4px 20px;
+        width: 150px;
+        height: 20px;
+        line-height: 17px;
+      }
+    }
+    .connector {
+      font-size: 1em;
+      padding-top: 0;
+    }
+    .placeholder {
+      height: 60px;
+    }
+  }
+  .closest-petition-map {
+    position: relative;
+    .shadow {
+      width: 400px;
+      height: 360px;
+    }
+  }
+}
+
+.leader-duty-content a {
+  font-size: 0.8em;
+  color: darken($border-color, 23%);
+  font-style: italic;
+}
+
+.nearby-petitions {
+  hr {
+    margin-bottom: 12px;
+    margin-top: 12px;
+  }
+}
+
+.nearby-petition {
+  a.accordion-toggle{
+    color: #333;
+    text-decoration: none;
+  }
+  .location-text {
+    margin-left: 30px;
+    color: $subtle-color;
+    line-height: 19px;
+  }
+
+  .nearby-petition-panel {
+    background-color: #f5f5f5;
+    margin: 18px 0 10px 29px;
+    @include border-radius(5px);
+    padding: 15px 20px;
+    .title {
+      color: $subtle-color;
+      margin-bottom: 10px;
+    }
+    .action {
+      display: inline-block;
+      float: left;
+      a {
+        font-size: 1em;
+        height: 10px;
+      }
+    }
+    .connector {
+      display: inline-block;
+      float: left;
+      color: lighten($subtle-color, 15%);
+      margin: 5px 20px;
+    }
+    .lead-nearby-petition {
+      position: relative;
+      .leader-duty-content a{
+        position: relative;
+        top: 4px;
+        left: 10px;
+        color: $subtle-color;
+      }
+    }
+  }
+}
+
+.title {
+  font: normal 100% "Bree Serif", serif;
+  text-transform: uppercase;
+}
+
+.separator {
+  border-bottom: $separator-line;
+}
+
+.shadow {
+  position: absolute;
+  top: 0;
+  box-shadow: 0 0 10px $text-color-light inset;
+}
+
+.leader-detail {
+  margin-right: 60px;
+  .leader-name {
+    font-size: 0.9em;
+  }
+  .subtle {
+    font-style: italic;
+  }
+}
+
+.leader-detail-closest {
+    width: 193px;
+    margin: 20px auto 0;
+    background-color: #f5f5f5;
+    @include border-radius(5px);
+    padding: 5px 0 5px 0;
+}
+
+.leader-info-box {
+  .leader-icon {
+    i {
+      font-size: 50px;
+      vertical-align: top;
+    }
+  }
+}
+
+.default-categories{
+  .check_boxes {
+    span {
+      display: inline-block;
+      width: 170px;
+    }
   }
 }

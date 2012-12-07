@@ -3,5 +3,6 @@ FactoryGirl.define do
     ip_address {Faker::Internet.ip_v4_address}
     association(:user)
     association(:petition)
+    reason 'some reason'
   end
 end

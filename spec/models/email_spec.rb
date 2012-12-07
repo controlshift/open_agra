@@ -8,8 +8,8 @@
 #  from_address :string(255)     not null
 #  subject      :string(255)     not null
 #  content      :text            not null
-#  created_at   :datetime        not null
-#  updated_at   :datetime        not null
+#  created_at   :datetime
+#  updated_at   :datetime
 #
 
 require 'spec_helper'

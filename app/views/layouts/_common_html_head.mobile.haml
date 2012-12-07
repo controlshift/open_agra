@@ -7,6 +7,9 @@
 - else
   = stylesheet_link_tag  "organisations/default/application_mobile"
 
+- unless Rails.env.test?
+  %link{rel: "stylesheet", type: "text/css", href: "/fonts/font-awesome.css" }
+
 - if Rails.env.production?
   %script{ type: 'text/javascript', src: 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js' }
 - else

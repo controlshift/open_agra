@@ -8,7 +8,8 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       options = request.env['omniauth.strategy'].options
       options[:client_id] = current_organisation.fb_app_id
       options[:client_secret] = current_organisation.fb_app_secret
-      options[:options] = { scope: 'email', client_options: { ssl: { ca_path: '/usr/lib/ssl/certs/ca-certificates.crt' } } }
+      options[:scope] = 'email, publish_stream'
+      options[:options] = { client_options: { ssl: { ca_path: '/usr/lib/ssl/certs/ca-certificates.crt' } } }
     end
     render text: "Setup complete.", status: 404
   end
@@ -35,7 +36,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       flash[:notice] = I18n.t "devise.omniauth_callbacks.success", :kind => "Facebook"
       sign_in_and_redirect @user, event: :authentication
     else
-      @user = User.new(email: info.email, first_name: info.first_name, last_name: info.last_name)
+      @user = User.new(email: info.email, first_name: info.first_name, last_name: info.last_name, default_organisation_slug: current_organisation.slug)
       render 'users/registrations/completing'
     end
   end

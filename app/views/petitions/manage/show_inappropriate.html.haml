@@ -1,9 +1,5 @@
 - title "Manage Campaign"
 
-- if can?(:manage, @petition)
-  - content_for :before_content do
-    = render partial: "petition_manage_breadcrumbs"
-    
 %h1 We Found A Problem With "#{@petition.title}"
 %br
 

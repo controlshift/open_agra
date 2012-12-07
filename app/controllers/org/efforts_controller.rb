@@ -6,7 +6,13 @@ class Org::EffortsController < Org::OrgController
   end
 
   def show
-    @petitions = Petition.where(effort_id: @effort).paginate(page: params[:page]).order('created_at DESC')
+    @petitions = Petition.where(effort_id: @effort).page(params[:page]).order('created_at DESC')
+    if @effort.open_ended?
+      render :show
+    else
+      render :show_targets
+    end
+
   end
 
   def new
@@ -14,7 +20,7 @@ class Org::EffortsController < Org::OrgController
   end
 
   def create
-    @effort = Effort.new params[:effort]
+    @effort = Effort.create_from_params params[:effort]
     @effort.organisation = current_organisation
     if @effort.save
       redirect_to org_effort_path(@effort)
@@ -34,11 +40,10 @@ class Org::EffortsController < Org::OrgController
     end
   end
 
-
-
   private
   def load_and_authorize_effort
     @effort = Effort.find_by_slug! params[:id]
+    raise ActiveRecord::RecordNotFound if @effort.organisation != current_organisation
     authorize_or_redirect! :manage, @effort
   end
 end

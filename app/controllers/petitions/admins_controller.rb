@@ -3,6 +3,8 @@ class Petitions::AdminsController < ApplicationController
   before_filter :load_campaign_admin_and_petition, except: [:new, :create]
   skip_before_filter :authenticate_user!, only: [:show]
 
+  layout 'application_sidebar'
+
   def new
     @campaign_admin = CampaignAdmin.new
     @admins = [@petition.user] + @petition.campaign_admins
@@ -65,6 +67,7 @@ class Petitions::AdminsController < ApplicationController
 
   def load_and_authorize_petition
     @petition = Petition.find_by_slug! params[:petition_id]
+    raise ActiveRecord::RecordNotFound if @petition.organisation != current_organisation
     authorize_or_redirect! :manage, @petition
   end
 

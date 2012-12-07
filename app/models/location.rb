@@ -23,10 +23,10 @@ class Location < ActiveRecord::Base
   validates_presence_of :query, :latitude, :longitude
   validates_uniqueness_of :query
   
-  searchable do
-    text :query, :country, :region, :locality, :street, :postal_code
-    latlon(:location) { Sunspot::Util::Coordinates.new(latitude, longitude) }
-  end
+  #searchable do
+  #  text :query, :country, :region, :locality, :street, :postal_code
+  #  latlon(:location) { Sunspot::Util::Coordinates.new(latitude, longitude) }
+  #end
 
   def formatted_string(options = {})
     separator = options[:separator] ? options[:separator] : "\n"
@@ -44,5 +44,13 @@ class Location < ActiveRecord::Base
 
   def lng
     longitude
+  end
+
+  def zoom
+    return 11 if street.present?
+    return 9  if locality.present?
+    return 6  if region.present?
+    return 4  if country.present?
+    return 3
   end
 end

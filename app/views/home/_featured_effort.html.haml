@@ -1,0 +1,28 @@
+.row
+  .span1
+    = "&nbsp;".html_safe
+  .span4
+    %a{ href: effort_path(effort) }
+      .petition-image-wrapper
+        - unless effort.image_file_name.blank?
+          .effort-image
+            =image_tag effort.image.url(:hero)
+        - else
+          .effort-image
+            =image_tag "image-placeholder-home.png"
+      .effort-progress
+        = render partial: "efforts/near/effort_progress", locals: { effort: effort, no_text: true }
+.row
+  .span1
+    .effort-signatures
+      %span.number= number_with_delimiter(effort.cached_signatures_size)
+      %br
+      of
+      %span.strong= number_with_delimiter(effort.goal)
+      %br
+      signatures
+  .span4
+    %a{ href: effort_path(effort) }
+      .effort-title
+        %h3=effort.title
+

@@ -15,26 +15,26 @@
         .right.moderation-status
           = simple_form_for @email, url: org_email_path(@email), validate: true, wrapper: :append do |f|
             = label_tag :moderation_status, "Moderation Status"
-            = f.select :moderation_status, PetitionBlastEmail::MODERATION_STATUSES.map { |s| [s.to_s.capitalize, s.to_s] }, class: "span2"
+            = f.select :moderation_status, BlastEmail::MODERATION_STATUSES.map { |s| [s.to_s.capitalize, s.to_s] }, {}, {class: "span2 blast-email-moderation-status"}
             = f.button :submit, 'Moderate', :id=> 'moderate-email-submit'
             .inappropriate-reason-popover
-              = f.input :moderation_reason, label: false, input_html: { rows: "5", placeholder: "Reason..." }
+              = f.input :moderation_reason, label: false, input_html: { rows: "5", placeholder: "Reason...", class: "blast-email-moderation-reason" }
         .clear
 
         :javascript
           $(function() {
             show_reason_if_inappropriate = function() {
-              if($("#petition_blast_email_moderation_status").val() == 'inappropriate') {
+              if($(".blast-email-moderation-status").val() == 'inappropriate') {
                 $(".inappropriate-reason-popover").show();
-                $("#petition_blast_email_moderation_reason").focus();
-                $("#petition_blast_email_moderation_reason").attr("data-validate", "true");
+                $(".blast-email-moderation-reason").focus();
+                $(".blast-email-moderation-reason").attr("data-validate", "true");
               }
               else {
-                $("#petition_blast_email_moderation_reason").removeAttr("data-validate");
+                $(".blast-email-moderation-reason").removeAttr("data-validate");
               }
             }
             show_reason_if_inappropriate();
-            $("#petition_blast_email_moderation_status").change(function() {
+            $(".blast-email-moderation-status").change(function() {
               $(".inappropriate-reason-popover").hide();
               show_reason_if_inappropriate();
             });
@@ -47,12 +47,27 @@
       .well
         = "#{@email.moderation_status.capitalize} and #{@email.delivery_status}."
 
+    %h3
+      Date Created
+    .well
+      = pretty_date_format(@email.created_at)
+
+    %h3
+      From
+    .well
+      = @email.from_address
 
     %h3
       To
-
     .well
-      = " #{pluralize(@email.recipient_count, 'signer')} of the \"#{@email.petition.title}\" petition"
+      = " #{pluralize(@email.recipient_count, 'subscribed signer')} of the "
+      - if @email.petition.present?
+        = link_to "#{@email.title}", petition_path(@email.petition)
+        = " petition"
+      - elsif @email.group.present?
+        = link_to "#{@email.title}", group_path(@email.group)
+        = " group"
+
     %h3
       Subject
     .well
@@ -62,3 +77,7 @@
       Body
     .well
       = @email.body.html_safe
+      %br
+      %br
+      If you don't want to receive emails from the '#{@email.source.title}' campaign in the future, please
+      #{link_to "unsubscribe", blast_email_unsubscribe_url(@email)}.

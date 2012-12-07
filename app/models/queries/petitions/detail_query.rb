@@ -13,7 +13,6 @@ module Queries
         end
         query.all_of do |all|
           all.with(:organisation_id, @organisation.id)
-          all.without(:user_id, nil)
           all.with(:launched, true)
           all.with(:admin_status,[:awesome, :good])
           all.with(:cancelled, false)

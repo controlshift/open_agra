@@ -1,0 +1,14 @@
+.breadcrumbs
+  = link_to 'Efforts', org_efforts_path
+  >
+  = link_to "Manage #{@effort.title}", org_effort_path(@effort)
+  >
+  Add Target
+
+= title "Add Target"
+
+= simple_form_for [:org, :effort, @target], url: add_org_effort_targets_path(@effort), :wrapper => 'compact', html: {class: 'find-target-form mt30'} do |f|
+  .form-inputs.row
+    =f.input :name, input_html: {data: {autocomplete_source: org_effort_targets_path(@effort)}}, :wrapper_html => { :class => 'span4' }
+    #add_target.span6
+      =f.button :submit, value: "Add Target", class: 'mt20'

@@ -1,0 +1,22 @@
+.row
+  .span7
+    = title "Stories"
+  .span3
+    = link_to 'New Story', new_org_contents_story_path, class: "btn btn-primary"
+
+%br
+- if @stories.any?
+  = table_for(@stories) do |t|
+    = t.data do
+      - t.cell(:featured) { |p| p.featured? ? "&#10003".html_safe : "" }
+      - t.cell(:title) { |p| link_to(p.title, org_contents_story_path(p), {:class => 'use-pjax'}) }
+      - t.cell(:content) { |p| truncate(p.content, length: 25) }
+  = will_paginate @stories
+- else
+  .row
+    .span4.offset4{style:"padding-top:50px;"}
+      %p
+        Stories are displayed as a carousel of images on the site homepage. You can use them to highlight successes and tell the story of your movement.
+
+    .span1
+      = image_tag "target-arrow.png"

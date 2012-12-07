@@ -23,6 +23,9 @@
     .row
       .span3
         = form.input :join_label
+      .span3
+        = form.input :country, as: :string
+
 
   %h3 Options
   %hr
@@ -97,6 +100,17 @@
       .span3= form.input :bsd_api_secret, label: 'BSD API Secret'
   %br
 
+  %h3 Salesforce
+  %hr
+    .row
+      .span3= form.input :salesforce_host
+      .span3= form.input :salesforce_consumer_key
+      .span3= form.input :salesforce_consumer_secret
+
+    .row
+      .span3= form.input :salesforce_username
+      .span3= form.input :salesforce_security_token, hint: "password + token"
+  %br
   %h3 Action Kit API
   %hr
     .row

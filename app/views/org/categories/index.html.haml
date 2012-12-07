@@ -10,4 +10,13 @@
     = t.data do
       - t.cell(:name) { |c| link_to(c.name, edit_org_category_path(c), {:class => 'use-pjax'}) }
 - else
-  No categories found.
+  .row
+    .span4.offset4{style:"padding-top:50px;"}
+      %p
+        Categories help organise petitions. They allow people to browse campaigns by category, and segment signers by the issues they care about.
+      %p
+        Once categories have been added they will optionally appear on the new petition form depending on how your organisation's site is configured.
+
+    .span1
+      = image_tag "target-arrow.png"
+

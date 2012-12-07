@@ -15,6 +15,8 @@
       %br
       = f.input :phone_number, label: "Phone Number"
       = f.input :postcode, label: "Postcode"
+      - @user.additional_field_configs.each do |field_name, field_config|
+        = additional_field_input(f, field_name, field_config)
       = check_box :user, :opt_out_site_email
       = label_tag :opt_out_site_email, "Opt out site email", for: "user_opt_out_site_email"
 

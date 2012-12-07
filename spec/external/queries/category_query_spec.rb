@@ -62,6 +62,19 @@ describe Queries::Petitions::CategoryQuery, solr: true, external: true do
           specify { subject.categories.should_not include(@other_category)}
         end
       end
+
+      describe "pagination with 50 results per page for a category" do
+        subject {Queries::Petitions::CategoryQuery.new(organisation: @organisation, category: @category)}
+
+        context "when executed" do
+          before(:each) {
+            subject.per_page = 50
+            subject.execute!
+          }
+
+          specify {subject.petitions.per_page.should eql(50)}
+        end
+      end
     end
   end
 end

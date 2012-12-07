@@ -6,15 +6,14 @@ class Groups::ManageController < ApplicationController
   end
 
   def export
-    csv_string = Queries::PeopleForGroup.new.people_as_csv(@group.id)
-    filename = "people-#{Time.now.strftime("%Y%m%d")}.csv"
-    send_data(csv_string, type: 'text/csv; charset=utf-8; header=present', filename: filename)
+    streaming_csv(Queries::Exports::MembersForGroupExport.new(group: @group, organisation: current_organisation))
   end
 
   private
 
   def load_and_authorize_group
     @group = Group.find_by_slug!(params[:group_id])
+    raise ActiveRecord::RecordNotFound if @group.organisation != current_organisation
     authorize! :manage, @group
   end
 end

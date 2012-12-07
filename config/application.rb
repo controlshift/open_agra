@@ -26,7 +26,7 @@ module Agra
 
     # Custom directories with classes and modules you want to be autoloadable.
     # config.autoload_paths += %W(#{config.root}/extras)
-    config.autoload_paths += Dir[Rails.root.join('lib', '**/')]
+    config.autoload_paths += Dir[Rails.root.join('lib', '**/')] + Dir[Rails.root.join('app', 'models', 'validators')]
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
@@ -58,11 +58,13 @@ module Agra
     # otherwise, the app tries to access the database, and precompilation fails.
     # see: http://stackoverflow.com/questions/8622297/heroku-cedar-assetsprecompile-has-beef-with-attr-protected
     config.assets.initialize_on_precompile = false
+    config.assets.paths << Rails.root.join("vendor", "assets", "fonts")
     config.assets.precompile += [/organisations\/[\w_]+\/application/]
     config.assets.precompile += ['ie7.css']
     config.assets.precompile += ['ie8.css']
     config.assets.precompile += ['mobile.js']
-    config.assets.precompile += ['location.js', 'efforts_location.js']
+    config.assets.precompile += ['facebook_share.js']
+    config.assets.precompile += ['location.js', 'efforts_location.js', 'petition/manage.js', 'create_effort.js', 'petition/contact_user.js']
     config.assets.precompile += ['tinymce-jquery']
 
     config.action_controller.asset_host = ENV["S3_HOST_ALIAS"]
@@ -73,7 +75,8 @@ module Agra
         s3_host_alias: ENV["S3_HOST_ALIAS"],
         url: ':s3_alias_url',
         path: "/:class/:attachment/:id/:style/:filename",
-        s3_credentials: {url: :s3_alias_url, access_key_id: ENV["S3_KEY"], secret_access_key: ENV["S3_SECRET"], bucket: ENV["S3_BUCKET"], s3_host_name: ENV["S3_REGION"]}
+        s3_credentials: {url: :s3_alias_url, access_key_id: ENV["S3_KEY"], secret_access_key: ENV["S3_SECRET"], bucket: ENV["S3_BUCKET"], s3_host_name: ENV["S3_REGION"]},
+        s3_headers: { 'Cache-Control' => 'public, max-age=1314000' }
       }
       config.paperclip_file_options = config.paperclip_options.merge({
         path: "/:class/:attachment/:id/:timestamp/:filename"
@@ -92,12 +95,6 @@ module Agra
 
     ActiveSupport::Deprecation.silenced = true
 
-    # for Spork
-    if Rails.env.test?
-      initializer :after => :initialize_dependency_mechanism do
-        ActiveSupport::Dependencies.mechanism = :load
-      end
-    end
     WillPaginate.per_page = 10
 
     # for custom 404 and 500 page.

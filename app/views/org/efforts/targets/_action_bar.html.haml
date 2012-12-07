@@ -1,0 +1,6 @@
+= link_to(edit_org_effort_target_path(effort, petition.target), {class: "edit-target", rel:"tooltip", title:"Edit Petition Target"}) do
+  %i.icon-edit.ml10
+= link_to(remove_org_effort_target_path(effort, petition.target),
+confirm: "Remove action will only break the association between effort and current petition, do you want to proceed?",
+method: :delete, class: "remove-target", rel:"tooltip", title:"Remove Target") do
+  %i.icon-trash.ml10

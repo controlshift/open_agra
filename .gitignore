@@ -14,3 +14,4 @@ solr/data
 solr/pids
 log/*log.lck
 tags
+.zeus.sock

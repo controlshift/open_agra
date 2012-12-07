@@ -12,11 +12,6 @@
     .mt10
     = check_box_tag(:admin, 1, @user.admin, id: "user_admin", name: "user[admin]", class: "boolean optional")
     = label_tag(:admin,  "Admin", for: "user_admin")
-  - if @user.groups.any?
-    .strong Groups
-    %ul
-      - @user.groups.each do |group|
-        %li= group.title
 
 
   .mt10

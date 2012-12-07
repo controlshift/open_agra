@@ -9,7 +9,6 @@ html, body {
 }
 
 a { cursor: pointer; }
-[class^="icon-"] { background-image: image-url("glyphicons-halflings.png") !important; }
 
 .shadow { @include box-shadow(#000000 0 0 20px 0 false); }
 
@@ -38,7 +37,7 @@ a { cursor: pointer; }
   margin-bottom: -60px;
 
   background: {
-    color: #ffffff;
+    color: $bg-color;
     image: image-url("bg-footer-stripe.png");
     repeat: repeat-x;
     position: left bottom;
@@ -50,12 +49,12 @@ a { cursor: pointer; }
 
   .navbar-inner {
     background: {
-      color: #ffffff;
+      color: $header-bg-color;
       image: none;
     }
     @include border-radius(0);
     @include remove-shadow;
-    
+
     .container {
       width: 940px;
     }
@@ -72,13 +71,13 @@ a { cursor: pointer; }
   .nav > li > a {
     padding-top: 10px;
   }
-  
+
   .nav li a {
     display: inline-block;
     background-repeat: no-repeat;
     font: $title-font;
     text-transform: uppercase;
-    color: $title-color;
+    color: $header-link-color;
     line-height: 28px;
     padding-left: 32px;
     margin-left: 12px;
@@ -92,14 +91,14 @@ a { cursor: pointer; }
   .dropdown.open .dropdown-toggle {
     color: #999;
   }
-  
+
   #nav-start-petition { @include toggle-bg-image($nav-start-petition-url) }
   #nav-login { @include toggle-bg-image($nav-login-url) }
 
   #nav-user {
     color: $accent-color;
     padding-left: 10px;
-    
+
     .caret {
       position: relative;
       border-top-color: $title-color !important;
@@ -107,7 +106,7 @@ a { cursor: pointer; }
       left: 4px;
     }
   }
-  
+
   .profile-image {
     width: 28px;
     height: 28px;
@@ -119,7 +118,7 @@ a { cursor: pointer; }
     li a {
       padding-left: 10px;
       color: $accent-color;
-      font-family: $base-font-family;
+      font-family: $text-font-family;
       text-transform: none;
 
       &:hover {
@@ -158,10 +157,12 @@ a { cursor: pointer; }
     &:hover {
       i {
         opacity: 0.8;
+        text-decoration: none;
         // filter: alpha(opacity=80); don't do this IE filter thing, it screws up IE7,8
       }
     }
     i {
+      color: $search-color;
       opacity: 0.3;
       // filter: alpha(opacity=30); don't do this IE filter thing, it screws up IE7,8
     }
@@ -171,7 +172,7 @@ a { cursor: pointer; }
 .main-content {
   position: relative;
   height: 100%;
-  
+
   .container, .container-fluid {
     position: relative;
     height: 100%;
@@ -200,13 +201,59 @@ a { cursor: pointer; }
   }
 
   .content-wrapper {
+    min-height: 600px;
     padding-top: 40px;
+    position: relative;
   }
 
   .sidebar-wrapper {
     position: relative;
-    min-height: 800px;
   }
+}
+
+.sidebar {
+  background: {
+    color: #f5f5f5;
+    image: image-url("bg-header-shadow.png"), image-url("bg-footer-shadow.png");
+    repeat: repeat-x, repeat-x;
+    position: left top, left bottom;
+  }
+  border-left: 1px solid #ebebeb;
+  padding: 0 0 0 30px;
+  margin: 0px;
+  margin-bottom: -60px;
+
+  .container { width: 190px; padding: 0 !important; margin: 0 }
+  .sidebar-box { margin-bottom: 30px; }
+  .sidebar-box.share { margin-bottom:80px;}
+
+  h2 {
+    display: inline-block;
+    color: #252525;
+    font: $title-font;
+    font-size: 28pt;
+    text-transform: uppercase;
+    line-height: 28pt;
+    margin-bottom: 15px;
+  }
+
+	.titlebar {
+	  position: relative;
+
+		.number {
+		  position: absolute;
+		  top: 5px;
+		  left: -40px;
+		  width:20px;
+		  height:40px;
+		  color: $title-color;
+      font: $title-font;
+		  font-size: 14pt;
+		  line-height: 40px;
+		  background-image: image-url("bg-step-number.png");
+		  vertical-align: middle;
+		}
+	}
 }
 
 .footer {
@@ -215,9 +262,9 @@ a { cursor: pointer; }
   bottom: 0;
   width: 100%;
   height: 60px;
-  color: $fg-color;
+  color: $footer-text-color;
   font-size: $footer-font-size;
-  background-color: #ffffff;
+  background-color: $footer-bg-color;
 
   .container {
     position: relative;
@@ -228,7 +275,7 @@ a { cursor: pointer; }
     font-family: $description-font-family;
     color: $subtle-color;
   }
-  
+
   .follow {
     margin-top: -8px;
   }
@@ -240,7 +287,7 @@ a { cursor: pointer; }
   a.footer-link, .footer-link a, span.footer-text {
     font-family: $subtitle-font-family;
     font-style: italic;
-    color: $title-color;
+    color: $footer-link-color;
     padding: 0 8px;
   }
 }
@@ -327,7 +374,7 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
   	  left: 10px;
   	}
 
-  	.logo-seperator {
+  	.logo-separator {
   	  position: absolute;
   	  top: 0;
   	  left: 30px;
@@ -351,7 +398,7 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
   }
   .nav-tabs > li div.title { margin: 5px 10px 0px 10px; }
   .nav-tab-content { padding: 10px 10px 10px 20px; }
-  
+
   input, textarea {
     margin-bottom: 0;
   }
@@ -379,7 +426,7 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
 .body-petitions-search {
   .thumbnails {
     a { text-decoration: none; }
-    
+
     .thumbnail {
       position: relative;
       overflow: hidden;
@@ -404,7 +451,7 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
       text-transform: uppercase;
     }
     .why {
-      color: $fg-color;
+      color: $text-color;
       max-height: 65px;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -412,7 +459,7 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
     }
     .campaigner {
       color: $subtle-color;
-      font-size: $subtle-font-size;
+      font-size: 0.8em;
     }
   }
 }
@@ -430,7 +477,7 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
     font-family: $subtitle-font-family;
     line-height: 1em;
 
-    a { color: $fg-color; text-decoration: none; }
+    a { color: $text-color; text-decoration: none; }
     .arrow { color: $accent-color; font-style: normal; font-size: 8pt; margin-left: 5px; }
     img { vertical-align: baseline; margin-left: 2px; }
   }
@@ -516,5 +563,150 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
       list-style-type: none;
       margin-bottom: 8px;
     }
+  }
+}
+
+// =============================================
+//	Upload image
+// =============================================
+
+.upload-image {
+  .preview-image {
+    width: 220px;
+
+    img {
+      height: 122px;
+    }
+  }
+}
+
+.upload-image-box-horizontal {
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  .upload-image {
+    .preview-image {
+      float: left;
+      margin-right: 5px;
+    }
+    .petition-image {
+      background-color: white;
+      img {
+        display: block;
+      }
+      padding: 5px;
+      @include box-shadow(rgba(0, 0, 0, 0.5) 1px 1px 5px 0 false);
+    }
+    .arrow {
+      float: left;
+      margin-top: 20px;
+      height: 0px;
+      width: 5px;
+      border: solid 5px transparent;
+      border-right-color: $border-color;
+    }
+    .upload-field {
+      float: left;
+      width: 265px;
+      height: 120px;
+      padding: 10px 10px 10px;
+      border: solid 2px $border-color;
+      @include border-radius(5px);
+    }
+    .status-text {
+      font-family: $text-font-family;
+      font-size: $text-font-size;
+    }
+  }
+}
+
+// =============================================
+//	 Google Map
+// =============================================
+
+#location-map {
+  height: 420px;
+  width: 580px;
+  img {
+    max-width: none;
+  }
+  margin: 3px auto;
+}
+
+// =============================================
+//	 effort search page
+// =============================================
+.near-effort-search {
+  .icon-globe {
+    display: none;
+  }
+  .search-query {
+    -webkit-border-radius: 6px;
+    width: 250px;
+  }
+
+}
+
+.effort-search {
+  .search-btn {
+    display: none;
+  }
+}
+
+// =============================================
+//	 Petition Signatures Styles
+// =============================================
+
+.petition-signatures {
+  .number {
+  font-size: 30pt;
+  font-weight: bold;
+  color: $accent-color;
+  line-height: 34pt;
+  }
+  color: #252525;
+  font-size: 14pt;
+  font-weight: normal;
+  font-style: italic;
+  font-family: $subtitle-font-family;
+}
+
+// =============================================
+//	Progressbar Styles
+// =============================================
+.progressbar {
+  width:200px;
+  height:100%;
+  display: inline-block;
+  vertical-align: middle;
+
+  .total {
+    width: 100%;
+    height: 15px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    text-align: left;
+    overflow: hidden;
+    background-image: image-url("bg-progress.png");
+    border: 3px solid #404040;
+    &.gray {
+      background-color: #e4e4e4;
+      background-image: none;
+      border: 0;
+      padding: 2px 0 0 2px;
+      @include border-radius(0);
+      @include box-shadow(#bcbcbc 0 2px 5px 0 inset);
+    }
+  }
+  .done {
+    vertical-align: top;
+    height: 14px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-image: url($bg-progress-done-url);
+    border: 0px solid #ddd;
+  }
+  .text {
+    display: inline;
   }
 }

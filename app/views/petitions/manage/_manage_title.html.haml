@@ -1,0 +1,14 @@
+.manage-buttons
+  .group2.btn-group
+    - if kind =='view'
+      = link_to petition_manage_path(@petition), id: "manage-petition-button", class: "btn btn-manage" do
+        %i.icon-cog
+        Manage
+    - else
+      = link_to petition_path(@petition), id: "view-petition-button", class: "btn btn-manage" do
+        %i.icon-eye-open
+        View
+
+.row
+  .span6
+    %h1= @petition.title

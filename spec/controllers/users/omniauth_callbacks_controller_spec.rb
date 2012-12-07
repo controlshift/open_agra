@@ -4,8 +4,8 @@ describe Users::OmniauthCallbacksController do
   include_context "setup_default_organisation"
   
   describe "#facebook" do
-    let(:user) { Factory.build(:user) }
-    let(:petition) { Factory(:petition) }
+    let(:user) { Factory.build(:user, organisation: @organisation) }
+    let(:petition) { Factory(:petition, organisation: @organisation) }
 
     before :each do
       @request.env["devise.mapping"] = Devise.mappings[:user]
@@ -30,13 +30,15 @@ describe Users::OmniauthCallbacksController do
         service = mock
         PetitionsService.should_receive(:new) { service }
         service.stub(:link_petition_with_user!)
-        
+        launch_petition_path = ""
+        session[:user_return_to] = launch_petition_path
+
         post :facebook
         
         flash[:notice].should_not be_nil
         assigns(:token).should == petition.token
         assigns(:user).facebook_id.should == '1234'
-        response.should redirect_to launch_petition_path(petition)
+        response.should redirect_to launch_petition_path
       end
     end
   end

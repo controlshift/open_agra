@@ -55,14 +55,12 @@ module PetitionHelper
       who = 'Fred Daman, CEO of Fredcorp',
       what = 'Tell Fred to pay everyone more money',
       why = 'I want more money',
-      delivery_details = "Sydney", campaigner_contactable = true, categories = [])
+      delivery_details = "Sydney", categories = [])
     fill_in 'petition_title', with: title
     fill_in 'petition_who', with: who
     fill_in 'petition_what', with: what
     fill_in 'petition_why', with: why
     fill_in 'petition_delivery_details', with: delivery_details
-    check 'Allow supporters to contact me' if campaigner_contactable
-    uncheck 'Allow supporters to contact me' if not campaigner_contactable
     attach_file :image, Rails.root.join("scenarios/fixtures/white.jpg")
     categories.each do |category|
       check category

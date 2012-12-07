@@ -15,6 +15,7 @@ class PetitionsService < ApplicationService
 
   def link_petition_with_user!(petition, user)
     self.current_object= petition
+    return if petition.user.present?
     current_object.user = user
     current_object.save!
     actions_after_petition_is_created_and_has_user
@@ -27,11 +28,34 @@ class PetitionsService < ApplicationService
 
     true
   end
+
+  def launch(petition, current_user)
+    if petition.cached_signatures_size == 0
+      signature = petition.signatures.build({default_organisation_slug: petition.organisation.slug})
+      signature_attributes = current_user.signature_attributes(signature)
+      signature.assign_attributes( signature_attributes )
+      raise "invalid signature" if !signature.valid?
+      SignaturesService.new.save_while_launching(signature)
+      petition.schedule_reminder_email!
+    end
+    petition.launched = true
+    petition.save!
+    petition
+  end
+
+  def lead(petition, current_user)
+    petition.user = current_user
+    petition.achieve_leading_progress!
+    petition.save!
+    launch(petition, current_user)
+  end
   
   def notify_petition_being_edited_by_campaigner
     if current_object.admin_status == :edited_inappropriate || current_object.admin_status == :edited
       ModerationMailer.delay.notify_admin_of_edited_petition(current_object)
     end
+
+    true
   end
 
   private

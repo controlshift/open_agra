@@ -78,4 +78,23 @@ describe 'Ability' do
     specify {@ability.should be_able_to(:manage, @group)}
     specify {@ability.should_not be_able_to(:manage, Factory(:group, organisation: organisation))}
   end
+
+  context 'as a normal user' do
+    before(:each) do
+      normal_user = create(:user, organisation: organisation)
+      @petition = create(:petition_without_leader, organisation: organisation)
+      @ability = Ability.new(normal_user)
+    end
+
+    it 'should let normal user update petitions without leader' do
+      @ability.should be_able_to(:update, @petition)
+    end
+
+    it 'should not let normal user update petitions already have leader' do
+      petition_owner = create(:user, organisation: organisation)
+      @petition.user = petition_owner
+      @petition.save
+      @ability.should_not be_able_to(:update, @petition)
+    end
+  end
 end

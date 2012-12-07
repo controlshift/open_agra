@@ -74,12 +74,6 @@ describe Queries::Petitions::AdminQuery, solr: true, external: true do
         ps.petitions.should be_empty
       end
 
-      it "should not find orphan petitions" do
-        ps = Queries::Petitions::AdminQuery.new search_term: @orphan.title
-        ps.execute!
-        ps.petitions.should be_empty
-      end
-
       it "should find petitions by notes" do
         ps = Queries::Petitions::AdminQuery.new search_term: @petition.admin_notes
         ps.execute!

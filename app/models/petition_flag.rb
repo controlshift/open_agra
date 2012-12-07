@@ -6,12 +6,14 @@
 #  petition_id :integer
 #  user_id     :integer
 #  ip_address  :string(255)
-#  created_at  :datetime        not null
-#  updated_at  :datetime        not null
+#  created_at  :datetime
+#  updated_at  :datetime
+#  reason      :text
 #
 
 class PetitionFlag < ActiveRecord::Base
   validates :petition_id, presence: true
+  validates :reason, presence: true
   validates :user_id, uniqueness: {scope: :petition_id, message: 'You have already flagged this petition'},
             allow_blank: true
   validates :ip_address, uniqueness: {scope: [:user_id, :petition_id], message: 'You have already flagged this petition'},
@@ -20,6 +22,6 @@ class PetitionFlag < ActiveRecord::Base
   belongs_to :petition
   belongs_to :user
 
-  scope :created_after, ->(time){ time.nil? ? all : where("created_at > ?", time) }
+  scope :created_after, ->(time){ time.nil? ? where("created_at > ?", 1.year.ago) : where("created_at > ?", time) }
 
 end

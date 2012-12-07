@@ -1,0 +1,10 @@
+.lead-petition
+  = render partial: "petition_chevron", locals: {effort: @petition.effort}
+
+= render partial: "what_I_am_leading_for", locals: {petition: @petition}
+
+= simple_form_for(@petition, url: lead_effort_petition_path(@effort, @petition), method: :put) do |form|
+  = form.button :submit, "Commit as a Leader", class: "lead-petition-btn btn btn-primary left mt30"
+
+- content_for :sidebar do
+  = render partial: 'leading_sidebar', locals: {petition: @petition}

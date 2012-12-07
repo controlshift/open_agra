@@ -6,6 +6,7 @@ require 'rspec/autorun'
 require 'capybara/rspec'
 require 'headless'
 require 'webmock/rspec'
+require 'sidekiq/testing/inline'
 
 Dir[Rails.root + "scenarios/helpers/*.rb"].each {|file|  require file }
 $original_sunspot_session = Sunspot.session
@@ -38,9 +39,9 @@ class Capybara::Driver::Webkit
   end
 end
 
+Rails.application.config.assets.paths << "scenarios/support/assets"
 
 RSpec.configure do |config|
-
 
   # == Mock Framework
   #
@@ -85,6 +86,10 @@ RSpec.configure do |config|
   # automatically. This will be the default behavior in future versions of
   # rspec-rails.
   config.infer_base_class_for_anonymous_controllers = false
+
+  #This allows you to use the core set of syntax methods (build, build_stubbed,
+  #create, attributes_for, and their *_list counterparts) without having to call them on FactoryGirl directly
+  config.include FactoryGirl::Syntax::Methods
 
   config.before :each do
     Sunspot::Rails::Tester.start_original_sunspot_session

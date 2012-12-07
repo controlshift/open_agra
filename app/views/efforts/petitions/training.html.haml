@@ -1,0 +1,16 @@
+.training
+  = render partial: "petition_chevron", locals: {effort: @effort}
+
+  .petition-title
+    %h1
+      = @petition.title
+  .separator.mt20.mb20
+
+  .training-content.normal-text
+    = @effort.training_text_in_organisation(current_organisation).html_safe
+
+  = simple_form_for(@petition, url: train_effort_petition_path(@effort, @petition), method: :put) do |form|
+    = form.button :submit, "I'm Ready, Let's Go!", class: "btn btn-primary left"
+
+- content_for :sidebar do
+  = render partial: 'training_sidebar', locals: { effort: @effort, petition: @petition }

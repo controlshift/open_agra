@@ -47,10 +47,9 @@ describe "Campaigner visits manage petition page", :type => :request do
     visit petition_manage_path(@petition)
 
     page.should have_content(@petition.title)
-    page.should have_link("manage-edit")
+    page.should have_link("manage-email")
     page.should have_link("manage-collect")
     page.should have_link("manage-deliver")
-    page.should have_link("manage-contact")
   end
   
   context "petition is marked as inappropriate" do
@@ -65,7 +64,7 @@ describe "Campaigner visits manage petition page", :type => :request do
       
       page.should have_content "We Found A Problem With"
       page.should have_content @petition.admin_reason
-      page.should have_link "Edit Petition", href: edit_petition_manage_path(@petition)
+      page.should have_link "Edit", href: edit_petition_manage_path(@petition)
     end
     
     it "should be able to contact site administrator" do

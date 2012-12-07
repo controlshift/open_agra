@@ -1,0 +1,52 @@
+.breadcrumbs
+  = link_to 'Efforts', org_efforts_path
+  >
+  = link_to "Manage #{@effort.title}", org_effort_path(@effort)
+  >
+  Leaders
+
+= title "#{@effort.title} Leaders"
+
+- if @user.present?
+  .leader-info-box.clearfix.mt30
+    .leader-icon.pull-left.mr20.ml20
+      - if @user.facebook_id.present?
+        = image_tag "http://graph.facebook.com/#{@user.facebook_id}/picture", class: 'profile-image'
+      - else
+        %i.icon-user
+    .leader-info.pull-left.mr20
+      .leader-name.mb10
+        = @user.full_name
+      .email= @user.email
+      .phone-number= @user.phone_number
+    .actions.pull-left
+      .remove-user
+        = link_to org_effort_leader_path(@effort, @petition), :confirm => 'Are you sure?', :method => :delete,  class: 'btn' do
+          %i.icon-remove-sign
+          &nbsp; Remove as Leader
+      .edit-user.ml5.mt10
+        = link_to 'Edit User', org_admin? ? edit_org_user_path(@user) : edit_admin_user_path(@user)
+- else
+  .no-leader.mt20.mb10
+    The petition has no leader yet.
+
+.admin-notes.span6.mt10.mb10
+  = simple_form_for(@petition, url: note_org_effort_petition_path(@effort,@petition), method: :put, wrapper: 'compact') do |f|
+    = f.input :admin_notes, as: :text, label: "Notes", input_html: {rows: 5, class:'span6'}
+    = f.button :submit, class: "btn right"
+
+- if @user.present?
+  .leading-progress.span6.clearfix
+    .title Progress
+    .statuses= leading_progress(@petition.progress)
+
+- if @admins.any?
+  .campaign-admins.span7.mt20
+    %h3 Additional Campaign Admins
+    = table_for(@admins) do |t|
+      = t.data do
+        - t.cell(:name) { |a| a.full_name }
+        - t.cell(:email) { |a| a.email }
+        - t.cell(:phone) { |a| a.phone_number }
+    = link_to "Manage Campaign Admins", new_petition_admin_path(@petition), class: "right"
+

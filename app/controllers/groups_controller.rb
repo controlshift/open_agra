@@ -12,6 +12,7 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find_by_slug!(params[:id])
+    raise ActiveRecord::RecordNotFound if @group.organisation != current_organisation
     @petitions = @group.petitions.appropriate.paginate page: params[:page]
   end
 end

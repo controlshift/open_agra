@@ -13,9 +13,14 @@ class ActionKitNotifier
       
       resource_uri  = "https://#{@username}:#{@password}@#{@host}/rest/v1/action/"
       data          = format_data(params)
-      
-      response = RestClient.post(resource_uri, data.to_json, content_type: :json, accept: :json)
-      Rails.logger.debug "ActionKit response: #{response.inspect}"
+
+      begin
+        response = RestClient.post(resource_uri, data.to_json, content_type: :json, accept: :json)
+        Rails.logger.debug "ActionKit response: #{response.inspect}"
+      rescue RestClient::Exception => e
+        RestExceptionMailer.exception_email(e, params).deliver
+        raise e
+      end
       return true
     else
       Rails.logger.error "ActionKit API parameters are not present."

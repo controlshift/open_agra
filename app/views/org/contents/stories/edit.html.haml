@@ -1,0 +1,10 @@
+.breadcrumbs
+  = link_to 'Manage Stories', org_contents_stories_path
+  >
+  = link_to @story.title, org_contents_story_path(@story)
+  > Edit
+.word-wrap
+  = title "Edit #{@story.title}"
+%br
+= render partial: 'form'
+

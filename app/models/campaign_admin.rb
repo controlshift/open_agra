@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: campaign_admins
+#
+#  id               :integer         not null, primary key
+#  petition_id      :integer
+#  user_id          :integer
+#  invitation_email :string(255)
+#  invitation_token :string(60)
+#
+
 class CampaignAdmin < ActiveRecord::Base
   belongs_to :petition, touch: true
   belongs_to :user, touch: true

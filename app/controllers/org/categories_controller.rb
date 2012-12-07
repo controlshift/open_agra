@@ -41,5 +41,6 @@ class Org::CategoriesController < Org::OrgController
   def load_and_authorize_category
     @category = Category.find_by_slug! params[:id]
     authorize_or_redirect! :manage, @category
+    raise ActiveRecord::RecordNotFound if @category.organisation != current_organisation
   end
 end

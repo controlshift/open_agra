@@ -1,0 +1,72 @@
+%ul
+  %li
+    = link_to edit_petition_manage_path(@petition) do
+      %i.icon-pencil
+      Edit Petition
+
+    %li{ style: @petition.alias.present? ? "" : "display:none;", id: "view-short-url"}
+      = link_to "#", href: "#petition-alias-view-modal", rel: 'popover', data: { toggle: 'modal' } do
+        %i.icon-globe
+        View Short URL
+
+    %li{ style: @petition.alias.present? ? "display:none;": "", id: "set-short-url"}
+      = link_to "#", id: "set-short-url", href: "#petition-alias-modal", rel: 'popover', data: { toggle: 'modal' } do
+        %i.icon-globe
+        Set Short URL
+
+  %li
+    = link_to new_petition_admin_path(@petition), id: 'manage-admins' do
+      %i.icon-group
+      Campaign Admins
+  %li.divider
+  - if @petition.cancelled?
+    %li
+      = link_to activate_petition_manage_path(@petition), id: 'manage-activate', method: :put, confirm: 'Are you sure you want to reactivate this petition?' do
+        %i.icon-ok
+        Reactivate Petition
+  - else
+    %li
+      = link_to cancel_petition_manage_path(@petition), id: 'manage-hide', rel: 'popover', data: { placement: 'left', content: cf('petition_manage_hide_popover'), method: :put, confirm: 'Are you sure you want to hide this petition from public view?'} do
+        %i.icon-ban-circle
+        Hide Petition
+  %li.divider
+  %li
+    %form
+      .control-group
+        = check_box_tag(:petition_campaigner_contactable, :campaigner_contactable, @petition.campaigner_contactable?, id: "petition_campaigner_contactable", 'data-petition-update-url' => petition_manage_path(@petition, format: :js))
+        = label_tag(:campaigner_contactable,  'Supporters can contact me', for: 'petition_campaigner_contactable')
+      
+- content_for :end_of_body do
+  / render div at the end of body for fixing IE7 z-index problem
+  .modal.hide.fade.petition-selector-modal#petition-alias-modal{'data-alias-check-url' => check_alias_petition_manage_path(@petition), 'data-alias-update-url' => update_alias_petition_manage_path(@petition)}
+    .modal-header
+      %button.close{ "data-dismiss" => "modal" } x
+      %h3 Set Petition Short URL
+    .modal-body.petition-form
+      %p
+        You can use the short URL on paper flyers and in the media when you want to give people an easy to type address for your campaign. 
+      %b You can set it only once.
+      .mt10
+        .inline-block.petition-host-label#petition-alias-host
+          = petition_alias_url("")
+        .inline-block
+          %input.span2#petition-alias-textbox
+          %span.indicator
+          .control-group.error
+            .help-inline
+    .modal-footer
+      .double-confirm-box
+        %span.double-confirm{style: 'display:none;'} This will become permanent, please confirm again.
+      %a.btn.btn-primary.disabled#btn-confirm{ href: "#" } Confirm
+
+  .modal.hide.fade#petition-alias-view-modal
+    .modal-header
+      %button.close{ "data-dismiss" => "modal" } x
+      %h3 Your Campaign's Short URL
+    .modal-body.petition-form
+      %p
+        Use your short URL on paper flyers and in the media when you want to give people an easy to type address for your campaign. 
+    
+      .h4.petition-alias-url
+        - if @petition.alias
+          = petition_alias_url(@petition.alias)

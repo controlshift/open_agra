@@ -1,0 +1,28 @@
+.edit
+  = render partial: "petition_chevron", locals: {effort: @effort}
+
+  .petition-title
+    %h1
+      = @petition.title
+
+  .separator.mt20.mb30
+
+  .edit-form
+    = simple_form_for(@petition, url: effort_petition_path(@effort, @petition), wrapper: :compact, html: { id: 'petition_form', multipart: true, class: "petition-form"}, method: :put) do |form|
+      = input_field_for_petition(form, :who, 'Whom are you petitioning?',  cf('petition_form_whom_help'))
+      = input_field_for_petition(form, :what, 'What do you want them to do?', cf('petition_form_what_help'), {rows: 6, maxlength: 5000})
+      = input_field_for_petition(form, :why, 'Why is this important?', cf('petition_form_why_help'), {rows: 6, maxlength: 5000})
+      .upload-image-box-horizontal
+        .upload-image.upload-image-switcher{'data-changed-placeholder-url' => asset_path('image-placeholder-form-changed.png') }
+          .preview-image
+            = image_content(entity: @petition, style: :form, content_class: 'preview-image')
+          .arrow
+          .upload-field
+            = form.input :image,
+              as: :file,
+              label: 'Upload an image', input_html: { accept: 'image/jpeg,image/gif,image/png' }
+          .clear
+      = form.button :submit, class: 'btn-primary submit-button left', disable_with: 'Saving…'
+
+- content_for :sidebar do
+  = render partial: 'leading_sidebar', locals: {petition: @petition}

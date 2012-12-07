@@ -38,6 +38,7 @@ class Org::GroupsController < Org::OrgController
   private
   def load_and_authorize_group
     @group = Group.find_by_slug! params[:id]
+    raise ActiveRecord::RecordNotFound if @group.organisation != current_organisation
     authorize_or_redirect! :manage, @group
   end
 end

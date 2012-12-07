@@ -104,3 +104,17 @@
   right: 0;
   margin: 8px -20px 0 0;
 }
+
+.well-button {
+  h3{
+    color: $text-color;
+  }
+  color: $text-color-light;
+  text-decoration: none;
+}
+
+a:hover.well-button {
+  text-decoration: none;
+  color: $text-color-light;
+}
+

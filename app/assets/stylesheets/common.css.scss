@@ -1,8 +1,7 @@
 @import 'petitions_common.css.scss';
 
 body {
-  font-family: $base-font-family;
-  font-size: $base-font-size;
+  font: $text-font-size $text-font-family;
   @include font-smoothing(antialiased);
 }
 
@@ -10,12 +9,14 @@ body {
 .mt10 { margin-top: 10px; }
 .mt20 { margin-top: 20px; }
 .mt30 { margin-top: 30px; }
+.mt50 { margin-top: 50px; }
 .mr5 { margin-right: 5px; }
 .mr10 { margin-right: 10px; }
 .mr20 { margin-right: 20px; }
 .mb5 { margin-bottom: 5px; }
 .mb10 { margin-bottom: 10px; }
 .mb20 { margin-bottom: 20px; }
+.mb30 { margin-bottom: 30px; }
 .ml5 { margin-left: 5px; }
 .ml10 { margin-left: 10px; }
 .ml20 { margin-left: 20px; }
@@ -28,6 +29,7 @@ body {
 
 .left { float: left; }
 .right { float: right; }
+.nofloat { float: none!important; }
 .center { text-align: center!important; }
 .text-right { text-align: right; }
 .text-left { text-align: left; }
@@ -44,14 +46,14 @@ body {
 //	Text Styles
 // =============================================
 h1, h2, h3 { font-weight: normal; }
-h1 { color:$accent-color; font: $title-font; font-size: $h1-font-size; text-transform: uppercase; }
-h2 { color:$title-color; font: $title-font; text-transform: uppercase; }
-h2 { color:$title-color; font-family: $description-font-family; }
+h1 { color:$accent-color; font: $title-font; font-size: 2.2em; text-transform: uppercase; }
+h2 { color:$title-color; font: $title-font; font-size: 1.6em; text-transform: uppercase; }
+h3 { color:$subtitle-color; font: 1.2em $subtitle-font-family; }
 h4 { margin-bottom: 10px; }
-p { font-size: $base-font-size; }
+p { font-size: $text-font-size; }
 
-abbr, abbr[title] { color: $accent-color; border: 0 solid #fff; cursor: default; }
-.subtle { color: $subtle-color; font-size: $subtle-font-size; }
+abbr, abbr[title] { color: $accent-color-dark; border: 0; cursor: default; }
+.subtle { color: $subtle-color; font-size: 0.8em; }
 
 .strong { font-weight: bold; }
 
@@ -76,7 +78,7 @@ input[type=checkbox] {
 }
 
 form .control-group.error input, form .control-group.error textarea {
-  color: #555;
+  color: $input-text-color;
 }
 
 form .controls {
@@ -84,16 +86,18 @@ form .controls {
 }
 
 // =============================================
-//	Label Styles
+//	Label And Modal Styles
 // =============================================
 .label {
   a {
-    //color: #3A87AD;
     color: #fff;
     @include remove-text-shadow();
   }
   background-color: #ccc;
-  //background-color: rgba($accent-color-light, 0.1);
+}
+
+.modal {
+  h3 { font-family: $subtitle-font-family; font-size: 1.4em; }
 }
 
 // =============================================
@@ -103,14 +107,14 @@ form .controls {
 
 .btn, .btn-info, .btn-success {
   @include font-smoothing(antialiased);
-  font: $title-font;
+  font: $button-font;
   font-size: $button-font-size;
   text-transform: uppercase;
   padding: 4px 20px 4px 20px;
 }
 
 .btn-primary {
-  font:  $title-font;
+  font: $button-font;
   font-size: 1.1em;
   line-height: 1em;
   float: right;
@@ -137,14 +141,13 @@ form .controls {
 }
 
 .btn-secondary {
-  font-size: 1em;
   float: left;
   padding: 4px 30px 5px 30px;
 }
 
 .btn-mini {
   padding: 2px 6px;
-  font-family: $base-font-family;
+  font-family: $text-font-family;
   font-size: 11px;
   line-height: 14px;
   text-transform: none;
@@ -152,13 +155,11 @@ form .controls {
 
 .btn.left { float: left; }
 
-//success messages
 .btn-success, .alert.alert-success {
   border-color: #cccccc;
   background-color: #ececec;
   background-image: none;
   @include remove-gradient;
-//filter: none;
 }
 
 .btn-info, .alert.alert-info {
@@ -168,16 +169,13 @@ form .controls {
   background-color: #D9EDF7;
   background-image: none;
   @include remove-gradient;
-//filter: none;
 }
 
-//error messages
 .alert.alert-danger, .btn-error, .alert.alert-error {
   border-color: #ff0000;
   background-color: #fbe9e9;
   background-image: none;
   @include remove-gradient;
-//filter: none;
 }
 
 .actions { background: none; border-top: none; padding-right: 0px; }
@@ -219,7 +217,7 @@ form .controls {
 
 p.important {
   font-size:11pt;
-  color: $content-color-light;
+  color: $text-color-light;
   font-weight: lighter;
   font-style: italic;
   font-family: $subtitle-font-family;
@@ -228,4 +226,39 @@ p.important {
 
 cite {
   color: $subtle-color
+}
+.manage-buttons {
+  float: right;
+  margin-top: 8px;
+
+  .group1 {
+    float: right;
+    margin-left: 5px;
+  }
+  .group2 {
+    float: right;
+  }
+  .btn-group {
+    display: inline-block;
+  }
+  .btn-manage {
+    i { margin-right: 3px; }
+    background-color: #f3f3f3;
+    background-image: none;
+    color: #252525;
+    font-size: 11px;
+    line-height: 16px;
+    padding: 8px 12px;
+  }
+}
+
+label.conditional_boolean  {
+  color: #666;
+  font-size: 9pt;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+
+.conditional_boolean .controls {
+  display: inline;
 }

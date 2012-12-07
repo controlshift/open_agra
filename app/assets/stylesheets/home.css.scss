@@ -50,7 +50,7 @@
       }
 
       .number {
-        font-family: $georgia-font-family;
+        font-family: Georgia;
         font-weight: bold;
         font-style: italic;
         font-size: 38pt;
@@ -67,7 +67,7 @@
       .about-and-contact, .about-and-contact a {
         margin-top: 60px;
         color: #a1a1a1;
-        font-family: $description-font-family;
+        font-family: $text-font-family;
         font-weight: bold;
         font-size: 10pt;
       }
@@ -150,11 +150,11 @@
     }
     h4 {
       font-size: 10pt;
-      font-family: $description-font-family;
+      font-family: $text-font-family;
     }
     p {
-      color: $content-color-light;
-      font-family: $description-font-family;
+      color: $text-color-light;
+      font-family: $text-font-family;
     }
     p.important {
       img { vertical-align: top; margin-right: 10px; }
@@ -273,5 +273,95 @@
     a:hover {
       background-color: rgba($accent-color, 0.1);
     }
+  }
+}
+
+.featured-petitions, .featured-effort {
+  a:hover { text-decoration: none; }
+
+  .featured-petition {
+    margin-top: 20px;
+  }
+
+  .petition-image, .effort-image {
+    width: 300px;
+    height: 170px;
+    padding: 0px;
+    overflow: hidden;
+    @include remove-shadow;
+
+    img {
+      min-width: 300px;
+      max-width: 300px;
+    }
+  }
+
+  .petition-progress, .effort-progress {
+    margin-top: 2px;
+    height: 10px;
+
+    .progressbar {
+      width: 296px;
+      vertical-align: top;
+
+      .total {
+        height: 6px;
+        margin: 0;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        background-color: #e4e4e4;
+        background-image: none;
+        border: 0px solid #d6d6d6;
+        padding: 2px;
+        @include border-radius(0);
+        @include box-shadow(#bcbcbc 1px 2px 4px 0 inset);
+      }
+      .done {
+        height: 6px;
+        margin: 0;
+        background-image: url($bg-progress-done-s-url);
+        background-repeat: repeat-x;
+      }
+    }
+  }
+
+  .petition-title h3, .effort-title h3 {
+    width: 300px;
+    color: $title-color;
+    font: $title-font;
+    font-size: 11pt;
+    text-transform: uppercase;
+    line-height: 1.5em;
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+
+  .petition-why {
+    width: 300px;
+    max-height: 70px;
+    color: $text-color-light;
+    font-size: 10pt;
+    font-family: $text-font-family;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 20px;
+    line-height: 13pt;
+  }
+
+  .petition-signatures, .effort-signatures {
+    .number {
+      font-size: 14pt;
+      font-weight: bold;
+      color: $accent-color;
+      line-height: 34pt;
+    }
+
+    margin-top: 7px;
+    color: $title-color;
+    font-size: 9pt;
+    font-weight: normal;
+    font-style: italic;
+    font-family: $subtitle-font-family;
+    text-align: right;
   }
 }

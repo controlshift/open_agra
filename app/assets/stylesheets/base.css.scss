@@ -4,42 +4,60 @@
 
 @import "compass/css3";
 
+// legacy variables
 $fg-color: #252525;
+$serif-font-family: 'Bree Serif', serif;
+$helvetica-font-family: Helvetica;
+$georgia-font-family: Georgia;
+
+// currently used variables
+$text-color: #252525;
+$text-color-white: #ffffff;
+$link-color: #0069D6;
 $bg-color: #ffffff;
+$border-color: #dddddd;
+
+$header-text-color: #252525;
+$header-link-color: #252525;
+$header-bg-color: #ffffff;
+$header-border-color: #e3e3e3;
+
+$footer-text-color: #252525;
+$footer-link-color: #252525;
+$footer-bg-color: #ffffff;
+$footer-border-color: #e3e3e3;
+
 $title-color: #252525;
-$content-color-light: #7d7d7d;
+$subtitle-color: #252525;
+$text-color-light: #7d7d7d;
 $subtle-color: #666666;
+$input-text-color: #555;
+
 $accent-color: #ff5000;
 $accent-color-light: #fc4f00;
 $accent-color-medium: #ff5000;
 $accent-color-dark: #cb3f00;
 $secondary-accent-color: #ff5000;
-$link-color: #0069D6;
-$header-border-color: #e3e3e3;
-$footer-bg-color: #ffffff;
-$border-color: #dddddd;
+
 $search-color: #666;
 $search-bg-color: #f3f3f3;
 
-$base-font-size: 10pt;
-$base-font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-$helvetica-font-family: Helvetica;
-$serif-font-family: 'Bree Serif', serif;
-$georgia-font-family: Georgia;
-$title-font-family: $serif-font-family;
+$text-font-size: 10pt;
+$text-font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+
+$title-font-size: 1em;
+$title-font-family: 'Bree Serif', serif;
 $title-font: normal 100% $title-font-family;
-$description-font-family: $helvetica-font-family;
-$subtitle-font-family: $georgia-font-family;
-$h1-font-size: 2.2em; 
-$h2-font-size: 1.6em;
-$h3-font-size: 1.2em;
-$subtle-font-size: 0.8em;
+
+$subtitle-font-size: 1em;
+$subtitle-font-family: Georgia;
+
 $button-font-size: 1em;
-$label-font-size: 1em;
-$label-subtle-font-size: 1em;
-$error-font-size: 0.9em;
+$button-font-family: 'Bree Serif', serif;
+$button-font: normal 100% $button-font-family;
+
 $footer-font-size: 0.8em;
-$letter-font-family: Georgia, Serif;
+$description-font-family: Helvetica;
 
 $btn-home-main-url: image-path("btn-home-main.png");
 $nav-global-admin-url: image-path("btn-icon-user.png");
@@ -49,6 +67,8 @@ $nav-login-url: image-path("btn-icon-login.png");
 $btn-flag-url: image-path("btn-icon-flag.png");
 $bg-progress-done-url: image-path("bg-progress-done.png");
 $bg-progress-done-s-url: image-path("bg-progress-done-s.png");
+
+$separator-line: 2px solid #EBEBEB;
 
 @mixin toggle-bg-image($url) {
   background: {

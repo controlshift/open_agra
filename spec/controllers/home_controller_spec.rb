@@ -88,16 +88,24 @@ describe HomeController do
         response.body.should_not match(/rspec test homepage/)
       end
 
-      it "should return latest awesome petitions" do
-        3.times { Factory(:petition, organisation: @organisation, admin_status: :awesome) }
+      it "should return latest awesome petitions even without leader" do
+        2.times { Factory(:petition, organisation: @organisation, admin_status: :awesome) }
+        Factory(:petition_without_leader, organisation: @organisation, admin_status: :awesome)
         get :index
         assigns(:featured_petitions).count.should == 3
       end
-      
+
       it "should return featured stories" do
         3.times { Factory(:story, organisation: @organisation, featured: true) }
         get :index
         assigns(:featured_stories).count.should == 3
+      end
+
+      it "should return the latest featured effort" do
+        earlier_featured_petition = create(:effort, organisation: @organisation, featured: true)
+        latest_featured_petition = create(:effort, organisation: @organisation, featured: true)
+        get :index
+        assigns(:featured_effort).should == latest_featured_petition
       end
     end
   end

@@ -5,9 +5,11 @@
 @mixin current_step($step, $marg_left: 14px) {
   .#{$step} {
     margin-left: $marg_left; margin-right: 14px;
-    .#{$step} {
-      color: $accent-color;
-      .number { background-color: $accent-color; }
+    .chevron {
+      .#{$step} {
+        color: $accent-color;
+        .number { background-color: $accent-color; }
+      }
     }
   }
 }
@@ -22,65 +24,166 @@ form.petition {
   margin: 0px;
 }
 
-.manage-petitions-breadcrumbs {
-  height: 38px;
-  border-bottom: 1px solid $header-border-color;
-  background: image-url("bg-breadcrumbs.png") repeat-x;
 
-  color: $title-color;
-  font-weight: bold;
-  font-family: $description-font-family;
-  line-height: 40px;
-  vertical-align: middle;
+.chevron {
+  margin-top: 20px; margin-bottom: 40px;
+  font-family: $title-font-family;
+  font-size: 14pt;
+  text-align: center;
+  line-height: 18px;
 
-  a { color: $title-color; }
-  a.view { color: $accent-color; font-weight: normal; }
-  img { vertical-align: middle; margin: 0 10px; }
-}
-
-.body-petitions, .body-registrations {
-  .chevron {
-    margin-top: 20px; margin-bottom: 40px;
-    font-family: $serif-font-family;
-    font-size: 14pt;
-    text-align: center;
-
-    .number {
-      display: inline-block;
-      width: 22px; height: 22px;
-      margin-left: 0px; margin-right: 10px;
-      color: #ffffff;
-      background-color: $subtle-color;
-      background-image: image-url("step_num.png");
-    }
+  .number {
+    display: inline-block;
+    width: 21px; height: 22px;
+    margin-left: 0px; margin-right: 10px;
+    color: #ffffff;
+    background-color: $subtle-color;
+    background-image: image-url("step_num.png");
+    background-repeat: no-repeat;
   }
-
-  @include current_step(create, 0px);
-  @include current_step(launch);
-  @include current_step(share);
-  @include current_step(manage);
 }
+@include current_step(create, 0px);
+@include current_step(launch);
+@include current_step(manage);
+@include current_step(lead-petition, 0px);
+@include current_step(training);
+@include current_step(edit);
+@include current_step(start);
 
-.body-view-show, .body-manage-show, .body-signatures-create {
+.body-view-show, .body-manage, .body-emails, .body-admins, .body-signatures-create {
+
+  .sidebar.manage {
+      hr { border: 1px solid #dedede; }
+
+      ul{
+        margin: 0;
+        list-style: none;
+      }
+
+      li{
+        display: list-item;
+        list-style: none;
+        padding-bottom: 8px;
+      }
+
+
+      li > a {
+        color: black;
+        text-decoration: none;
+        &:hover {
+          color: #252525;
+          background-color: #ebebeb;
+        }
+      }
+
+      .manage-tab {
+        width: 190px;
+        margin-left: -30px;
+        padding: 11px 10px 12px 20px;
+
+        a {
+          &:hover {
+            color: #999999;
+            text-decoration: none;
+            cursor: pointer;
+          }
+          display: block;
+          height: 37px;
+          padding-left: 47px;
+          color: #999999;
+          font-size: 13px;
+          font-family: $serif-font-family;
+          text-transform: uppercase;
+          line-height: 14px;
+
+          .strong { font-size: 20px; line-height: 1.1em; font-weight: normal; }
+        }
+
+        a#manage-start    { @include toggle-bg-image('icon-manage-tab-start.png') }
+        a#manage-email    { @include toggle-bg-image('icon-manage-tab-email.png') }
+        a#manage-collect  { @include toggle-bg-image('icon-manage-tab-collect.png') }
+        a#manage-deliver  { @include toggle-bg-image('icon-manage-tab-deliver.png') }
+        a#manage-training{
+          padding-left: 0px;
+          margin-top: -3px;
+          margin-bottom: 4px;
+          i {
+            color: #CCCCCC;
+            font-size: 46px;
+            margin-right: 8px;
+            margin-top: 5px;
+            vertical-align: text-bottom;
+          }
+          .training-label {
+            line-height: 46px;
+          }
+        }
+      }
+
+      .manage-tab.highlighted {
+        background-color: #e4e4e4;
+        @include border-top-right-radius(8px);
+        @include border-bottom-right-radius(8px);
+        a { color: #252525; background-position: left bottom; }
+        a#manage-training{
+          i {
+            color: #252525;
+          }
+        }
+      }
+
+      .manage-tab.separator {
+        border-bottom: 1px solid #dedede;
+      }
+
+      .campaign-tips {
+        h4 {
+          font-size: 15px;
+          font-family: $serif-font-family;
+          font-weight: normal;
+          text-transform: uppercase;
+          margin-bottom: 0;
+        }
+        .why {
+          color: $accent-color;
+          font-family: $georgia-font-family;
+          font-size: 11px;
+          font-style: italic;
+          margin-bottom: 10px;
+        }
+      }
+    }
+
   .sidebar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-image: image-url("bg-stripe-black.png");
-    background-color: #333;
-    padding: 0 0 0 40px;
+    background: {
+      color: #f5f5f5;
+      image: image-url("bg-header-shadow.png"), image-url("bg-footer-shadow.png");
+      repeat: repeat-x, repeat-x;
+      position: left top, left bottom;
+    }
+    border-left: 1px solid #ebebeb;
+    padding: 0 0 0 30px;
     margin: 0px;
+    margin-bottom: -60px;
 
-    .container { width: 220px; padding: 0 !important; margin: 0 }
-    .sidebar-box { margin-bottom: 30px; }
+    .container { width: 190px; padding: 0 !important; margin: 0 }
+    .sidebar-box {
+      margin-bottom: 30px;
+      .settings {
+        a > i {
+          color: $accent-color;
+        }
+      }
+      share { margin-bottom:80px;}
+    }
 
     h2 {
       display: inline-block;
-      color: #ffffff;
+      color: #252525;
       font: $title-font;
-      font-size: 38pt;
+      font-size: 28pt;
       text-transform: uppercase;
-      line-height: 34pt;
+      line-height: 28pt;
       margin-bottom: 15px;
     }
 
@@ -101,49 +204,33 @@ form.petition {
   		  vertical-align: middle;
   		}
   	}
+  }
 
-  	.petition-progress {
-      .progressbar {
-        width: 210px;
-        height: 41px;
-        vertical-align: top;
+  .petition-progress {
+    .progressbar {
+      width: 218px;
+      height: 18px;
+      vertical-align: top;
 
-        .total {
-          height: 29px;
-          margin: 0;
-          background-image: image-url("bg-progress.png");
-          background-repeat: repeat-x;
-          border: 5px solid #404040;
-          padding: 2px 0 0 2px;
-          @include border-radius(0);
-        }
-        .done {
-          height: 26px;
-          margin: 0;
-          background-image: url($bg-progress-done-url);
-          background-repeat: repeat-x;
-        }
-        .text {
-          display: none;
-        }
+      .total {
+        height: 18px;
+        margin: 0;
+        background-color: #e4e4e4;
+        background-image: none;
+        border: 0;
+        padding: 2px 0 0 2px;
+        @include border-radius(0);
+        @include box-shadow(#bcbcbc 0 2px 5px 0 inset);
       }
-    }
-
-  	.petition-signatures {
-  	  .number {
-        font-size: 30pt;
-        font-weight: bold;
-        color: $accent-color;
-        line-height: 34pt;
+      .done {
+        height: 16px;
+        margin: 0;
+        background-image: url($bg-progress-done-url);
+        background-repeat: repeat-x;
       }
-      color: #ffffff;
-      font-size: 14pt;
-      font-weight: normal;
-      font-style: italic;
-      font-family: $subtitle-font-family;
-      margin-left: 10px;
     }
   }
+
 }
 
 // =============================================
@@ -152,15 +239,16 @@ form.petition {
 
 .body-view-show, .body-signatures-create {
   #contact_user_form .ajax-loader { margin:0px 10px 0px 0px; }
-  #contact_user_form .error { color: red; font-size:$base-font-size }
+  #contact_user_form .error { color: red; font-size:$text-font-size }
 
   .spread-word{
-    color: white;
+    color: #252525;
     font-size: 1.1em;
     font-style: italic;
     font-family: Helvetica;
+    line-height: 1.3em;
   }
-  
+
   .btn-flag {
     margin: 40px 0 0 0;
   }
@@ -175,7 +263,7 @@ form.petition {
       line-height: 15px;
       width: 190px;
       height: 46px;
-      color: $fg-color;
+      color: $text-color;
       font-family: $description-font-family;
       margin-bottom: 20px;
       margin-right: 10px;
@@ -197,18 +285,18 @@ form.petition {
     margin: 20px 0 0 0;
     list-style: none;
   }
-  
-  .signthepetition {
+
+  .sign-the-petition {
     span.help-inline, .help-block {
       font-size: 8pt;
-      color: #ffffff !important;
+      color: $accent-color !important;
     }
     span.help-block {
-      a { color: #ffffff; }
+      a { color: #252525; }
     }
     form {
-  	  label {
-  	    color: #ffffff;
+  	  label.string, label.tel, label.email {
+  	    color: #252525;
   	    font-size: 8pt;
   	    font-weight: bold;
   	    font-family: $description-font-family;
@@ -220,15 +308,18 @@ form.petition {
   	  .label-wrapper { height: 20px; }
   		input.string {
   		  @include border-radius(0);
-  		  width: 200px;
+  		  width: 180px;
   		  margin: 0;
   		}
   		input.signature-narrow {
   	    width: 160px;
   	  }
   	  .checkbox {
-  	    width: 160px;
+  	    width: 140px;
   	    margin-top: 10px;
+  	  }
+  	  .control-group.error input, .control-group.error select, .control-group.error textarea {
+  	    border-color: $accent-color;
   	  }
   	}
 
@@ -248,55 +339,76 @@ form.petition {
     .input-why, .checkbox-why, .help-block {
 
   	  a {
-        color: #ffffff;
+        color: #252525;
         font-size: 8pt;
         font-style: italic;
         font-family: $subtitle-font-family;
       }
   	}
 
-  	.btn-primary { float: left; width: 210px }
-  	
+  	.btn-primary { float: left; width: 190px }
+
   	.return-to-petition { display: none; }
+
+    .signature-disclaimer {
+      font-style: italic;
+      font-weight: 0.8em;
+    }
   }
 
-  .social_share { 
+  .social_share {
+    line-height: 0;
+
   	a.share {
-  	  margin: 10px 5px 0 0;
+  	  background-color: #e4e4e4;
+  	  background-image: none;
+  	  @include border-radius(4px);
+  	  height: 40px;
+  	  line-height: 18px;
+
+  	  &:hover {
+  	    background-color: #e4e4e4;
+    	  background-image: none;
+    	  text-decoration: none;
+  	  }
+  	  .text {
+  	    display: inline-block;
+  	    font-family: $serif-font-family;
+  	    text-transform: uppercase;
+    	  color: #252525;
+    	  float: left;
+    	  margin: 10px 0 0 10px;
+  	  }
+  	  i {
+  	    display: inline-block;
+  	    float: right;
+  	    color: $accent-color;
+  	  }
+  	}
+  	a.share.facebook {
+  	  width: 190px;
+  	  margin-bottom: 5px;
+	    i {
+	      font-size: 30px;
+	      line-height: 1em;
+  	    margin: 5px 10px 0 0;
+	    }
+  	}
+  	a.share.twitter {
+  	  width: 95px;
+	    i {
+	      font-size: 16px;
+  	    margin: 10px 10px 0 0;
+	    }
+  	}
+  	a.share.email {
+  	  width: 90px;
+	    i {
+	      font-size: 16px;
+  	    margin: 10px 10px 0 0;
+	    }
   	}
   	.petition_url { display: none; }
-  }
-}
-
-// =============================================
-//	Progressbar Styles
-// =============================================
-.progressbar {
-  width:200px;
-  height:100%;
-  display: inline-block;
-  vertical-align: middle;
-
-  .total {
-    width: 100%;
-    height: 15px;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    background-image: image-url("bg-progress.png");
-    border: 3px solid #404040;
-    text-align: left;
-    overflow: hidden;
-  }
-  .done {
-    vertical-align: top;
-    height: 14px;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    background-image: url($bg-progress-done-url);
-    border: 0px solid #ddd;
-  }
-  .text {
-    display: inline;
   }
 }
 
@@ -336,6 +448,108 @@ form.petition {
 //	Manage petition page
 // =============================================
 
+.body-manage, .body-emails, .body-admins {
+  h2{
+    color: #252525;
+    font-size: 20px;
+    font-family: $serif-font-family;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+}
+
+.sidebar.manage {
+  .sidebar-box.settings {
+    .well {
+      background-color: #f0f0f0;
+      margin-left: -15px;
+      padding: 18px 12px 0 12px;
+
+      li > a {
+        &:hover {
+          color: #252525;
+          background-color: #ebebeb;
+        }
+      }
+      li.divider {
+        height: 1px;
+        border-bottom: 0;
+        border-top: 1px solid #dedede;
+      }
+      a > i {
+        color: $accent-color;
+      }
+      form {
+        margin: 0;
+        .control-group {
+          margin: 0;
+          white-space: nowrap;
+
+          input[type=checkbox] { margin: 0 2px 0 2px; }
+          label { display: inline-block; }
+        }
+      }
+    }
+  }
+}
+
+.body-manage {
+  .achievements-accordion {
+    .accordion-group {
+      border: {
+        top: $separator-line;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      @include border-radius(0);
+      padding: 14px 0;
+
+      .accordion-toggle {
+        color: #252525;
+        font-size: 20px;
+        font-family: $serif-font-family;
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 0;
+        margin-right: 10px;
+        line-height: 30px;
+        background-image: image-url("arrow-down.png");
+        background-repeat: no-repeat;
+        background-position: right center;
+
+        img { margin-right: 10px; vertical-align: top; }
+
+        .complete {
+          float: right;
+          color: #04a83f;
+          font-family: $georgia-font-family;
+          font-style: italic;
+          font-weight: bold;
+          font-size: 16px;
+          text-transform: none;
+          margin-right: 30px;
+        }
+      }
+
+      .accordion-toggle.open {
+        background-image: image-url("arrow-up.png");
+      }
+
+      .accordion-inner {
+        border: 0;
+        padding: 10px 10px 10px 40px;
+
+        .btn-secondary {
+          float: right;
+          padding: 6px 20px 7px 20px;
+          margin-right: 45px;
+        }
+      }
+    }
+  }
+}
+
 .body-manage-show {
   h1.title {
     display: inline;
@@ -345,58 +559,58 @@ form.petition {
     text-transform: uppercase;
     line-height: 34pt;
   }
-  
-  .petition-progress-box {
+
+  .btn-primary {
+    i {
+      font-size: 1.4em;
+      margin-left: -10px;
+      vertical-align: text-top;
+      padding-right: 10px;
+    }
+  }
+}
+
+
+
+.petition-selector-modal {
+
+  .petition-host-label {
+    vertical-align:top;
+    line-height: 29px;
+  }
+
+  .petition-selector-textbox {
+    margin-bottom: 0;
+  }
+
+  .indicator {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+  }
+
+  .control-group.error {
+    display: block;
+
+    .help-inline {
+      font-size: 12px;
+    }
+  }
+
+  .double-confirm-box {
     position: relative;
-    width: 100%;
-    margin: 40px 0px;
-    padding: 12px;
-    background: {
-      color: #444444;
-    }
-    @include border-radius(6px);
-
-    .petition_url { display: none; }
-
-    .petition-progress {
-      padding-right: 14px;
-
-      .progressbar {
-        width: 100%;
-
-        .total {
-          height: 29px;
-          background-image: image-url("bg-progress.png");
-          background-repeat: repeat-x;
-          border: 5px solid #404040;
-          padding: 2px 0 0 2px;
-          @include border-radius(0);
-        }
-        .done {
-          height: 26px;
-          background-image: url($bg-progress-done-url);
-          background-repeat: repeat-x;
-        }
-        .text {
-          display: none;
-        }
-      }
-    }
-
-    .petition-signatures {
-  	  .number {
-        font-size: 30pt;
-        font-weight: bold;
-        color: $secondary-accent-color;
-        line-height: 34pt;
-      }
-      color: #ffffff;
-      font-size: 14pt;
-      font-weight: normal;
-      font-style: italic;
-      font-family: $subtitle-font-family;
-      margin-left: 10px;
-    }
+    display: inline-block;
+    width: 355px;
+    height: 29px;
+    margin-right: 20px;
+    overflow: hidden;
+  }
+  .double-confirm {
+    position: absolute;
+    top: 5px;
+    right: -355px;
+    font-weight: bold;
+    font-size: 1em;
   }
 }
 
@@ -408,7 +622,7 @@ form.petition {
   line-height: 8pt;
   margin-bottom: 10px;
 
-  a { color: $fg-color; font-weight: bold; }
+  a { color: $text-color; font-weight: bold; }
   img { vertical-align: -25%; margin-left: 5px; }
 }
 
@@ -418,6 +632,7 @@ form.petition {
   bottom: 12px;
 
   .text { display: none; }
+  i { display: none; }
 
   .desc {
     display: inline-block;
@@ -444,7 +659,8 @@ form.petition {
   a.share.email { @include toggle-bg-image('btn-share-email.png') }
 }
 
-.sidebar.manage, .manage-menu {
+
+.manage-menu {
   hr { width: 90%; border: 1px solid #555555; }
 
   a {
@@ -459,11 +675,11 @@ form.petition {
     color: #ffffff;
     font-size: 10px;
     font-weight: normal;
-    font-family: serif-font-family;
+    font-family: $title-font-family;
     text-transform: uppercase;
     line-height: 14px;
 
-    .strong { font-size: 14px; line-height: 14px; }
+    .strong { font-size: 14px; line-height: 14px; font-weight: normal; }
   }
 
   a#manage-email    { @include toggle-bg-image('icon-manage-email.png') }
@@ -473,14 +689,6 @@ form.petition {
   a#manage-contact  { @include toggle-bg-image('icon-manage-contact.png') }
   a#manage-hide     { @include toggle-bg-image('icon-manage-close.png') }
   a#manage-activate { @include toggle-bg-image('icon-manage-activate.png') }
-}
-
-.sidebar.manage {
-  a {
-    display: block;
-    width: 300px;
-    margin-bottom: 15px;
-  }
 }
 
 .manage-menu {
@@ -533,11 +741,6 @@ form.petition {
 }
 
 .manage-edit-petition {
-  .preview-image {
-    float: left;
-    display: inline-block;
-    width: 220;
-  }
   .petition-image {
     width: 200px;
     height: auto;
@@ -552,7 +755,7 @@ form.petition {
     filter: none;
     h3 { filter: none; }
   }
-  
+
   .petition-box-actions {
     margin-bottom: 20px;
   }
@@ -580,8 +783,8 @@ form.petition {
     position: relative;
   }
   .status-text {
-    font-family: $base-font-family;
-    font-size: $base-font-size;
+    font-family: $text-font-family;
+    font-size: $text-font-size;
   }
   .image-upload-input {
     position: absolute;
@@ -597,102 +800,15 @@ a#add-categories {
 ul#selected-categories {
   list-style-type: none;
   margin: 10px 5px;
-  
+
   li {
     margin: 5px 0;
   }
 }
 
-// =============================================
-//	Edit petition page
-// =============================================
-.body-manage-edit {
-  #petition-alias-modal {
-    #petition-alias-host {
-      vertical-align:top;
-      line-height: 29px;
-    }
-    #petition-alias-textbox {
-      margin-bottom: 0;
-    }
-    
-    .indicator {
-      width: 16px;
-      height: 16px;
-      display: inline-block;
-    }
-    
-    .control-group.error {
-      display: block;
-      
-      .help-inline {
-        font-size: 12px;
-      }
-    }
-    
-    .double-confirm-box {
-      position: relative;
-      display: inline-block;
-      width: 355px;
-      height: 29px;
-      margin-right: 20px;
-      overflow: hidden;
-    }
-    .double-confirm {
-      position: absolute;
-      top: 5px;
-      right: -355px;
-      font-weight: bold;
-      font-size: 1em;
-    }
-  }
-  
-  .upload-image-box-horizontal {
-    margin-top: 20px;
-    margin-bottom: 20px;
-
-    .upload-image {
-      .preview-image {
-        float: left;
-        margin-right: 5px;
-        img {
-          height: 122px;
-        }
-      }
-      .petition-image {
-        background-color: white;
-        img {
-          display: block;
-        }
-        padding: 5px;
-        @include box-shadow(rgba(0, 0, 0, 0.5) 1px 1px 5px 0 false);
-      }
-      .arrow {
-        float: left;
-        margin-top: 20px;
-        height: 0px;
-        width: 5px;
-        border: solid 5px transparent;
-        border-right-color: $border-color;
-      }
-      .upload-field {
-        float: left;
-        width: 265px;
-        height: 120px;
-        padding: 0px 10px 10px;
-        border: solid 2px $border-color;
-        @include border-radius(5px);
-      }
-      .status-text {
-        font-family: $base-font-family;
-        font-size: $base-font-size;
-      }
-    }
-  }
-}
 
 // =============================================
-//	Manual input signatures page
+//	Manual input signatures
 // =============================================
 
 .body-signatures-manual_input {
@@ -701,11 +817,29 @@ ul#selected-categories {
   }
 }
 
+#input-signatures-modal {
+  input {
+    margin-bottom: 0;
+  }
+  .help-inline {
+    display: block;
+  }
+  .alert {
+    padding: 0;
+    margin-right: 20px;
+    line-height: 29px;
+  }
+  .alert-success, .alert-error {
+    background-color: transparent;
+    border: 0;
+  }
+}
+
 // =============================================
 //	Delivery page
 // =============================================
 
-.body-manage-deliver {
+.manage-deliver {
   .accordion {
     margin-bottom: 20px;
 
@@ -715,13 +849,13 @@ ul#selected-categories {
       text-decoration: none;
       padding-left: 30px;
     }
-    
+
     .accordion-toggle {
       background-image: image-url("spindown-closed.gif");
       background-repeat: no-repeat;
       background-position: 15px 13px;
     }
-    
+
     .accordion-toggle.open {
       background-image: image-url("spindown-open.gif");
     }
@@ -800,7 +934,7 @@ ul#selected-categories {
     position: absolute;
     top: -0px;
     left: 180px;
-    width: 680px;
+    width: 460px;
     height: 235px;
     min-height: 235px;
     padding: 30px 30px 50px 30px;
@@ -835,7 +969,7 @@ ul#selected-categories {
     	padding: 10px 20px 10px 0;
     	margin-bottom: 20px;
       cursor: pointer;
-      border-bottom: 2px solid #ebebeb;
+      border-bottom: $separator-line;
 
     	h2 {
     	  display: inline;
@@ -880,7 +1014,7 @@ ul#selected-categories {
   }
 
   #admin-notes, #admin-notes a {
-    color: $fg-color;
+    color: $text-color;
   }
 
   #admin-notes a {
@@ -912,17 +1046,26 @@ ul#selected-categories {
 
     .profile {
       color: $subtle-color;
-      font-family: $description-font-family;
+      font-family: $text-font-family;
       font-size: 8pt;
       font-weight: lighter;
       line-height: 1.5em;
       margin-top: 10px;
       margin-bottom: 30px;
 
+      .name { font-weight: bold; color: #252525; }
       img { vertical-align: -25%; margin-left: 5px; }
     }
 
-    hr { border: 1px solid #ebebeb; }
+    hr {
+      border-top: 1px solid #ebebeb;
+      border-bottom: 1px solid #ffffff;
+    }
+
+    .petition-map {
+      position: relative;
+    }
+
   }
 }
 
@@ -949,4 +1092,92 @@ ul#selected-categories {
 
 .table th .desc {
   background-image: image-url("down_arrow.png");
+}
+
+#flag-reason {
+  width: 518px;
+}
+
+@mixin upper_link_style($link_to) {
+  .link-container {
+    margin-top: -27px;
+    height: 40px;
+    margin-bottom: 43px;
+    .#{$link_to}-link {
+      text-decoration: none;
+      color: black;
+      font-weight: bold;
+      background: image-url("go-to-#{$link_to}.png") no-repeat 0 20px;
+      line-height: 47px;
+      display: inline-block;
+      padding-left: 53px;
+      margin-left: 8px;
+    }
+  }
+}
+
+@include upper_link_style(effort);
+@include upper_link_style(group);
+
+.becoming-leader {
+  h1.title {
+    display: inline;
+    color: $accent-color;
+    font: $title-font;
+    font-size: 2.2em;
+    text-transform: uppercase;
+  }
+  .normal-text {
+    p {
+      color: $text-color;
+      margin-bottom: 14px;
+    }
+  }
+}
+
+.leading-progress {
+  .title {
+    text-transform: capitalize;
+    margin: 10px 0;
+  }
+  .statuses {
+    height: 20px;
+    overflow: hidden;
+  }
+  .status {
+    width: 80px;
+    height: 20px;
+    line-height: 20px;
+    padding-left: 3px;
+    text-transform: capitalize;
+    color: white;
+    background-color: lighten(#666, 30%);
+    position: relative;
+    float: left;
+    font-weight: bold;
+    margin-right: 20px;
+  }
+
+  .status:after {
+    content: "";
+    border-left: 12px solid lighten(#666, 30%);
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    position: absolute;
+    top: -2px;
+    right: -10px;
+  }
+
+  .status.accomplished {
+    background-color: #666;
+  }
+
+  .status.accomplished:after {
+    border-left: 12px solid #666;
+  }
+
+  .status:last-child:after {
+    display: none;
+  }
+
 }

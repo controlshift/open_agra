@@ -1,0 +1,37 @@
+.accordion.achievements-accordion#achievements-accordion{'data-save-achievements-url' => petition_manage_path(@petition, format: :js) }
+
+  = achievements_accordion 'Share on Facebook', :share_on_facebook do
+    .row
+      .span3
+        = link_to "#", class: "btn btn-primary nofloat facebook", id: "share_on_facebook_button", data: { href: facebook_share_href(@petition) } do
+          %i.icon-facebook
+          Share on Facebook
+      .span4
+        %p.important
+          Posting to your facebook wall is one of the most effective ways to spread your campaign
+
+
+  - if can_share_with_friends_on_facebook?
+    = achievements_accordion 'Invite your friends', :share_with_friends_on_facebook do
+      %p.important
+        Who might support this campaign? Invite them to sign with a quick personal note.
+      .mb20.mt10
+        = facebook_share_widget_helper template: { name: @petition.title, link: petition_url(@petition) }
+  = achievements_accordion 'Share on Twitter', :share_on_twitter do
+    = link_to twitter_share_href(@petition), class: "btn btn-primary nofloat", id: "share_on_twitter_button" do
+      %i.icon-twitter
+      Share on Twitter
+      
+  = achievements_accordion 'Share via Email', :share_via_email do
+    = link_to "#email_template", class: "btn btn-primary nofloat", id: "view_email_template", "data-toggle" => "modal", "data-backdrop" => "true" do
+      %i.icon-envelope-alt
+      Share via email
+          
+- content_for :end_of_body do
+  :coffeescript
+    $ ->
+       pages.getting_started.initialize()
+
+        
+  / render div at the end of body for fixing IE7 z-index problem
+  = render partial: "petitions/view/email_template"

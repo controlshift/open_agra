@@ -1,5 +1,9 @@
 = title "Content Migration"
 %br
+
+This advanced feature allows for the export of the custom site content you've created for your organisation.
+%br
+
 .row
   .span4
     %h2 Import
@@ -23,7 +27,7 @@
               %label{ class: "checkbox" }
                 = check_box_tag "slug[]", content.slug
                 = content.name
-      = submit_tag "Export", class: "btn"
+      = submit_tag "Export", class: "btn", id: "export-button"
       :javascript
         $("#select_all_checkbox").click(function() {
           $("input[name='slug[]']").attr('checked', $("#select_all_checkbox").is(':checked'));

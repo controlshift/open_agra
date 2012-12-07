@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::Base
   include OrganisationHelpers
+  helper FacebookShareWidget::Engine.helpers
+  include SimpleCaptcha::ControllerHelpers
+
   protect_from_forgery
 
   before_filter :authenticate_user!
@@ -47,5 +50,14 @@ class ApplicationController < ActionController::Base
 
   def private_organisations_view_path
     File.join(AgraPrivate::Engine.paths["app/views"].existent, "organisations/#{current_organisation.slug}")
+  end
+
+  def streaming_csv(export)
+    filename = "#{export.name}-#{Time.now.strftime("%Y%m%d")}.csv"
+    self.response.headers['Content-Type'] = 'text/csv; charset=utf-8; header=present'
+    self.response.headers['Content-Disposition'] = "attachment; filename=#{filename}"
+    self.response.headers['Content-Transfer-Encoding'] = 'binary'
+    self.response.headers['Last-Modified'] = Time.now.httpdate
+    self.response_body = export.as_csv_stream
   end
 end

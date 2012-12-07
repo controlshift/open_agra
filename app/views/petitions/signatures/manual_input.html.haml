@@ -1,7 +1,3 @@
-- content_for :before_content do
-  = render partial: "petitions/manage/petition_manage_breadcrumbs"
-  = render partial: "petitions/manage/petition_manage_menu", locals: {highlight_id: "manage-collect"}
-  
 = title "Enter Petition Signatures"
 %br
 
@@ -50,14 +46,14 @@
     .clear
   
 :javascript
-  var error_rows = eval('#{j(@error_rows_json)}');
+  var error_rows = #{raw @error_rows.to_json};
   
   $("#manual-input-form input").live('focusin', function() {
     var lastInputs = $("#table-input tbody tr:last :input");
     if (lastInputs.is($(this))) addNewRow();
   });
       
-  clientSideValidations.callbacks.element.before = function(element, eventData) {
+  ClientSideValidations.callbacks.element.before = function(element, eventData) {
     var row = element.closest("tr");
     var isBlankRow = row.find(":input:text").filter(function() { return $(this).val().length > 0; }).length == 0;
     

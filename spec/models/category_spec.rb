@@ -8,6 +8,7 @@
 #  updated_at      :datetime        not null
 #  organisation_id :integer
 #  slug            :string(255)
+#  external_id     :string(255)
 #
 
 require 'spec_helper'

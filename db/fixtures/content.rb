@@ -34,6 +34,7 @@ Content.seed(:slug, :organisation_id,
   { slug: 'petition_form_whom_help',  body: "Who has the power to give you what you want? MPs, CEOs, the Prime Minister, the Mayor etc.", category: 'Petitions', name: 'Form Help for Petition Whom Field'},
   { slug: 'petition_form_what_help',  body: "This is what you would write in a letter to your target. i.e. Dear Minister, please don't approve a coal seam gas mine in Newtown etc.", category: 'Petitions', name: 'Form Help for Petition What Field'},
   { slug: 'petition_form_why_help',   body: "This is what you'd say to a friend if you were trying to explain why you cared about this issue. Try to use a combination of facts and stories so you appeal to people's heads and hearts.", category: 'Petitions', name: 'Form Help for Petition Why Field'},
+  { slug: 'petition_form_where_help',   body: 'A location that your petition relates to. State, city, neighborhood or address.', category: 'Petitions', name: 'Form Help for Petition Where Field'},
   { slug: 'welcome_email',                            body: load_content('welcome_email'),                            category: 'Email', name: 'Welcome email for new campaigns',         filter: 'liquid' },
   { slug: 'promote_petition_send_launch_kicker',      body: load_content('promote_petition_send_launch_kicker'),      category: 'Email', name: 'Promote Email: Launch Kicker',            filter: 'liquid' },
   { slug: 'promote_petition_encourage',               body: load_content('promote_petition_encourage'),               category: 'Email', name: 'Promote Email: Encourage',                filter: 'liquid' },
@@ -44,6 +45,17 @@ Content.seed(:slug, :organisation_id,
   { slug: 'twitter_share_text',   body: 'This cause is close to my heart - please sign:', category: 'Social', name: 'Twitter Share Text'},
   { slug: 'petition_landing_aside',         body: load_content('petition_landing_aside'), category: 'Petition Landing', name: 'Aside'},
   { slug: 'petition_landing_description',   body: "Your campaign to make Australia better begins here.  We'll help you with tools and advice every step of the way.", category: 'Petition Landing', name: 'Description'},
-  { slug: 'petition_landing_title',         body: 'Start A Campaign', category: 'Petition Landing', name: 'Title'}
+  { slug: 'petition_landing_title',         body: 'Start A Campaign', category: 'Petition Landing', name: 'Title'},
+
+  { slug: 'email_template_share_on_social_media', body: load_content('email_template_share_on_social_media'),   category: 'Email', kind: 'email_template', filter: 'liquid', name: 'Share on social media'},
+  { slug: 'email_template_we_had_a_win',          body: load_content('email_template_we_had_a_win'),            category: 'Email', kind: 'email_template', filter: 'liquid', name: 'We had a win'},
+  { slug: 'email_template_report_back',           body: load_content('email_template_report_back'),             category: 'Email', kind: 'email_template', filter: 'liquid', name: 'Report back'},
+  { slug: 'email_template_delivery',              body: load_content('email_template_delivery'),                category: 'Email', kind: 'email_template', filter: 'liquid', name: 'Delivery'},
+
+  { slug: 'petition_show_postcode_label', body: 'Postcode', category: 'Petitions', name: 'Postcode Label'  },
+  { slug: 'leader_duties_text',    body: load_content('leader_duties_text'),   category: 'Efforts', name: 'Leader duty',          filter: 'liquid'  },
+  { slug: 'how_this_works_text',   body: load_content('how_this_works_text'),  category: 'Efforts', name: 'Specific target help', filter: 'liquid'  },
+  { slug: 'training_text',         body: load_content('training_text'),        category: 'Efforts', name: 'Training text',        filter: 'liquid'  },
+  { slug: 'training_sidebar_text', body: load_content('training_sidebar_text'),category: 'Efforts', name: 'Training sidebar text',filter: 'liquid'  }
 )
 

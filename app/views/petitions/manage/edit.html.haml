@@ -1,96 +1,17 @@
-- content_for :before_content do
-  = render partial: "petition_manage_breadcrumbs"
-  = render partial: "petition_manage_menu", locals: {highlight_id: "manage-edit"}
-  
+- content_for :sidebar do
+  = render partial: 'petitions/manage/manage_menu_bar', locals: {highlight_id: ''}
+
+
+.row
+  .span9
+    = manage_title "Edit Petition", {kind: 'edit'}
 .row
   .span7.manage-edit-petition
-    = title "Edit Petition"
-    .mt10
-      %i.icon-globe
-      - if @petition.alias.present?
-        %span#petition-url-text= petition_alias_url(@petition.alias)
-      - else
-        %span#petition-url-text= petition_url(@petition)
-        = link_to "Set Short URL", "#", id: "set-short-url", href: "#petition-alias-modal", "data-toggle" => "modal"
     .mt20.mb20
       You can make edits to your petition - but it will notify a moderator that you have done so.  If you substantially change your petition we will notify your supporters. 
     
     = render partial: "petitions/form", locals: {post_path: petition_manage_path(@petition), show_details: true,
-                                                   cancel_path: petition_manage_path(@petition)}
+                                                   cancel_path: petition_manage_path(@petition), suppress_popover: true,}
 
 - content_for :end_of_body do
-  / render div at the end of body for fixing IE7 z-index problem
-  .modal.hide.fade#petition-alias-modal
-    .modal-header
-      %button.close{ "data-dismiss" => "modal" } x
-      %h3 Set Petition Short URL
-    .modal-body.petition-form
-      %b You can set it only once.
-      .mt10
-        .inline-block#petition-alias-host
-          = petition_alias_url("")
-        .inline-block
-          %input.span2#petition-alias-textbox
-          %span.indicator
-          .control-group.error
-            .help-inline
-    .modal-footer
-      .double-confirm-box
-        %span.double-confirm This will become a permanent URL, please confirm again.
-      %a.btn.btn-primary.disabled#btn-confirm{ href: "#" } Confirm
-      
-    :coffeescript
-      confirmed_once = false
-      
-      showConfirmation = ->
-        confirmed_once = true
-        $('.double-confirm').show()
-        $('.double-confirm').animate({ right: "0" }, 300)
-        
-      hideConfirmation = ->
-        confirmed_once = false
-        $('.double-confirm').hide()
-        $('.double-confirm').css("right", "-355px")
-      
-      keyupHandler = ->
-        if $('#petition-alias-textbox').val() == ""
-          $('#petition-alias-modal .indicator').html('')
-        else
-          $('#petition-alias-modal .indicator').html('<img src="#{asset_path('ajax-loader-16.gif')}" />')
-          $.ajax
-            url: '#{check_alias_petition_manage_path(@petition)}'
-            type: "post"
-            data: { alias: $('#petition-alias-textbox').val() }
-            success: (resp) ->
-              $('#btn-confirm').removeClass('disabled')
-              $('#petition-alias-modal .indicator').html('<img src="#{asset_path('tick.png')}" />')
-              $('#petition-alias-modal .help-inline').html('')
-            error: (jqXHR, textStatus, errorThrown) ->
-              json = eval("(\#{jqXHR.responseText})")
-              #console.debug(json)
-              $('#btn-confirm').addClass('disabled')
-              $('#petition-alias-modal .indicator').html("<img src=\"#{asset_path('cross.png')}\" />")
-              $('#petition-alias-modal .help-inline').html("\#{json.message}")
-            
-      $('#petition-alias-textbox').keyup(throttle($('#petition-alias-textbox'), keyupHandler, 250))
-      $('#petition-alias-textbox').keydown(hideConfirmation)
-            
-      $('#btn-confirm').click ->
-        unless $(this).hasClass('disabled')
-          if confirmed_once
-            alias = $('#petition-alias-textbox').val()
-            $.ajax
-              url: '#{update_alias_petition_manage_path(@petition)}'
-              type: "post"
-              data: { alias: alias }
-              success: (resp) ->
-                $('#petition-alias-modal').modal('hide')
-                $('#set-short-url').remove()
-                $('#petition-url-text').html("#{petition_alias_url("")}\#{alias}")
-              error: (jqXHR, textStatus, errorThrown) ->
-                json = eval("(\#{jqXHR.responseText})")
-                $('#petition-alias-modal .help-inline').html("\#{json.message}")
-          else
-            showConfirmation()
-        
-        
+  = render partial: "petitions/view/email_template"

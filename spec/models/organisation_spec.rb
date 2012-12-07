@@ -4,8 +4,8 @@
 #
 #  id                           :integer         not null, primary key
 #  name                         :string(255)
-#  created_at                   :datetime        not null
-#  updated_at                   :datetime        not null
+#  created_at                   :datetime
+#  updated_at                   :datetime
 #  slug                         :string(255)
 #  host                         :string(255)
 #  contact_email                :string(255)
@@ -57,6 +57,7 @@ describe Organisation do
   it { should allow_mass_assignment_of(:action_kit_host) }
   it { should allow_mass_assignment_of(:action_kit_username) }
   it { should allow_mass_assignment_of(:action_kit_password) }
+  it { should allow_mass_assignment_of(:country)}
   it { should respond_to(:action_kit_host) }
   it { should respond_to(:action_kit_username) }
   it { should respond_to(:action_kit_password) }
@@ -173,6 +174,17 @@ describe Organisation do
     it 'should return false if join parent org is optional' do
       subject.always_join_parent_org_when_sign_up = '0'
       subject.always_join_parent_org_when_sign_up?.should be_false
+    end
+  end
+
+  describe "#cached_signatures_size" do
+    it "should calculate the count" do
+      @organisation = Factory(:organisation)
+      @petition = Factory(:petition, organisation: @organisation)
+      @signature = Factory(:signature, petition: @petition)
+      @organisation.cached_signatures_size.should == 1
+      @signature2 = Factory(:signature, petition: @petition)
+      @organisation.cached_signatures_size.should == 1
     end
   end
 

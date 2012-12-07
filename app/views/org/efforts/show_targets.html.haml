@@ -1,0 +1,39 @@
+.breadcrumbs
+  = link_to 'Efforts', org_efforts_path
+  >
+  Manage #{@effort.title}
+
+.row.mb20
+  .span10
+    = title "\"#{@effort.title}\" Effort"
+
+
+.row
+  .span2.well
+    = link_to new_effort_near_path(@effort), id: "landing-effort-button", class: 'well-button' do
+      %h3
+        %i.icon-share-alt
+        Landing Page
+      Where members get started
+  .span2.well
+    = link_to effort_path(@effort), id: "view-effort-button", class: 'well-button' do
+      %h3
+        %i.icon-eye-open
+        Hub Page
+      Public directory of campaigns
+
+  .span2.well
+    = link_to edit_org_effort_path(@effort), id: "edit-effort", class: 'well-button' do
+      %h3
+        %i.icon-pencil
+        Edit
+      Change settings & content
+
+.header.mt30.mb10.clearfix
+  %h4.pull-left Targets
+
+  = link_to find_org_effort_targets_path(@effort), class: "pull-right btn" do
+    %i.icon-plus-sign
+    &nbsp; Add Target
+
+= render partial: 'target_petition_table'

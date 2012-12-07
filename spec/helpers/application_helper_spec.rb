@@ -46,4 +46,44 @@ describe ApplicationHelper do
     end
   end
 
+  describe '#ask_for_location?' do
+    
+    let(:organisation) { mock }
+    let(:petition) { mock }
+    let(:effort) { mock }
+    
+    before :each do
+      helper.stub(:current_organisation).and_return(organisation)
+    end
+
+    it 'returns true if organisation requires it' do
+      organisation.stub(:requires_location_for_campaign?).and_return(true)
+      helper.ask_for_location?.should be_true
+    end
+
+    it 'returns true if a current petition is inside effort where location is required' do
+      organisation.stub(:requires_location_for_campaign?).and_return(false)
+      petition.stub(:effort).and_return(effort)
+      effort.stub(:ask_for_location?).and_return(true)
+      helper.instance_variable_set(:@petition, petition)
+      helper.ask_for_location?.should be_true
+    end
+
+    it 'returns false if a current petition is not inside an effort and organisation does not requires it' do
+      organisation.stub(:requires_location_for_campaign?).and_return(false)
+      petition.stub(:effort).and_return(nil)
+      helper.instance_variable_set(:@petition, petition)
+      helper.ask_for_location?.should be_false
+    end
+
+    it 'returns false if a current organisation and effort do not require location' do
+      organisation.stub(:requires_location_for_campaign?).and_return(false)
+      petition.stub(:effort).and_return(effort)
+      effort.stub(:ask_for_location?).and_return(false)
+      helper.instance_variable_set(:@petition, petition)
+      helper.ask_for_location?.should be_false
+    end
+
+  end
+
 end

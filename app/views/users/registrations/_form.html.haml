@@ -1,0 +1,101 @@
+%ul.nav.nav-tabs
+  %li.active.register.ml20
+    %a{ href: '#register', 'data-toggle' => 'tab' }
+      %h1 Join
+      .subtle For first time users
+
+  %li.login
+    %a{ href: '#login', 'data-toggle' => 'tab' }
+      %h1 Login
+      .subtle For existing users
+
+.clearall
+.tab-content
+  .tab-pane.row.active#register
+    .span3
+      .mt20
+      = simple_form_for(resource, as: resource_name, url: registration_path(resource_name), wrapper: :compact, validate: false, html: { id: 'user_registration' }) do |f|
+        = f.input :first_name, required: true
+        .input-why
+          %a{ rel:'popover', 'data-original-title'=>'Why?', 'data-content'=>"<p>Petitions that don’t use real names get taken less seriously. Using your real name adds power to the petition and makes it more effective.</p> <p>As the petition creator, your first and last name will appear on the petition web-page but your email address, phone number, postcode and other personal details will not be publicly visible.</p>" } Why?
+        = f.input :last_name, required: true
+        = f.input :email, required: true, input_html: { type: 'email' }, hint: ''
+        = f.input :phone_number, required: true
+        .input-why
+          %a{ rel:'popover', 'data-original-title'=>'Why?', 'data-content'=>'This is just in case the office team needs to pass on media enquiries or advice about your campaign - your number won’t be publicly visible.' } Why?
+        .clearall
+        = f.input :postcode, required: true
+        = f.input :password, required: true
+        - @user.additional_field_configs.each do |field_name, field_config|
+          = additional_field_input(f, field_name, field_config)
+        .mt10
+          = check_box_tag(:remember_me, 1, true, id: 'user_remember_me', name: 'user[remember_me]')
+          %label.subtle Remember me
+        .mt10
+          - if current_organisation.always_join_parent_org_when_sign_up?
+            = f.input :join_organisation, as: :hidden, input_html: {value: '1'}
+          - else
+            = check_box_tag(:join_organisation, 1, true, id: 'user_join_organisation', name: 'user[join_organisation]')
+            %label.subtle.mr10
+              = join_label
+              .checkbox-why
+                %a{ rel:'popover', 'data-original-title'=>'Why?', 'data-content'=>"Leave this ticked to hear about campaigns from  #{current_organisation.parent_name} and member started petitions on #{current_organisation.name}." } Why?
+        .mt10#agree-toc
+          = f.check_box(:agree_toc, required: true)
+          %label{for: 'user_agree_toc', class: 'subtle'} I agree to #{current_organisation.name}'s
+          = succeed '.' do
+            = link_to 'Terms and Conditions', tos_path, target: '_blank'
+          = f.error 'agree_toc'
+        = hidden_field_tag 'token', params[:token] if params.key?(:token)
+        .submit_button
+          = f.button :submit, 'Register', class: 'btn-primary', id: 'user_registration_submit'
+        .clearall
+      :javascript
+        email_suggest('#user_registration #user_email');
+    - if current_organisation.enable_facebook_login?
+      .span1.offset1
+        .mt20
+        = image_tag 'separator-or.png'
+      .span3
+        %div{ style: 'margin-top: 105px;' }
+          = render partial: 'users/shared/facebook_login'
+
+  .tab-pane.row#login
+    .span3
+      .mt20
+      = render partial: 'users/shared/login'
+    - if current_organisation.enable_facebook_login?
+      .span1.offset1
+        .mt20
+        = image_tag 'separator-or.png'
+      .span3
+        %div{ style: 'margin-top: 105px;' }
+          = render partial: 'users/shared/facebook_login'
+
+:javascript
+  $(function() {
+    $('#user_first_name').focus();
+    if ( LoginFailed() )
+    {
+      $('li.register').removeClass('active');
+      $('#register').removeClass('active');
+      $('li.login').addClass('active');
+      $('#login').addClass('active');
+    }
+    $(function () {
+        $("a[data-toggle='tab']").on('shown', function (e) {
+          $("[data-alert = 'alert']").hide();
+          $("[class ~= 'control-group']").removeClass('error');
+          $('.help-inline').empty();
+        })
+    });
+  });
+
+  function LoginFailed()
+  {
+    var urlPathname = window.location.search;
+    var matchPos = urlPathname.search(/login/);
+    if (matchPos == -1 )
+      return false;
+    else return true;
+  }

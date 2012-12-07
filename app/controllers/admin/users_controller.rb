@@ -1,5 +1,3 @@
-require 'csv'
-
 class Admin::UsersController < Admin::AdminController
   before_filter :load_user, except: [:index, :email, :export]
 
@@ -11,7 +9,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def update
-    @user.attributes = User.extract_accessible_attributes_symbol_hash_values(params[:user])
+    @user.attributes = params[:user].slice( *@user.accessible_attribute_names )
     @user.admin = params[:user][:admin]
     @user.org_admin = params[:user][:org_admin]
     if @user.save
@@ -29,12 +27,6 @@ class Admin::UsersController < Admin::AdminController
       redirect_to admin_users_path, alert: "Address Not Found"
     end
 
-  end
-  
-  def export
-    csv_string = Queries::People.new.people_as_csv(current_organisation.id)
-    filename = "users-#{Time.now.strftime("%Y%m%d")}.csv"
-    send_data(csv_string, type: 'text/csv; charset=utf-8; header=present', filename: filename)  
   end
 
 private

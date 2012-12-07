@@ -1,0 +1,11 @@
+.sidebar
+  .row
+    .span3.mt50
+      .sidebar-text.mt20.mb30
+        .title.strong.mt30.mb5
+          As a leader you will:
+        .training-sidebar-content.normal-text
+          = effort.training_sidebar_text_in_organisation(current_organisation).html_safe
+
+      .separator.mt50.mb30
+      = render partial: 'local_campaign_detail', locals: { petition: petition }

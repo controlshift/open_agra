@@ -1,0 +1,7 @@
+- if @targets.any?
+  = table_for(@targets) do |t|
+    = t.data do
+      - t.cell(:name)
+      - t.cell(:phone_number)
+- else
+  No targets found.

@@ -1,0 +1,121 @@
+- content_for :campaign_tips do
+
+  .campaign-tips.mb30
+    %hr.mt50
+    %h4
+      =image_tag "icon-bulb.png"
+      Email Tips
+    %ul
+      %li Your subject line is the first thing people will see – and it's how people will decide if they want to open your email.  Keep it short and punchy and test it out on your friends.
+      %li Double check your emails for spelling and grammar mistakes – better yet, have a friend read over it for you.
+      %li Most people only skim emails – so keep it short and bold important information.
+    %hr
+
+= render partial: 'shared/errors', locals: {error_obj: @email}
+%h2 Email supporters
+%br
+.row
+  .span9.email-supporters-form
+
+    = simple_form_for @email, url: group_emails_path(@group), validate: false, wrapper: :compact do |f|
+
+      %h4 From:
+      .well
+        = current_user.email
+
+      %h4 To:
+      .well
+        = " #{pluralize(@group.subscriptions.subscribed.size, 'subscribed supporter')} of the \"#{@group.title}\" group"
+
+
+      = f.input :subject, label: 'Subject'
+      .mb10
+      = text_area_tag :group_blast_email_body, @email.body, rows: 15, name: 'group_blast_email[body]', class: 'tinymce group-blast-email-body'
+      .mt20
+        %a.btn.btn-secondary#send-test-email-btn{href: '#', rel: :popover, 'data-placement' => 'left',
+                                                 'data-content' => 'Send a test email to yourself - this is so you can see what the email looks like, double check for bugs or spelling and grammar errors.  (It will send to the email adress you use to login)',
+                                                 'data-original-title' => 'send test email to myself'} Send test email to myself
+        .btn-desc
+          -#to #{pluralize(@petition.signatures.count, 'supporter')}
+        = f.button :submit, 'Send', class: 'btn-primary', disable_with: 'Sending…', id: 'send-email-btn'
+
+%script{ type:'text/javascript', src: '/assets/tinymce.js' }
+
+:javascript
+  $(function() {
+    initVerticalTabs();
+
+    tinyMCE.init({
+      mode : 'exact',
+      theme: 'advanced',
+      plugins : 'paste',
+      theme_advanced_toolbar_location : 'top',
+      theme_advanced_buttons1 : 'bold,italic,underline,|,fontselect,fontsizeselect,forecolor,backcolor,link,numlist,bullist,justifyleft,justifycenter,justifyright,|,code',
+      theme_advanced_buttons2 : '',
+      theme_advanced_buttons3 : '',
+      theme_advanced_toolbar_align : 'left',
+      paste_auto_cleanup_on_paste : true,
+      paste_retain_style_properties: 'font-size,color',
+      width : 690,
+      relative_urls : false,
+      remove_script_host : false,
+      document_base_url : getDirPath(document.URL),
+      content_css : '/tinymce_content.css',
+      elements: 'group_blast_email_body'
+    });
+
+    $('#send-email-btn').click(function() {
+      tinyMCE.triggerSave();
+      return confirm('Proceed sending email to your supporters?');
+    });
+  });
+
+  $('#send-test-email-btn').click(function() {
+    $('#send-test-email-btn').addClass('disabled');
+    $('#send-test-email-btn').text('Sending...');
+    tinyMCE.triggerSave();
+
+    $.ajax({
+      url: "#{test_group_emails_path(@group, format: :json)}",
+      type: 'post',
+      data: $('#new_group_blast_email').serialize(),
+      dataType: 'json',
+      success: function(resp) {
+        $('#send-test-email-btn').removeClass('disabled');
+        $('#send-test-email-btn').text('Send test email to myself');
+
+        alert_message(resp['message']);
+      },
+        error: function(jqXHR, textStatus, errorThrown) {
+        $('#send-test-email-btn').removeClass('disabled');
+        $('#send-test-email-btn').text('Send test email to myself');
+
+        if (jqXHR != undefined && jqXHR != null && jqXHR.responseText != null) {
+          json = eval('(' + jqXHR.responseText + ')');
+          alert_message_error(json['message']);
+        }
+      }
+    });
+
+    return false;
+  });
+
+  function getDirPath(URL) {
+      var result = unescape(URL.substring(0,(URL.lastIndexOf('/')) + 1))
+      return result
+  }
+
+  function initVerticalTabs() {
+    $('.template#share-on-social-media').show();
+    $('#template-selector li, #template-selector li a').click(function() {
+      $('.template').hide();
+      $('#template-selector li').removeClass('active');
+      var li = this.nodeName.toLowerCase() == 'li' ? $(this) : $(this).closest('li');
+      li.addClass('active');
+      var href = this.nodeName.toLowerCase() == 'a' ? $(this).attr('href') : $(this).find('a').attr('href');
+      $(href).show();
+      return false;
+    });
+  }
+
+

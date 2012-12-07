@@ -24,6 +24,8 @@ class Groups::PetitionsController < ApplicationController
 
   def load_and_authorize_group
     @group = Group.find_by_slug!(params[:group_id])
+    raise ActiveRecord::RecordNotFound if @group.organisation != current_organisation
+
     authorize! :manage, @group
   end
 

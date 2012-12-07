@@ -1,0 +1,22 @@
+$("#table-input tbody").html("");
+$("#input-signatures-modal .alert-success").text("<%= @success_text %>");
+$("#input-signatures-modal .alert-error").text("<%= @error_text %>");
+
+var error_rows = <%= raw @error_rows.to_json %>;
+
+for (var i=0; i<error_rows.length; i++) {
+  var row = error_rows[i];
+  addNewRow(row['first_name'], 
+            row['last_name'], 
+            row['email'], 
+            row['phone_number'], 
+            row['postcode'], 
+            row['join_organisation'] === true ? "checked" : "",
+            errorOrDefault(row['errors'], 'first_name'),
+            errorOrDefault(row['errors'], 'last_name'),
+            errorOrDefault(row['errors'], 'email'),
+            errorOrDefault(row['errors'], 'phone_number'),
+            errorOrDefault(row['errors'], 'postcode'));
+}
+
+for (var i=0; i<5; i++) { addNewRow(); }

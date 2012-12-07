@@ -1,4 +1,4 @@
-- cache("v2_header_#{current_organisation.cache_key}#{current_user.cache_key}#{show_login_link}") do
+- cache("v3_header_#{current_organisation.cache_key}#{current_user.cache_key}#{show_login_link}") do
   .header
     .navbar
       .navbar-inner
@@ -9,7 +9,7 @@
             %input.search-query{ name: "q", placeholder: "Search" }
             %a.search-button#search-campaign{ href: "javascript:$('form.navbar-search').submit();" }
               %i.icon-search
-          %div
+          .header-buttons
             - if user_signed_in?
               - cache("v1_logged_in_header_#{current_organisation.cache_key}#{current_user.cache_key}") do
                 %ul.nav.pull-right

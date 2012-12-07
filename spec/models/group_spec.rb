@@ -29,4 +29,25 @@ describe Group do
     it { should validate_presence_of(:organisation) }
   end
 
+  describe "#subscribed_signatures" do
+    it "should return subscribed signatures of petitions within a group" do
+      group = create(:group)
+      petition = create(:petition, group: group)
+      signature = create(:signature, petition: petition, join_organisation: true)
+      unsubscribed_signature = create(:signature, petition: petition, unsubscribe_at: "2012-10-19 02:34:16", join_organisation: true)
+
+      group.subscribed_signatures.should == [signature]
+    end
+
+    it "should ignore duplicated signatures among petitions" do
+      group = create(:group)
+      petition = create(:petition, group: group)
+      another_petition = create(:petition, group: group)
+      signature = create(:signature, petition: petition, join_organisation: true, email: "abc@abc.com")
+      duplicated_signature = create(:signature, petition: another_petition, join_organisation: true, email: "abc@abc.com")
+
+      group.subscribed_signatures.count.should == 1
+    end
+  end
+
 end

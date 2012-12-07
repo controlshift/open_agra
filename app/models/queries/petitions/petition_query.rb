@@ -19,8 +19,10 @@ module Queries
 
       def execute!
         if valid?
-          @result = Petition.search do |query|
-            configuration(query)
+          retryable(:on => RSolr::Error::Http ) do
+            @result = Petition.search do |query|
+              configuration(query)
+            end
           end
         else
           nil

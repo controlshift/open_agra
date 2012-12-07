@@ -1,0 +1,14 @@
+= title  "Members"
+
+.right.search-box
+  = form_tag  email_org_members_path, :method => :get, class: 'search' do
+    %input.search-query{ name: "email", placeholder: "email" }
+    %a.search-button#search-btn{ href: "javascript:$('form.search').submit();" }
+      %i.icon-search
+
+- if @members.any?
+  = table_for(@members) do |t|
+    = t.data do
+      - t.cell(:email) {| u | link_to(u.email, org_member_path(u)) }
+      - t.cell('Has Account') { |u| u.user ? "&#10003".html_safe : "" }
+  = will_paginate @members

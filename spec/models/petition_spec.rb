@@ -2,33 +2,41 @@
 #
 # Table name: petitions
 #
-#  id                     :integer         not null, primary key
-#  title                  :string(255)
-#  who                    :string(255)
-#  why                    :text
-#  what                   :text
-#  created_at             :datetime        not null
-#  updated_at             :datetime        not null
-#  user_id                :integer
-#  slug                   :string(255)
-#  organisation_id        :integer         not null
-#  image_file_name        :string(255)
-#  image_content_type     :string(255)
-#  image_file_size        :integer
-#  image_updated_at       :datetime
-#  delivery_details       :text
-#  cancelled              :boolean         default(FALSE), not null
-#  token                  :string(255)
-#  admin_status           :string(255)     default("unreviewed")
-#  launched               :boolean         default(FALSE), not null
-#  campaigner_contactable :boolean         default(TRUE)
-#  admin_reason           :text
-#  administered_at        :datetime
-#  effort_id              :integer
-#  admin_notes            :text
-#  source                 :string(255)
-#  group_id               :integer
-#  location_id            :integer
+#  id                           :integer         not null, primary key
+#  title                        :string(255)
+#  who                          :string(255)
+#  why                          :text
+#  what                         :text
+#  created_at                   :datetime
+#  updated_at                   :datetime
+#  user_id                      :integer
+#  slug                         :string(255)
+#  organisation_id              :integer         not null
+#  image_file_name              :string(255)
+#  image_content_type           :string(255)
+#  image_file_size              :integer
+#  image_updated_at             :datetime
+#  delivery_details             :text
+#  cancelled                    :boolean         default(FALSE), not null
+#  token                        :string(255)
+#  admin_status                 :string(255)     default("unreviewed")
+#  launched                     :boolean         default(FALSE), not null
+#  campaigner_contactable       :boolean         default(TRUE)
+#  admin_reason                 :text
+#  administered_at              :datetime
+#  effort_id                    :integer
+#  admin_notes                  :text
+#  source                       :string(255)
+#  group_id                     :integer
+#  location_id                  :integer
+#  petition_letter_file_name    :string(255)
+#  petition_letter_content_type :string(255)
+#  petition_letter_file_size    :integer
+#  petition_letter_updated_at   :datetime
+#  alias                        :string(255)
+#  achievements                 :text
+#  bsd_constituent_group_id     :string(255)
+#  target_id                    :integer
 #
 
 require 'spec_helper'
@@ -60,7 +68,60 @@ describe Petition do
     it { should allow_mass_assignment_of(:delivery_details)}
 
     it { should belong_to :location }
-    
+
+    describe "target association" do
+      it { should belong_to(:target) }
+
+      describe "validations" do
+        it "should pass if there is no effort or target" do
+          subject.should have(0).errors_on(:target)
+        end
+
+        it "should fail if specific_target? effort is present" do
+          subject.effort = Factory.build(:effort, effort_type: 'specific_targets')
+          subject.should have(1).errors_on(:target)
+        end
+
+        it "should pass if effort is not specific target" do
+          subject.effort = Factory.build(:effort, effort_type: 'open_ended')
+          subject.should have(0).errors_on(:target)
+        end
+
+        it "should pass if specific_target? effort and targets are present" do
+          subject.effort = Factory.build(:effort, effort_type: 'specific_targets')
+          subject.target = Factory.build(:target)
+          subject.should have(0).errors_on(:target)
+        end
+      end
+    end
+
+    describe "effort association" do
+      it { should belong_to(:effort) }
+
+      describe "validations" do
+        it "should pass if effort is present without target" do
+          subject.effort = Factory.build(:effort)
+          subject.should have(0).errors_on(:effort)
+        end
+
+        it "should pass if there is no effort or target" do
+          subject.should have(0).errors_on(:effort)
+        end
+
+        it "should fail if target is present without effort" do
+          subject.target = Factory.build(:target)
+          subject.should have(1).errors_on(:effort)
+        end
+      end
+    end
+
+    describe "#signatures_size" do
+      it "should just return the signatures collection size" do
+        subject.signatures.should_receive(:size).and_return 1
+        subject.signatures_size.should == 1
+      end
+    end
+
     [:title, :who, :what, :why, :delivery_details].each do |attribute|
       it "should strip whitespace from #{attribute}" do
         subject.send("#{attribute}=", " string ")
@@ -372,73 +433,6 @@ describe Petition do
       end
 
     end
-
-    describe "#goal" do
-
-      specify {
-        subject.stub(:cached_signatures_size).and_return(99)
-        subject.goal.should == 100
-      }
-
-      specify {
-        subject.stub(:cached_signatures_size).and_return(100)
-        subject.goal.should == 200
-      }
-
-      specify {
-        subject.stub(:cached_signatures_size).and_return(101)
-        subject.goal.should == 200
-      }
-
-      specify {
-        subject.stub(:cached_signatures_size).and_return(850)
-        subject.goal.should == 1000
-      }
-
-      specify {
-        subject.stub(:cached_signatures_size).and_return(1001)
-        subject.goal.should == 2000
-      }
-    end
-  end
-
-  describe "#csv" do
-    it "should generate a csv string with all the fields" do
-      @petition = Factory(:petition)
-      sign1 = Factory(:signature, petition: @petition)
-      sign2 = Factory(:signature, petition: @petition)
-      sign3 = Factory(:signature, petition: @petition)
-      csv = @petition.to_csv
-
-      csv.should == <<-eos
-First name,Last name,Email,Phone number,Postcode
-#{sign1.first_name},#{sign1.last_name},#{sign1.email},#{sign1.phone_number},#{sign1.postcode}
-#{sign2.first_name},#{sign2.last_name},#{sign2.email},#{sign2.phone_number},#{sign2.postcode}
-#{sign3.first_name},#{sign3.last_name},#{sign3.email},#{sign3.phone_number},#{sign3.postcode}
-      eos
-    end
-
-    it "should generate a csv string with specific fields" do
-      @petition = Factory(:petition)
-      sign1 = Factory(:signature, petition: @petition)
-      sign2 = Factory(:signature, petition: @petition)
-      sign3 = Factory(:signature, petition: @petition)
-
-      csv = @petition.to_csv([:first_name, :last_name])
-
-      csv.should == <<-eos
-First name,Last name
-#{sign1.first_name},#{sign1.last_name}
-#{sign2.first_name},#{sign2.last_name}
-#{sign3.first_name},#{sign3.last_name}
-      eos
-    end
-
-    it "should generate header-only csv string if no signatures" do
-      @petition = Factory(:petition)
-
-      @petition.to_csv.should == "First name,Last name,Email,Phone number,Postcode\n"
-    end
   end
 
   describe "attaching an image" do
@@ -471,14 +465,13 @@ First name,Last name
       Factory(:petition, organisation: @current_org, user: @user).update_attribute(:admin_status, :approved)
       Factory(:petition, organisation: @current_org, user: @user).update_attribute(:admin_status, :inappropriate)
       Factory(:petition, organisation: @current_org, user: @user).update_attribute(:admin_status, :awesome)
-      Factory(:petition, organisation: @current_org, user: nil).update_attribute(:admin_status, :awesome)
+      Factory(:petition_without_leader, organisation: @current_org).update_attribute(:admin_status, :awesome)
       Factory(:petition, organisation: @current_org, cancelled: true).update_attribute(:admin_status, :awesome)
 
       petitions = Petition.awesome
-      petitions.count.should == 1
+      petitions.count.should == 2
       petition = petitions.first
       petition.admin_status.should == :awesome
-      petition.user.should_not be_nil
       petition.cancelled.should be_false
     end
 
@@ -496,7 +489,7 @@ First name,Last name
     it "should retrieve hot petitions" do
       @hottest_petition = Factory(:petition, organisation: @current_org, user: @user)
       5.times { Factory(:signature, petition: @hottest_petition) }
-      @third_hot_day_petition = Factory(:petition, organisation: @current_org, user: @user)
+      @third_hot_day_petition = Factory(:petition_without_leader, organisation: @current_org)
       1.times { Factory(:signature, created_at: Date.today, petition: @third_hot_day_petition) }
       #order of petition creation is deliberately not in sort order
       @second_hot_week_petition = Factory(:petition, organisation: @current_org, user: @user)
@@ -514,19 +507,6 @@ First name,Last name
 
     it "should not retrieve any petitions" do
       Petition.hot([@current_org]).should be_empty
-    end
-
-    it "should not return any orphans" do
-      orphan = Factory(:petition, user: nil, organisation: @current_org)
-      Factory(:signature, created_at: Date.today, petition: orphan)
-
-      petition = Factory(:petition, organisation: @current_org)
-      Factory(:signature, created_at: Date.today, petition: petition)
-
-      hot_petitions = Petition.hot([@current_org])
-      hot_petitions.should_not include(orphan)
-      hot_petitions.should include(petition)
-      hot_petitions.should have(1).item
     end
 
     it 'should retrieve hot petitions from many organisations' do
@@ -574,12 +554,6 @@ First name,Last name
     it "should not return petitions being signed more than once" do
       2.times {Factory(:signature, petition: @petition)}
       Petition.one_signature.should_not include(@petition)
-    end
-
-    it "should not return any orphan" do
-      orphan = Factory(:petition, user: nil)
-      Factory(:signature, petition: orphan)
-      Petition.one_signature.should_not include(orphan)
     end
 
     it "should not return any draft" do
@@ -633,34 +607,20 @@ First name,Last name
       awaiting.should include(petition_self)
       awaiting.should_not include(petition_other)
     end
-
-    context "a petiton and an orphaned petition" do
-      before(:each) do
-        @orphan = Factory(:petition, organisation: @current_org, user: nil)
-        @petition = Factory(:petition, organisation: @current_org)
-      end
-
-      it "should not return any orphans" do
-        awaiting = Petition.awaiting_moderation(@current_org.id)
-
-        awaiting.should_not include(@orphan)
-        awaiting.should include(@petition)
-        awaiting.should have(1).item
-      end
-    end
   end
   
   describe "#appropriate" do
-    it "should retrieve awesome and good petitions" do
+    it "should retrieve awesome and good petitions with and without leader" do
       unreviewed = Factory(:petition, admin_status: :unreviewed)
       good = Factory(:petition, admin_status: :good)
       awesome = Factory(:petition, admin_status: :awesome)
+      orphan_awesome = Factory(:petition_without_leader, admin_status: :awesome)
       approved = Factory(:petition, admin_status: :approved)
       inappropriate = Factory(:petition, admin_status: :inappropriate, admin_reason: "don't like it")
       
-      Petition.appropriate.all.should =~ [awesome, good]
+      Petition.appropriate.all.should =~ [awesome, good, orphan_awesome]
     end
-    
+
     it "should not return any cancelled" do
       cancelled = Factory(:cancelled_petition, admin_status: :approved)
       Petition.appropriate.should_not include(cancelled)
@@ -669,7 +629,7 @@ First name,Last name
 
   describe "#orphans" do
     it "should retrieve petitions which are not orphans" do
-      orphan = Factory(:petition, user: nil)
+      orphan = Factory(:petition_without_leader)
       petition = Factory(:petition)
       Petition.not_orphan.should_not include(orphan)
       Petition.not_orphan.should include(petition)
@@ -696,7 +656,7 @@ First name,Last name
       @petition.admins.should include(@petition.user)
     end
 
-    describe "with campaign admins" do
+    describe "a campaign admin" do
       before(:each) do
         @user_2 = Factory(:user)
         Factory(:campaign_admin, petition: @petition, user: @user_2, invitation_email: @user_2.email)
@@ -708,5 +668,67 @@ First name,Last name
       end
     end
 
+    context "a campaign admin who has been invited but has not accepted" do
+      before(:each) do
+        Factory(:campaign_admin, petition: @petition, user: nil, invitation_email: "george@washington.com")
+      end
+
+      it "should include both users" do
+        @petition.admins.should include(@petition.user)
+        @petition.admins.size.should == 1
+        @petition.admins.should_not include(nil)
+      end
+    end
+  end
+
+
+  describe "#create_with_params" do
+    it "should work without an image" do
+      attrs = {}
+      attrs[:effort] = Factory(:specific_targets_effort,
+        image_default_file_name: nil, image_default_content_type: nil, image_default_file_size: nil, image_default_updated_at: nil
+      )
+      attrs[:target] = Factory(:target, name: "target name")
+      p = Petition.create_with_param(attrs)
+      p.title.should == "specific targets effort title: target name"
+      p.save.should == true
+    end
+
+    it "should work with an image" do
+      attrs = {}
+      attrs[:effort] = Factory(:specific_targets_effort,
+        image_default_file_name: 'image.jpg',
+        image_default_content_type: 'image/jpg',
+        image_default_file_size: 1024,
+        image_default_updated_at: Time.now
+      )
+      attrs[:target] = Factory(:target, name: "target name")
+      p = Petition.create_with_param(attrs)
+      p.title.should == "specific targets effort title: target name"
+      p.save.should == true
+    end
+  end
+
+  describe "achievements" do
+    it "should get manage status if not all of the share actions is accomplished" do
+      petition = build(:petition)
+      petition.achievements[:share_on_facebook] = "1"
+      petition.achievements[:share_with_friends_on_facebook] = "0"
+      petition.save
+
+      petition.progress.should == "manage"
+    end
+
+    it "should get share status when all of the share actions are accomplished" do
+      petition = build(:petition)
+      petition.achievements[:share_on_facebook] = "1"
+      petition.achievements[:share_with_friends_on_facebook] = "1"
+      petition.achievements[:share_on_twitter] = "1"
+      petition.achievements[:share_via_email] = "1"
+
+      petition.save
+
+      petition.progress.should == "share"
+    end
   end
 end

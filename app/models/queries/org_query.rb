@@ -58,7 +58,7 @@ module Queries
         all_tables = get_matches_in_query_fragment(q, regex_to_get_all_tables)
 
         allowed = (tables_match_white_list == all_tables) # fragments are allowed if the count of all table is equal to the count of allowed queries.
-        break if !allowed
+        break unless allowed
       end
 
       allowed

@@ -8,36 +8,79 @@ describe CampaignerMailer do
   end
 
   context "a signature and blast email" do
-    before(:each) do
-      @signature = Factory(:signature, petition: @petition)
-      @email = Factory(:petition_blast_email, petition: @petition)
+    context "for petition blast email" do
+      before(:each) do
+        @signature = Factory(:signature, petition: @petition)
+        @email = Factory(:petition_blast_email, petition: @petition)
+      end
+
+      it "should send mail to supporters" do
+        email = CampaignerMailer.email_supporters(@email, [@signature.email], [@signature.token]).deliver
+        check_email(email)
+      end
+
+      def check_email(email)
+        json = JSON.parse(email.header['X-SMTPAPI'].value)
+        json["to"].should == [@signature.email]
+        json["sub"]["___token___"].should ==  [@signature.token]
+        email.from.should == [@email.from_address]
+        email.subject.should == @email.subject
+        email_content = email.body.to_s.chomp
+        email_content.should include @email.body
+        email_content.should include 'unsubscribe'
+        email_content.should_not include 'You are an administrator'
+      end
+
+      it "should sanitize the email body" do
+        javascript_string = "<script type=\"text/javascript\">$('.I am dangerous').click()</script>"
+        sanitized_email_body = @email.body
+        @email.update_attribute(:body, @email.body + javascript_string)
+        email = CampaignerMailer.email_supporters(@email, [@signature.email], [@signature.token])
+
+        email_content = email.body.to_s.chomp
+        email_content.should_not include javascript_string
+        email_content.should include sanitized_email_body
+      end
     end
 
-    it "should send mail to supporters" do
-      email = CampaignerMailer.email_supporters(@email, [@signature.email], [@signature.token]).deliver
-      check_email(email)
+    context "for group blast email" do
+      before(:each) do
+        @signature = create(:signature, petition: @petition)
+        @group = create(:group, organisation: @organisation)
+        @petition.group = @group
+        @petition.save
+        @email = create(:group_blast_email, group: @group, organisation: @organisation)
+      end
+
+      it "should send mail to supporters" do
+        email = CampaignerMailer.email_supporters(@email, [@signature.email], [@signature.token]).deliver
+        check_email(email)
+      end
+
+      def check_email(email)
+        json = JSON.parse(email.header['X-SMTPAPI'].value)
+        json["to"].should == [@signature.email]
+        json["sub"]["___token___"].should == [@signature.token]
+        email.from.should == [@email.from_address]
+        email.subject.should == @email.subject
+        email_content = email.body.to_s.chomp
+        email_content.should include @email.body
+        email_content.should include 'unsubscribe'
+        email_content.should_not include 'You are an administrator'
+      end
+
+      it "should sanitize the email body" do
+        javascript_string = "<script type=\"text/javascript\">$('.I am dangerous').click()</script>"
+        sanitized_email_body = @email.body
+        @email.update_attribute(:body, @email.body + javascript_string)
+        email = CampaignerMailer.email_supporters(@email, [@signature.email], [@signature.token])
+
+        email_content = email.body.to_s.chomp
+        email_content.should_not include javascript_string
+        email_content.should include sanitized_email_body
+      end
     end
 
-    def check_email(email)
-      json = JSON.parse(email.header['X-SMTPAPI'].value)
-      json["to"].should == [@signature.email]
-      json["sub"]["___token___"] == [unsubscribing_petition_signature_url(@petition, @signature.token)]
-      email.from.should == [@email.from_address]
-      email.subject.should == @email.subject
-      email_content = email.body.to_s.chomp
-      email_content.should include @email.body
-    end
-
-    it "should sanitize the email body" do
-      javascript_string = "<script type=\"text/javascript\">$('.I am dangerous').click()</script>"
-      sanitized_email_body = @email.body
-      @email.update_attribute(:body, @email.body + javascript_string)
-      email = CampaignerMailer.email_supporters(@email, [@signature.email], [@signature.token])
-
-      email_content = email.body.to_s.chomp
-      email_content.should_not include javascript_string
-      email_content.should include sanitized_email_body
-    end
   end
 
   it "should send thank you for creating a petition" do
@@ -71,7 +114,7 @@ describe CampaignerMailer do
   end
   
   it "should send email to notify campaigner of petition letter ready for download" do
-    email = CampaignerMailer.notify_petition_letter_ready_for_download(@petition)
+    email = CampaignerMailer.notify_petition_letter_ready_for_download(@petition, @campaigner)
     email.from.should == [@petition.organisation.contact_email]
     email.header['From'].to_s.should include @petition.organisation.name
     email.to.should == [@campaigner.email]

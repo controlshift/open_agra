@@ -65,16 +65,16 @@ Agra::Application.configure do
   config.active_support.deprecation = :notify
 
   # configuration needed by Sendgrid on Heroku
-  #config.action_mailer.smtp_settings = {
-  #    address: 'smtp.sendgrid.net',
-  #    port: '587',
-  #    authentication: :plain,
-  #    domain: 'heroku.com'
-  #}
+  config.action_mailer.smtp_settings = {
+      address: 'smtp.sendgrid.net',
+      port: '587',
+      authentication: :plain,
+      domain: 'heroku.com'
+  }
   config.action_mailer.delivery_method = :smtp
 
-  #config.middleware.use ExceptionNotifier,
-  #  :email_prefix => "[#{ENV['app-name']} ]",
-  #  :sender_address => %{"info" <info@controlshiftlabs.com>},
-  #  :exception_recipients => %w{controlshift-dev@googlegroups.com woodhull@gmail.com}
+  config.middleware.use ExceptionNotifier,
+    :email_prefix => "[#{ENV['app-name']} ]",
+    :sender_address => %{"info" <info@controlshiftlabs.com>},
+    :exception_recipients => %w{controlshift-dev@googlegroups.com woodhull@gmail.com}
 end

@@ -1,0 +1,11 @@
+= simple_form_for @target, url: post_path, validate: true, wrapper: :compact do |form|
+  = form.input :name, require: true, disabled: is_edit
+  = form.input :phone_number, label: "Phone Number"
+  = form.input :email
+  %script{ type: 'text/javascript', src:'http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true'}
+  = javascript_include_tag 'location'
+  #targets-location
+    = form.input :location, label: "Where?", required: true,
+      input_html: {id: "location-query-field", name: 'location[query]', placeholder: 'Search by location', value: @target.location.present?? @target.location.query: "" }
+  #target-save-button
+    = form.button :submit, class: "submit-button"

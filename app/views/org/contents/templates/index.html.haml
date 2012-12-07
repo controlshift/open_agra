@@ -1,0 +1,11 @@
+.breadcrumbs
+  = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
+  >
+  Blast Email Templates
+
+= title "Email Templates"
+
+%ul
+- @contents.each do |content|
+  %li
+    = link_to Content.name_for(content.slug, current_organisation), edit_org_contents_template_path(content), :id => "#{content.slug}-edit-link", :class => 'use-pjax'

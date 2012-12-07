@@ -13,7 +13,7 @@ class Petitions::ViewController < ApplicationController
       show_as_public
     end
   end
-  
+
   def show_alias
     redirect_to petition_path(@petition)
   end
@@ -25,29 +25,74 @@ class Petitions::ViewController < ApplicationController
 
   def load_petition
     @petition = Petition.where(slug: params[:id]).includes(:user).first!
+    raise  ActiveRecord::RecordNotFound  if @petition.organisation != current_organisation
   end
-  
+
   def load_petition_by_alias
     @petition = Petition.where(alias: params[:id]).includes(:user).first!
+    raise ActiveRecord::RecordNotFound  if @petition.organisation != current_organisation
   end
 
   def show_as_public
     if @petition.cancelled? || !@petition.launched?
-      redirect_to root_path, alert: "We're sorry, this petition is not available."
+      redirect_to_alert
     elsif @petition.prohibited?
-      render 'show_inappropriate'
+      show_inappropriate
     else
-      @signature = Signature.new(current_user ? current_user.accessible_attributes_hash_values : {})
-      @email = Email.new
-      render 'show', layout: 'application_sidebar'
+      render_petition
     end
+  end
+
+  def redirect_to_alert
+    not_available_message = "We're sorry, this petition is not available."
+    respond_to do |format|
+      format.any(:html, :mobile) { redirect_to root_path, alert: not_available_message }
+      format.json { render json: {error: true, msg: not_available_message}, callback: params[:callback] }
+    end
+  end
+
+  def show_inappropriate
+    respond_to do |format|
+      format.any(:html, :mobile) { render 'show_inappropriate' }
+      format.json { render json: {error: true, msg: "This Petition has been disabled because of inappropriate content"}, callback: params[:callback] }
+    end
+  end
+
+  def render_petition
+    respond_to do |format|
+      format.any(:html, :mobile) {
+        @signature = Signature.new(default_organisation_slug: current_organisation.slug)
+        if current_user
+          signature_attributes = current_user.signature_attributes(@signature)
+          @signature.assign_attributes( signature_attributes )
+        end
+        @email = Email.new
+        render 'show', layout: 'application_sidebar'
+      }
+      format.json { render json: petition_info, callback: params[:callback]}
+    end
+  end
+
+  def petition_info
+    basic_info = @petition.serializable_hash(only: [:administered_at, :alias, :bsd_constituent_group_id, :delivery_details,
+                                          :location_id, :slug, :source, :title, :id, :created_at, :updated_at,
+                                          :who, :why, :what], include: {categories: {only: [:name, :slug]}})
+    advanced_info = {
+        goal: @petition.goal,
+        effort: @petition.effort ? @petition.effort.slug: nil,
+        group: @petition.group ? @petition.group.slug: nil,
+        image_url: @petition.image.url,
+        creator_name: @petition.user.full_name,
+        last_signed_at: @petition.signatures.any? ? @petition.signatures.last.created_at : nil,
+        signature_count: @petition.cached_signatures_size
+    }
+
+    basic_info.merge(advanced_info)
   end
 
   def show_as_admin_or_owner
     if @petition.launched?
-      @signature = Signature.new(current_user ? current_user.accessible_attributes_hash_values : {})
-      @email = Email.new
-      render 'show', layout: 'application_sidebar'
+      render_petition
     else
       redirect_to launch_petition_path(@petition), alert: 'Petition must be launched before it can be managed.'
     end

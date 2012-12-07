@@ -1,0 +1,15 @@
+<p>Dear Friends,</p>
+
+<p>
+Yesterday we delivered the petition – it was a fantastic day and was great meeting so many of you in person.
+</p>
+
+<p>You can see photos of the action by clicking the link below:</p>
+
+<p>INSERT FLICKR LINK HERE</p>
+
+<p>Thank you for helping to make it happen,</p>
+
+<p>{{ current_user.first_name }}</p>
+
+<p> PS – Why not share these photos on facebook?  It's a great way to show people that ordinary people like you and me can create real change!</p>

@@ -1,0 +1,59 @@
+class @PetitionShareAccordion
+  constructor:  ->
+    $('.accordion-toggle').on 'click', (event) =>
+     this.toggleAccordion(event)
+
+    $("#view_email_template").click =>
+      achievement = new Achievement 'share_via_email', this
+      achievement.complete()
+
+    new FacebookShare( =>
+      achievement = new Achievement 'share_on_facebook', this
+      achievement.complete()
+    )
+
+    twitterWidget.callbacks.tweet = (intent) =>
+      achievement = new Achievement 'share_on_twitter', this
+      achievement.complete()
+
+    facebookShareWidget.callbacks.success = (friend) =>
+      achievement = new Achievement 'share_with_friends_on_facebook', this, {expandNext: false}
+      achievement.complete()
+
+    this.expandNextStep()
+
+  expandNextStep: ->
+    $(".accordion-body").removeClass('in')
+    $(".accordion-toggle").removeClass('open')
+    groupToExpand = $(".accordion-group").filter(-> $("img.not-completed", this).length > 0).first()
+    groupToExpand.find(".accordion-body").addClass('in')
+    groupToExpand.find(".accordion-toggle").addClass('open')
+
+  toggleAccordion: (elem) ->
+    parent = $(elem).closest(".accordion")
+    isExpanded = $(elem).closest(".accordion-heading").siblings(".accordion-body").hasClass('in')
+    $(".accordion-toggle", parent).removeClass('open')
+    if !isExpanded
+      $(elem).addClass('open')
+      switch $(elem).attr('href')
+        when '#collapse-share_on_facebook' then $("#share_on_facebook_button").click()
+        when '#collapse-share_via_email' then $("#view_email_template").click()                   t
+
+
+class Achievement
+  constructor: (@id, @accordion, @options = {expandNext: true}) ->
+
+  complete: () ->
+    data = { petition: {}, _method: 'PUT' }
+    data.petition[@id] = '1'
+    $.ajax
+      url: $('#achievements-accordion').data('save-achievements-url')
+      type: "POST"
+      data: data
+      success: (resp) =>
+        bullet = $("\#group-#{@id} a img")
+        bullet.attr('src', '<%= asset_path("bullet-round-done.png")%>')
+        bullet.removeClass('not-completed')
+        bullet.addClass('step-completed')
+        if @options.expandNext
+          @accordion.expandNextStep()

@@ -19,3 +19,6 @@
     - Content::CATEGORIES.each do |c|
       %li
         = link_to c, org_contents_path(:category => c), {:class => 'use-pjax'}
+
+    %li
+      = link_to 'Blast Email Templates', org_contents_templates_path(), {:class => 'use-pjax'}

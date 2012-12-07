@@ -13,6 +13,14 @@ describe ApplicationController do
     it "should raise exception if host does not match any organisation" do
       -> { controller.current_organisation }.should raise_error
     end
+
+    it "should use the canonical hostname" do
+      organisation = Factory(:organisation, host: 'www.coworker.org')
+      @request.host = 'coworker.controlshiftlabs.com'
+      controller.current_organisation.should == organisation
+      @request.host = 'www.coworker.org'
+      controller.current_organisation.should == organisation
+    end
   end
 
   describe "#show_login_link" do

@@ -1,0 +1,81 @@
+#= require underscore
+#= require backbone
+#= require location
+
+$ ->
+  class LocationMap extends Backbone.View
+    initialize: ->
+      @collection.on('reset', @renderMarkers, this)
+      @.on('completed_render_markers', @fitBounds, this)
+      @collection.fetch()
+      @render()
+
+    render: ->
+      @renderMap()
+
+    renderMap: ->
+      latlng = new google.maps.LatLng(-33, -151)
+      mapOptitions = {
+          zoom: 1,
+          center: latlng,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+      }
+      @map = new google.maps.Map(@el, mapOptitions)
+
+    setBounds: ->
+      @bounds = new google.maps.LatLngBounds()
+
+    renderMarkers: ->
+      if @collection.length
+        @setBounds()
+        @collection.each(@renderMarker)
+        @trigger('completed_render_markers')
+
+    fitBounds: =>
+      google.maps.event.addListenerOnce(@map, "zoom_changed", @adjustBounds)
+      @map.fitBounds(@bounds)
+
+    adjustBounds: =>
+      if @map.getZoom() > 15
+        @map.setZoom(15)
+
+    renderMarker: (location) =>
+      markerView = new MarkerView(model: location)
+      markerView.render(@map,@bounds)
+
+  class MarkerView extends Backbone.View
+
+    render: (map, bounds)->
+      slug = $(".effort-id").text()
+      location = new google.maps.LatLng(@model.get('latitude'), @model.get('longitude'))
+      map.setCenter(location)
+      marker = new google.maps.Marker(
+        position: location,
+        map: map,
+        icon: "<%= asset_path("marker.png")%>"
+      )
+
+      google.maps.event.addListener marker, "click", =>
+        window.location = "http://#{ document.location.host}/efforts/#{ slug }/near?#{ @model.queryString() }"
+
+      bounds.extend(marker.getPosition())
+
+
+  class LocationMarker extends Backbone.Model
+    queryString: ->
+      fields = ['query', 'latitude', 'longitude', 'latitude', 'locality', 'region', 'country']
+      pairs = _.map fields, (field) =>
+        ["location[#{field}]", this.get(field)]
+      attr = _.object(pairs)
+      jQuery.param(attr)
+
+
+  class LocationMarkers extends Backbone.Collection
+    model: LocationMarker
+
+    initialize: (options) ->
+      @url = "/efforts/#{options.effort_id}/locations"
+
+  if $('#location-map').length
+    locations = new LocationMarkers(effort_id: $(".effort-id").text())
+    location_map = new LocationMap(collection: locations, el: $("#location-map"))

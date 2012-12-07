@@ -1,21 +1,24 @@
 # == Schema Information
 #
-# Table name: petition_blast_emails
+# Table name: blast_emails
 #
-#  id                :integer         not null, primary key
+#  id                :integer         not null
 #  petition_id       :integer
 #  from_name         :string(255)     not null
 #  from_address      :string(255)     not null
 #  subject           :string(255)     not null
 #  body              :text            not null
 #  delayed_job_id    :integer
-#  created_at        :datetime        not null
-#  updated_at        :datetime        not null
+#  created_at        :datetime
+#  updated_at        :datetime
 #  recipient_count   :integer
 #  moderation_status :string(255)     default("pending")
 #  delivery_status   :string(255)     default("pending")
 #  moderated_at      :datetime
-#  moderation_reason :string(255)
+#  moderation_reason :text
+#  type              :string(255)
+#  group_id          :integer
+#  organisation_id   :integer
 #
 
 require 'spec_helper'
@@ -27,94 +30,8 @@ describe PetitionBlastEmail do
 
   subject { @blast }
   
-  it { should validate_presence_of(:from_name) }
-  it { should validate_presence_of(:from_address) }
-  it { should validate_presence_of(:subject) }
-  it { should validate_presence_of(:body) }
-  
-  it { should ensure_length_of(:from_name).is_at_most(100) }
-  it { should ensure_length_of(:subject).is_at_most(255) }
-  
-  it { should allow_mass_assignment_of(:from_name) }
-  it { should allow_mass_assignment_of(:from_address) }
-  it { should allow_mass_assignment_of(:subject) }
-  it { should allow_mass_assignment_of(:body) }
-  
-  it { should allow_value('ABCDEFGHIJKLMNOPQRSTUVWXYZ').for(:from_name) }
-  it { should allow_value("abcdefghijklmnopqrstuvwxyz1234567890- '").for(:from_name) }
-  it { should_not allow_value(',<.>/?;:"[{}]"~!@#$%^&*()_=+ ').for(:from_name) }
+  it_behaves_like BlastEmail
   it { should_not allow_value('Not sure what to write? There are templates on the bottom half of the page that you can use').for(:body)}
-  it { should allow_value('foo bar').for(:body)}
-
-  it "should combine email with name" do
-    subject.from_name = 'George'
-    subject.from_address = 'g@washington.com'
-    subject.from.should == '"George" <g@washington.com>'
-  end
-
-  it "should ensure moderation_reason is not nil when email is set to inappropriate" do
-    subject.moderation_status.should == 'pending'
-    subject.valid?
-    subject.errors[:moderation_reason].should be_empty
-
-    subject.moderation_status = 'inappropriate'
-    subject.valid?
-    subject.errors[:moderation_reason].should_not be_empty
-  end
-
-  describe "#in_delivery?" do
-    it "should not be if pending" do
-      subject.delivery_status.should == 'pending'
-      subject.in_delivery?.should be_false
-    end
-
-    it "should be if delivered" do
-      subject.delivery_status = 'delivered'
-      subject.in_delivery?.should be_true
-    end
-
-    it "should be if sending" do
-      subject.delivery_status = 'sending'
-      subject.in_delivery?.should be_true
-    end
-  end
-
-  describe "#ready_to_send?" do
-    it "should be ready if approved and pending" do
-      subject.delivery_status = 'pending'
-      subject.moderation_status = 'approved'
-      subject.ready_to_send?.should be_true
-    end
-
-    it "should not be ready if not approved" do
-      subject.delivery_status = 'pending'
-      subject.moderation_status = 'inappropriate'
-      subject.ready_to_send?.should be_false
-    end
-
-    it "should not be ready if already delivered" do
-      subject.delivery_status = 'sending'
-      subject.moderation_status = 'inappropriate'
-      subject.ready_to_send?.should be_false
-    end
-  end
-
-  describe "#available_to_moderate?" do
-    it "should not let you mark approved emails" do
-      subject.moderation_status = 'approved'
-      subject.available_to_moderate?.should be_false
-    end
-
-    it "should let you mark pending emails" do
-      subject.moderation_status = 'pending'
-      subject.available_to_moderate?.should be_true
-    end
-
-    it "should not let you mark inappropriate emails" do
-      subject.moderation_status = 'inappropriate'
-      subject.available_to_moderate?.should be_false
-    end
-  end
 
   describe "#awaiting_moderation" do
     before :each do
@@ -123,7 +40,7 @@ describe PetitionBlastEmail do
     end
 
     def email_with_moderation_status(moderation_status)
-      Factory(:petition_blast_email, moderation_status: moderation_status, petition: @petition, moderation_reason: 'foo')
+      create(:petition_blast_email, moderation_status: moderation_status, petition: @petition, moderation_reason: 'foo', organisation: @org)
     end
 
     specify { PetitionBlastEmail.awaiting_moderation(@org).should_not include email_with_moderation_status('approved') }
@@ -132,7 +49,7 @@ describe PetitionBlastEmail do
     specify { PetitionBlastEmail.awaiting_moderation(@org).should include email_with_moderation_status('pending') }
 
     it "should return petitions that belongs to own organisation" do
-      email_self = Factory(:petition_blast_email, petition: @petition, moderation_status: 'pending')
+      email_self = Factory(:petition_blast_email, petition: @petition, moderation_status: 'pending', organisation: @org)
       email_other = Factory(:petition_blast_email, moderation_status: 'pending')
 
       PetitionBlastEmail.awaiting_moderation(@org).should include(email_self)

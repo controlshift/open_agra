@@ -3,7 +3,7 @@
 
 .admin_major_stat#num_of_petitions_to_moderate
   .number
-    = @emails.total_entries
+    = @emails.size
   .subtle
     Emails left to moderate
 .clear
@@ -14,7 +14,7 @@
   = table_for(@emails) do |t|
     = t.data do
       - t.cell(:subject) { |e| link_to(e.subject, org_email_path(e), {:class => 'use-pjax'}) }
-      - t.cell(:petition) { |e| e.petition.title }
+      - t.cell(:source, heading: "Petition/Group") { |e| e.title }
       - t.cell(:recipients) { |e| e.recipient_count  }
   = will_paginate @emails
 - else

@@ -12,3 +12,6 @@ en:
   devise:
     confirmations:
       confirmed: Your email was successfully confirmed. You can now send email to your supporters.
+  errors:
+    messages:
+      email_format: "Not an email address"

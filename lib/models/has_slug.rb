@@ -13,12 +13,11 @@ module HasSlug
 
   module InstanceMethods
     def to_param
-      return slug
+      slug
     end
     
     def create_slug!
       return slug unless slug.blank?
-      
       field =  self.respond_to?(:title) ? title : name
       parameterized_name = field.blank? ? 'default-slug' : field.parameterize
       self.slug = parameterized_name
@@ -27,7 +26,7 @@ module HasSlug
         self.slug = "#{parameterized_name}-#{counter}"
         counter += 1
       end
-      return slug
+      slug
     end
     
   end

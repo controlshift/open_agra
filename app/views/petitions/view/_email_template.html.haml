@@ -2,16 +2,13 @@
   .modal-header
     %a.close{ href: "#", "data-dismiss" => "modal" } ×
     %h3 Send an email
+
   .modal-body
-    %p Help spread the word about this campaign by emailing your friends and family.  Copy and paste the content below into your favourite email client.
-    %p Tip: Calls to action work best if you tell people why you care about this issue so don't be afraid to share some of your personal story!
+    %p Help spread the word about this campaign by emailing your friends and family.  Copy and paste the text below into your email to get started.
+    %p Tip: Calls to action work best if you tell people why you care about this issue, so don't be afraid to edit the email and share some of your personal story!
 
     %form{action: "action"}
-      = label_tag :subject, "Subject of email"
-      = text_field_tag(:subject, "#{@petition.title}", class: "span5", id: 'subject-field')
-      %a.btn#subject_button Copy
 
-      = label_tag :body, "Body of email", class: "inline-block"
       = text_area_tag(:body, share_email_body_text(@petition), rows: 10, class: "span5", id: 'body-field')
       %a.btn#body_button Copy
           

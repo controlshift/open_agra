@@ -1,0 +1,86 @@
+= render :partial => 'search_near_petitions', locals: {effort: @effort}
+
+- if @petitions.any?
+  - if @closest_petition.present?
+    #closest-petition.petition
+      .effort-petition-location.muted
+        Closest
+      .ml5.closest-petition-text
+        .strong.mt10= @closest_petition.target.name
+        .location-text
+          = @closest_petition.location.query
+      .closest-petition-container.clearfix
+        .closest-petition-panel.pull-left
+          - if @closest_petition.user.blank?
+            .title can you lead this campaign in your area?
+            .action.mb10.mt20
+              = link_to "I'll be a leader", leading_effort_petition_path(@effort, @closest_petition), class: 'lead-petition-btn btn btn-primary nofloat'
+              .leader-duty-content.mt10
+                %a{ href: "#leader_duties_text", "data-toggle" => "modal"}
+                  What will I need to do?
+            .connector.title or
+            .action.mb10.mt20
+              = link_to "Sign the petition", petition_path(@closest_petition), id: 'sign-closest-petition', class: "btn btn-primary nofloat"
+
+          -else
+            .action.mb10.mt20
+              = link_to "Sign the petition", petition_path(@closest_petition), id: 'sign-closest-petition', class: "btn btn-primary nofloat"
+
+            .action.leader-detail.leader-detail-closest
+              .leader-name.strong
+                = @closest_petition.user.full_name
+              .subtle Community Leader
+
+        .closest-petition-map.pull-left
+          .map
+            = google_static_map(location: @closest_petition.location, size: "400x360")
+          .shadow
+
+      #leader_duties_text.modal.hide.leader-duty-modal
+        .modal-header
+          %a.close{ href: "#", "data-dismiss" => "modal" } ×
+          %h3 What Will I Need To Do?
+        .modal-body
+          = @effort.leader_duties_text_in_organisation(current_organisation).html_safe
+        .modal-footer
+
+  - if @other_petitions_nearby.present?
+    .nearby
+      .effort-petition-location.muted.mb20
+        Other #{@effort.title_default} Campaigns nearby
+      .nearby-petitions
+        - @other_petitions_nearby.each_with_index do |petition, index|
+          .nearby-petition.ml10
+            %img{src: asset_path("near-marker.png")}
+            %a.strong.accordion-toggle.ml10.mt10{"data-toggle" => 'collapse', "data-target" => "#petition-details-#{index}"} #{petition.target.name}
+            %span.collapse-arrow-down.right.collapse-arrow{id: "icon-arrow-#{index}"}
+            .collapse.ml30{id: "petition-details-#{index}"}
+              .location-text= petition.location.query
+              .nearby-petition-panel.clearfix
+                - if petition.user.present?
+                  .action.leader-detail
+                    .leader-name.strong
+                      = petition.user.full_name
+                    .subtle Community Leader
+                - else
+                  .title can you lead this campaign in your area?
+                  .action.lead-nearby-petition
+                    = link_to "I'll be a leader", leading_effort_petition_path(@effort, petition), class: 'lead-petition-btn btn btn-primary nofloat'
+                    .leader-duty-content
+                      %a{ href: "#leader_duties_text", "data-toggle" => "modal"}
+                        What will I need to do?
+                  .connector.title or
+                .action.sign-nearby-petition
+                  = link_to "Sign the petition", petition_path(petition), class: "btn btn-primary nofloat"
+          %hr
+- else
+  .search-result
+    No campaigns were found near your current location.
+  .search-tips.mt5
+    Try another search or
+    = link_to "go back to the map", new_effort_near_path(@effort)
+    to see all of the campaigns.
+
+- content_for :sidebar do
+  = render partial: 'near_sidebar'
+

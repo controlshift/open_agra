@@ -13,29 +13,32 @@ module Queries
       end
 
       def petitions
-        if valid?
-          query = Petition.not_orphan.includes(:user)
-                                         .order((sort_column + " " + sort_direction))
-                                         .paginate(page: page, conditions: conditions)
+        unless defined? @_petitions
+          if valid?
+            query = Petition.launched.includes(:user)
+                                           .order((sort_column + " " + sort_direction))
+                                           .paginate(page: page, conditions: conditions)
 
-          if sort_column == "signatures_count"
-            return query.join_and_includes_signatures_count
-                        .includes_petition_flags_count
-          elsif sort_column == "petition_flags_count"
-            return query.join_and_includes_petition_flags_count
-                        .includes_signatures_count
+            if sort_column == "signatures_count"
+              @_petitions = query.join_and_includes_signatures_count
+                          .includes_petition_flags_count
+            elsif sort_column == "petition_flags_count"
+              @_petitions = query.join_and_includes_petition_flags_count
+                          .includes_signatures_count
+            else
+              @_petitions = query.includes_signatures_count
+                          .includes_petition_flags_count
+            end
+
           else
-            return query.includes_signatures_count
-                        .includes_petition_flags_count
+            @_petitions = Petition.launched.includes(:user)
+                           .order("created_at desc")
+                           .paginate(page: page, conditions: conditions)
+                           .includes_signatures_count
+                           .includes_petition_flags_count
           end
-
-        else
-          return Petition.not_orphan.includes(:user)
-                         .order("created_at desc")
-                         .paginate(page: page, conditions: conditions)
-                         .includes_signatures_count
-                         .includes_petition_flags_count
         end
+        return @_petitions
       end
     end
   end

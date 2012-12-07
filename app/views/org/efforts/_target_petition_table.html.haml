@@ -1,0 +1,23 @@
+- if @petitions.any?
+  = table_for(@petitions) do |t|
+    = t.data do
+      - t.cell(:name) {|p| p.target.name}
+      - t.cell(:location) {|p| p.location.query}
+      - t.cell(:petition) {|p| p.title && link_to(p.title, petition_path(p))}
+      - t.cell(:leader) {|p| link_to_leaders(@effort, p)}
+      - t.cell(:actions)  do |p|
+        - render partial: 'org/efforts/targets/action_bar', locals: {petition: p, effort: @effort}
+
+  = will_paginate @petitions
+
+- else
+  .row
+    .span4.offset4{style:"padding-top:50px;"}
+      %p
+        Targets are the people or organisations that your effort will attempt to influence.
+      %p
+        A petition will be created inside the effort for each target. You'll use the landing page to
+        invite local members to sign up as leaders who will promote, organize around and deliver the petition to each target.
+
+    .span1
+      = image_tag "target-arrow.png"

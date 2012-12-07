@@ -5,7 +5,7 @@ describe Petitions::SignaturesController do
 
   context "signed in" do
     before(:each) do
-      @user = Factory(:user)
+      @user = Factory(:user, organisation: @organisation)
       sign_in @user
     end
 
@@ -45,7 +45,7 @@ describe Petitions::SignaturesController do
           post :save_manual_input, signatures: signatures, petition_id: @petition
 
           @petition.signatures.count.should == 4
-          assigns(:signatures_with_errors).count.should == 0
+          assigns(:error_rows).count.should == 0
           response.should redirect_to petition_manage_path(@petition)
         end
 
@@ -58,7 +58,7 @@ describe Petitions::SignaturesController do
           post :save_manual_input, signatures: signatures, petition_id: @petition
 
           @petition.signatures.count.should == 2
-          assigns(:signatures_with_errors).count.should == 0
+          assigns(:error_rows).count.should == 0
           flash.now[:notice].should == "2 signatures saved."
           response.should redirect_to petition_manage_path(@petition)
         end
@@ -72,7 +72,7 @@ describe Petitions::SignaturesController do
           post :save_manual_input, signatures: signatures, petition_id: @petition
 
           @petition.signatures.count.should == 1
-          assigns(:signatures_with_errors).count.should == 2
+          assigns(:error_rows).count.should == 2
           flash.now[:notice].should == "1 signature saved."
           response.should be_success
         end
@@ -86,19 +86,17 @@ describe Petitions::SignaturesController do
           post :save_manual_input, signatures: signatures, petition_id: @petition
 
           @petition.signatures.count.should == 2
-          assigns(:signatures_with_errors).count.should == 2
-          assigns(:signatures_with_errors)[0].errors.should_not be_empty
-          assigns(:signatures_with_errors)[0].errors[:email].should_not be_nil
-          assigns(:signatures_with_errors)[1].errors.should_not be_empty
-          assigns(:signatures_with_errors)[1].errors[:phone_number].should_not be_nil
+          assigns(:error_rows).count.should == 2
+          assigns(:error_rows)[0][:errors].should_not be_empty
+          assigns(:error_rows)[0][:errors][:email].should_not be_nil
+          assigns(:error_rows)[1][:errors].should_not be_empty
+          assigns(:error_rows)[1][:errors][:phone_number].should_not be_nil
           flash.now[:alert].should == "2 signatures cannot be saved."
-          assigns(:error_rows_json).should == "[#{assigns(:signatures_with_errors).
-            map { |sign| sign.to_json(methods: :errors) }.join(", ")}]"
           response.should render_template(:manual_input)
         end
 
         it "should not allow other user to submit signatures to my petition" do
-          other_user = Factory(:user)
+          other_user = Factory(:user, organisation: @organisation)
           sign_in other_user
 
           signatures = []
@@ -124,11 +122,11 @@ describe Petitions::SignaturesController do
 
         it "should export signatures for petition" do
           get :index, petition_id: @petition, format: :csv
-          response.body.should == @petition.to_csv([:first_name, :last_name, :phone_number, :postcode])
+          response.body.should start_with("id,first_name,last_name,phone_number,postcode")
         end
 
         it "should not export signatures for petition if user is not owner" do
-          other_user = Factory.create(:user)
+          other_user = Factory.create(:user, organisation: @organisation)
           sign_in other_user
           get :index, petition_id: @petition, format: :csv
           response.body.should redirect_to(root_path)
@@ -140,7 +138,7 @@ describe Petitions::SignaturesController do
 
   describe "#destroy" do
     before(:each) do
-      @petition = Factory.create(:petition, user: @user)
+      @petition = Factory.create(:petition, user: @user, organisation: @organisation)
       @signature = Factory.create(:signature, petition: @petition)
     end
 
@@ -161,16 +159,16 @@ describe Petitions::SignaturesController do
 
     context "wrong petition" do
       it "should throw exception if signature not found" do
-        @other_petition = Factory.create(:petition, user: @user)
+        @other_petition = Factory.create(:petition, user: @user, organisation: @organisation)
         lambda { delete :destroy, petition_id: @other_petition.slug, id: @signature }.
-          should raise_exception(ActiveRecord::RecordNotFound)
+            should raise_exception(ActiveRecord::RecordNotFound)
       end
     end
 
     context "wrong token" do
       it "should throw exception if signature not found" do
         lambda { delete :destroy, petition_id: @petition, id: "invalid_signature" }.
-          should raise_exception(ActiveRecord::RecordNotFound)
+            should raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -195,6 +193,14 @@ describe Petitions::SignaturesController do
         response.should redirect_to thanks_petition_path(@petition)
       end
 
+      it "should sign the petition with mobile" do
+        @petition.signatures.should be_empty
+        @signature = Factory.attributes_for(:signature)
+        post :create, {signature: @signature, petition_id: @petition, format: "mobile"}
+        @petition.signatures.count.should == 1
+        response.should redirect_to thanks_petition_path(@petition)
+      end
+
       it "should not sign with insufficient info" do
         attributes = Factory.attributes_for(:signature)
         attributes.delete(:postcode)
@@ -209,12 +215,19 @@ describe Petitions::SignaturesController do
         @petition.signatures.count.should == 1
         response.should redirect_to thanks_petition_path(@petition)
       end
+
+      it "should ignore signature whose email already exists with mobile" do
+        signature = Factory.create(:signature, petition: @petition)
+        post :create, {signature: Factory.attributes_for(:signature, email: signature.email), petition_id: @petition, format: "mobile"}
+        @petition.signatures.count.should == 1
+        response.should redirect_to thanks_petition_path(@petition)
+      end
     end
   end
 
   describe "#unsubscribing" do
     before :each do
-      @petition = Factory(:petition)
+      @petition = Factory(:petition, organisation: @organisation)
       @signature = Factory(:signature, petition: @petition)
     end
 
@@ -225,14 +238,14 @@ describe Petitions::SignaturesController do
 
     it "should throw exception if signature not found" do
       lambda { get :unsubscribing, petition_id: @petition, id: "invalid_signature" }.
-        should raise_exception(ActiveRecord::RecordNotFound)
+          should raise_exception(ActiveRecord::RecordNotFound)
     end
   end
 
   describe "#unsubscribe" do
     before :each do
-      @campaigner = Factory(:user)
-      @petition = Factory(:petition, user: @campaigner)
+      @campaigner = Factory(:user, organisation: @organisation)
+      @petition = Factory(:petition, user: @campaigner, organisation: @organisation)
       @signature = Factory(:signature, petition: @petition)
     end
 
@@ -259,7 +272,7 @@ describe Petitions::SignaturesController do
     end
 
     it "should not unsubscribe if the petitions not match" do
-      another_petition = Factory(:petition)
+      another_petition = Factory(:petition, organisation: @organisation)
 
       put :unsubscribe, petition_id: another_petition, id: @signature, unsubscribe: {email: @signature.email}
       assigns(:signature).unsubscribe_at.should be_nil
@@ -268,7 +281,7 @@ describe Petitions::SignaturesController do
 
     it "should throw exception if signature not found" do
       lambda { put :unsubscribe, petition_id: @petition, id: "invalid_signature", unsubscribe: {email: @signature.email} }.
-        should raise_exception(ActiveRecord::RecordNotFound)
+          should raise_exception(ActiveRecord::RecordNotFound)
     end
   end
 end

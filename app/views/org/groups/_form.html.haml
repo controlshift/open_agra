@@ -1,6 +1,14 @@
 = simple_form_for [:org, @group], validate: true, :wrapper => 'compact' do |form|
   = form.input :title,  input_html: { class:  'span9'}
   = form.input :description,  input_html: { class:  'span9'}
-  = form.input :image, as: :file
+  .upload-image-box-horizontal
+    .upload-image.upload-image-switcher{'data-changed-placeholder-url' => asset_path('image-placeholder-form-changed.png') }
+      = image_content(entity: @group, style: :form, content_class: 'preview-image')
+      .arrow
+      .upload-field
+        = form.input :image,
+          as: :file,
+          label: 'Upload an image', input_html: { accept: 'image/jpeg,image/gif,image/png' }
+      .clear
   .actions
     = form.button :submit

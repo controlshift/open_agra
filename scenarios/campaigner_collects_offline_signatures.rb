@@ -14,9 +14,9 @@ describe "Collect signatures offline", type: :request do
     visit offline_petition_manage_path('save-the-whales')
     click_on "Printable Blank Form"
     page.response_headers['Content-Type'].should == "application/pdf"
-
+    
     visit offline_petition_manage_path('save-the-whales')
-
+    
     click_on "Enter Petition Signatures"
     page.should have_content("Enter petition signatures")
 

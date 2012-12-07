@@ -2,6 +2,7 @@
   Override bootstrap IE6-7 default behavior
 */
 
+
 h1, h2, h3, .btn, .navbar .nav li a, .btn-start-petition, .title {
   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=#{image-path('blank.png')},sizingMethod=crop);
   zoom:1;

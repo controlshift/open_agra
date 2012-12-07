@@ -39,11 +39,21 @@ class Groups::InvitationsController < ApplicationController
   end
 
   def invalid_params
-    redirect_to root_path, alert: 'Incorrect token or email address for group invitation.'
+    message = if params[:group_member].present? && (@invitation.invitation_token != params[:group_member][:invitation_token])
+      'Incorrect or corrupted token for group invitation.'
+    elsif @invitation.invitation_email.strip.downcase != current_user.email.strip.downcase
+      "Invitation was for #{@invitation.invitation_email} but #{current_user.email} is currently signed in. Please login with the correct account for this invite."
+    else
+      'The invitation link you received is not correct.'
+    end
+
+    redirect_to root_path, alert: message
   end
 
   def load_group_and_invitation
     @invitation = GroupMember.find_by_id(params[:id])
     @group = Group.find_by_slug!(params[:group_id])
+    raise ActiveRecord::RecordNotFound if @group.organisation != current_organisation
+
   end
 end

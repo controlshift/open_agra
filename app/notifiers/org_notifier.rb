@@ -7,6 +7,10 @@ class OrgNotifier
   def notify_category_creation(params = {})
     notify(:notify_category_creation, params)
   end
+
+  def notify_category_update(params = {})
+    notify(:notify_category_update, params)
+  end
   
   def notify(method, params = {})
     organisation = params[:organisation]
@@ -40,6 +44,8 @@ class OrgNotifier
         notifier = BlueStateDigitalNotifier.new(organisation.bsd_host, organisation.bsd_api_id, organisation.bsd_api_secret)
       when 'actionkit'
         notifier = ActionKitNotifier.new(organisation.action_kit_host, organisation.action_kit_username, organisation.action_kit_password)
+      when 'salesforce'
+        notifier = SalesforceNotifier.new
       end
     end
     notifier

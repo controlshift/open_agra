@@ -1,0 +1,14 @@
+<ul>
+  <li>
+    <span> Take charge of a local campaign that's part of a bigger effort</span>
+  </li>
+  <li>
+    <span> Gather petition signatures</span>
+  </li>
+  <li>
+    <span> Email your supporters to keep them updated and ask them to do more</span>
+  </li>
+  <li>
+    <span> Stay in touch with the national campaign</span>
+  </li>
+</ul>

@@ -1,7 +1,7 @@
 module Jobs
   class BlastEmailJob
     def email_batch_size
-      1000
+      500
     end
 
     def initialize(blast_email)
@@ -9,14 +9,14 @@ module Jobs
     end
 
     def perform
-      recipients = @blast_email.petition.signatures.subscribed
-
-      # "SendGrid engineer told me it's best to keep the number of recipients to <= 1,000 per delivery"
-      # https://github.com/stephenb/sendgrid
-
-      recipients.each_slice(email_batch_size) do |batch|
+      if @blast_email.is_a?(PetitionBlastEmail)
+        finder = @blast_email.recipients.select([:id, :email, :token])
+      else
+        finder = @blast_email.recipients.includes(:member)
+      end
+      finder.find_in_batches(batch_size: email_batch_size) do |batch|
         begin
-          CampaignerMailer.email_supporters(@blast_email, batch.map(&:email), batch.map(&:token)).deliver
+          BlastEmailWorker.perform_async(@blast_email.id, batch.map(&:email), batch.map(&:token))
         rescue Exception => e
           ExceptionNotifier::Notifier.background_exception_notification(e)
         end

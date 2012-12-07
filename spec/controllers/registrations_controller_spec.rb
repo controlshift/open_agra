@@ -15,7 +15,7 @@ describe RegistrationsController do
       end
 
       it "should deny user to register" do
-        petition = Factory(:petition, organisation: @organisation)
+        petition = FactoryGirl.create(:petition, organisation: @organisation)
         post :create, user: Factory.attributes_for(:user), token: petition.token
 
         flash.alert.should == "Did you receive an email with an invitation to use this site? If so, you can only register using that email address. You may have tried to use a different address; please click the back button and try again."
@@ -23,7 +23,7 @@ describe RegistrationsController do
       end
 
       it "should render the view if petition token is provided but user's email leave blank" do
-        petition = Factory(:petition, organisation: @organisation)
+        petition = FactoryGirl.create(:petition, organisation: @organisation)
 
         post :create, user: Factory.attributes_for(:user, email: ""), token: petition.token
         response.should render_template :new
@@ -46,11 +46,12 @@ describe RegistrationsController do
       before :each do
         @organisation.stub(:use_white_list?).and_return(true)
         @email = EmailWhiteList.create!(email: "email@email.com").email
-        @user_attr = Factory.attributes_for(:user, email: @email)
+        @user_attr = FactoryGirl.attributes_for(:user, email: @email)
       end
 
       it "should be able to register new campaigner and go to launch page" do
-        petition = Factory(:petition, organisation: @organisation)
+        petition = FactoryGirl.create(:petition, organisation: @organisation)
+        controller.stub(:after_sign_up_path_for).and_return(launch_petition_path(petition))
         
         post :create, user: @user_attr, token: petition.token
         
@@ -58,40 +59,61 @@ describe RegistrationsController do
         response.should redirect_to launch_petition_path(petition)
       end
 
+      it "should be able to register new campaigner and go to training page" do
+        effort = FactoryGirl.create(:effort, organisation: @organisation)
+        petition = FactoryGirl.create(:petition, organisation: @organisation, effort: effort)
+        controller.stub(:after_sign_up_path_for).and_return(training_effort_petition_path(effort, petition))
+
+        post :create, user: @user_attr, token: petition.token
+
+        Petition.find_by_token(petition.token).user_id.should_not be_nil
+        response.should redirect_to training_effort_petition_path(effort, petition)
+      end
+
       it "should link user to petition and notify partner org" do
-        petition = Factory(:petition, organisation: @organisation)
-        
+        petition = FactoryGirl.create(:petition, organisation: @organisation)
+        after_sign_up_path = ""
+        controller.stub(:after_sign_up_path_for).and_return(after_sign_up_path)
+
         service = mock
         PetitionsService.stub(:new) { service }
         service.should_receive(:link_petition_with_user!).with(petition, kind_of(User))
-        
+
         post :create, user: @user_attr, token: petition.token
       end
 
       it "should allow email in the whitelist to register regardless case" do
-        petition = Factory(:petition, organisation: @organisation)
+        petition = FactoryGirl.create(:petition, organisation: @organisation)
         @user_attr[:email] = @email.capitalize
-        
+        controller.stub(:after_sign_up_path_for).and_return(launch_petition_path(petition))
+
         post :create, user: @user_attr, token: petition.token
-        
+
         response.should redirect_to(launch_petition_path(petition))
       end
 
-      it "should render the view if petition token is provided but user not save successfully" do
-        petition = Factory(:petition, organisation: @organisation)
+      context "user not save successfully" do
+        it "should redirect to new user view when petition token is provided" do
+          session[:header_content] = "start_petition_breadcrum_steps"
+          petition = FactoryGirl.create(:petition, organisation: @organisation)
 
-        post :create, user: Factory.attributes_for(:user, first_name: "", email: @email), token: petition.token
-        response.should render_template :new
+          post :create, user: Factory.attributes_for(:user, first_name: "", email: @email), token: petition.token
+
+          response.should render_template :new
+        end
+
+        it "should redirect to new user view when petition token is not provided" do
+          session[header_content: "start_petition_breadcrum_steps"]
+
+          post :create, user: Factory.attributes_for(:user, first_name: "", email: @email)
+
+          response.should render_template :new
+        end
       end
 
       it "should redirect to home page if petition token not provided" do
         post :create, user: Factory.attributes_for(:user, email: @email)
         response.should redirect_to root_path
-      end
-
-      it "should render the view if petition token not provided and user not save successfully " do
-        post :create, user: Factory.attributes_for(:user, first_name: "", email: @email)
-        response.should render_template :new
       end
 
       it "should throw record not found exception if petition token is invalid" do
@@ -114,7 +136,7 @@ describe RegistrationsController do
     end
 
     it "should render user sign up page" do
-      petition = Factory(:petition, organisation: @organisation)
+      petition = FactoryGirl.create(:petition, organisation: @organisation)
 
       get :new, token: petition.token
       response.should render_template :new

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe PetitionsService do
   include Shoulda::Matchers::ActionMailer
-  include PetitionAttributesHelpers
+  include PetitionAttributesHelper
 
   subject{ PetitionsService.new }
 
@@ -152,6 +152,22 @@ describe PetitionsService do
       subject.save(@petition)
       @petition.admin_status.should == :approved
     end
+
+    it "should not notify the organisation if achievement has been changed" do
+      ModerationMailer.should_not_receive(:delay)
+
+      @petition.share_on_facebook = 1
+      subject.save(@petition)
+
+      @petition.admin_status.should == :approved
+    end
+
+    it "should not notify the organisation if person changes their contact setting" do
+      ModerationMailer.should_not_receive(:delay)
+      subject.update_attributes(@petition, {:campaigner_contactable => "false"})
+
+      @petition.admin_status.should == :approved
+    end
   end
 
   describe "petition, meet your maker" do
@@ -209,6 +225,18 @@ describe PetitionsService do
       petition.admin_notes = 'a note '
       CampaignerMailer.should_not_receive(:delay)
       subject.save(petition)
+    end
+  end
+
+  describe "#link_petition_with_user!" do
+    it "should not link petition with user if the petition has already has a user" do
+      petition_owner = create(:user)
+      petition = create(:petition, user: petition_owner)
+      another_user = create(:user)
+
+      subject.link_petition_with_user!(petition, another_user)
+
+      petition.user.should == petition_owner
     end
   end
 end

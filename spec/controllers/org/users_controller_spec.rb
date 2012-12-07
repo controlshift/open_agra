@@ -58,10 +58,9 @@ describe Org::UsersController do
       describe "edit another organisations user" do
         before(:each) do
           @user = Factory(:user)
-          get :edit, id: @user.id
         end
 
-        it { should redirect_to '/' }
+        it {  -> {  get :edit, id: @user.id}.should raise_error(ActiveRecord::RecordNotFound)}
       end
 
       describe "#update" do
@@ -69,15 +68,13 @@ describe Org::UsersController do
         it "should not allow people to be made global admins" do
           @existing_user.admin?.should be_false
           post :update, id: @existing_user.id, user: {admin: '1'}
-          @existing_user.reload
-          @existing_user.admin?.should be_false
+          assigns(:user).admin?.should be_false
         end
 
         it "should allow people to be made org admins" do
           @existing_user.org_admin?.should be_false
           post :update, id: @existing_user.id, user: {org_admin: '1'}
-          @existing_user.reload
-          @existing_user.org_admin?.should be_true
+          assigns(:user).org_admin?.should be_true
         end
 
 

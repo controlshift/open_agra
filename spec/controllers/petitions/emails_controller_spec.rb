@@ -5,8 +5,8 @@ describe Petitions::EmailsController do
   
   context 'user not yet confirmed' do
     before(:each) do
-      @user = Factory(:user, confirmed_at: nil)
-      @petition = Factory(:petition, user: @user)
+      @user = Factory(:user, confirmed_at: nil, organisation: @organisation)
+      @petition = Factory(:petition, user: @user, organisation: @organisation)
       @email = { subject: 'test subject', body: 'test content' }
       sign_in @user
     end
@@ -20,8 +20,8 @@ describe Petitions::EmailsController do
 
   context 'user not login or unauthorised' do
     before :each do
-      user = Factory(:user, confirmed_at: 1.day.ago)
-      @petition = Factory(:petition, user: user)
+      user = Factory(:user, confirmed_at: 1.day.ago,  organisation: @organisation)
+      @petition = Factory(:petition, user: user, organisation: @organisation)
     end
 
     it 'should not not allow non-logged user to GET #new' do
@@ -51,8 +51,8 @@ describe Petitions::EmailsController do
 
   context 'authorised user log in' do
     before :each do
-      @user = Factory(:user, confirmed_at: 1.day.ago)
-      @petition = Factory(:petition, user: @user)
+      @user = Factory(:user, confirmed_at: 1.day.ago, organisation: @organisation)
+      @petition = Factory(:petition, user: @user, organisation: @organisation)
       @email = { subject: 'test subject', body: 'test content'}
       sign_in @user
     end

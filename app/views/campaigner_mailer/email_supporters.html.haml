@@ -1,8 +1,9 @@
 = raw(@content)
+%br
+%br
+- if @can_be_unsubscribed
+  If you don't want to receive emails from the '#{@source.title}' campaign in the future, please
+  #{link_to "unsubscribe", blast_email_unsubscribe_url(@email)}.
 
-- unless @is_campaign_admin
-  %br
-  %br
-  If you don't want to receive emails from the '#{@petition.title}' campaign in the future, please
-  #{link_to "unsubscribe", unsubscribing_petition_signature_url(@petition, "___token___")}.
-
+- else
+  You are an administrator for the '#{@source.title}' campaign and may not unsubscribe from it.

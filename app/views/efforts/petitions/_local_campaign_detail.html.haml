@@ -1,0 +1,11 @@
+.local-campaign-detail
+  .title.ml5
+    your local campaign
+  .ml5.petition-information
+    .strong.target-name.mt10= petition.target.name
+    .location-text
+      = petition.location.query
+  .petition-map
+    .map
+      = google_static_map(location: petition.location, size: "200x180")
+    .shadow

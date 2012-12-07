@@ -1,0 +1,41 @@
+<div class="control-group string {{#unless geocoder_success}}error{{/unless}}">
+  <div class="controls">
+    <label class="string required control-label" for="location-query-field">
+      Where?
+    </label>
+    {{#unless geocoder_success}}
+      <span class='help-inline'>We could not understand that location.</span>
+    {{/unless}}
+  </div>
+
+  <div>
+    <input type="radio" {{#if isLocal}}checked{{/if}} name="location_kind" value="local" class="local span1" style="margin-bottom: 10px;"/>
+
+    <input class="string required span6"
+          data-content="{{help_text}}"
+          data-title="Where?"
+          id="location-query-field"
+          name="location[query]"
+          rel="popover"
+          size="50"
+          type="text"
+          value="{{query}}">
+
+
+    <input name="location[latitude]"  type="hidden" value="{{latitude}}" />
+    <input name="location[longitude]" type="hidden" value="{{longitude}}" />
+    <input name="location[street]"    type="hidden" value="{{street}}" />
+    <input name="location[locality]"  type="hidden" value="{{locality}}" />
+    <input name="location[postal_code]" type="hidden" value="{{postal_code}}" />
+    <input name="location[region]"    type="hidden" value="{{region}}" />
+    <input name="location[country]"   type="hidden" value="{{country}}" />
+   </div>
+
+   <div>
+     <input type="radio" {{#if isNational}}checked{{/if}} name="location_kind" value="national" class="national span1" id="national-location-kind" />
+     <label for="national-location-kind">
+       This is a national or global campaign without a particular location
+     </label>
+   </div>
+
+</div>

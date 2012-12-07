@@ -46,24 +46,22 @@ describe Admin::UsersController do
       end
 
       describe "#update" do
-        it "should extract user attributes" do
-          user_attrs = { 'first_name' => 'abc' }
-          User.should_receive(:extract_accessible_attributes_symbol_hash_values).with(user_attrs)
-          post :update, id: @existing_user.id, user: user_attrs
+        it "should change a first name" do
+          @existing_user.admin?.should be_false
+          post :update, id: @existing_user.id, user: {first_name: 'FOO'}
+          assigns(:user).first_name.should == "FOO"
         end
 
         it "should allow people to be made admins" do
           @existing_user.admin?.should be_false
           post :update, id: @existing_user.id, user: {admin: '1'}
-          @existing_user.reload
-          @existing_user.admin?.should be_true
+          assigns(:user).admin?.should be_true
         end
 
         it "should allow people to be made org admins" do
           @existing_user.org_admin?.should be_false
           post :update, id: @existing_user.id, user: {org_admin: '1'}
-          @existing_user.reload
-          @existing_user.org_admin?.should be_true
+          assigns(:user).org_admin?.should be_true
         end
 
         it "should now allow invalid updates" do

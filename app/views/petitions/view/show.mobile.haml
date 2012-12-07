@@ -15,7 +15,17 @@
     .row.mt10
       - unless @petition.image_file_name.blank?
         .span4
-          = petition_image(@petition, :hero)
+          = image_content(entity: @petition)
+      .progressbar.mt5
+        .progressbar.total
+          .progressbar.done{ :style => "width:#{@petition.percent_to_goal}%"}
+        .petition-signatures
+          %span.number= number_with_delimiter(@petition.cached_signatures_size)
+          %br
+          of
+          %span.strong= number_with_delimiter(@petition.goal)
+          signatures
+
 
       .span8
         .petition-text.mt20
@@ -34,7 +44,7 @@
       = button_to 'Flag this petition for review', petition_flags_path(@petition), class: 'btn-flag'
         
 .sign{ @signature.errors.none? ? {style: "display:none;"} : {} }
-  .signthepetition-form.mt10
+  .sign-the-petition-form.mt10
     = render partial: 'petitions/view/sign'
     
 .thanks{style: "display:none;"}

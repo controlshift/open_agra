@@ -30,10 +30,10 @@ describe "Campaigner sends email to supporter", type: :request do
     end
 
     # select template
-    click_on "Delivery"
+    click_on "delivery-anchor"
     find("#delivery").should be_visible
 
-    click_on "Share on social media"
+    click_on "share-on-social-media-anchor"
     click_on "Apply"
 
     expected_content = find("#share-on-social-media").text

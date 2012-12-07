@@ -34,14 +34,17 @@ describe Org::EmailsController do
     end
 
     context "with some emails" do
-      let(:petition) { Factory(:petition, organisation: @organisation) }
-      let(:pending_email) { Factory(:petition_blast_email, petition: petition, moderation_status: 'pending') }
-      let(:approved_email) { Factory(:petition_blast_email, petition: petition, moderation_status: 'approved') }
-      let(:inappropriate_email) { Factory(:petition_blast_email, petition: petition, moderation_status: 'inappropriate', moderation_reason: 'reason') }
-      before(:each) { get :moderation }
-
       it "should only get pending emails" do
-        assigns(:emails).should include pending_email
+        petition = create(:petition, organisation: @organisation)
+        group = create(:group, organisation: @organisation)
+        pending_group_email = create(:group_blast_email, group: group, moderation_status: 'pending', organisation: @organisation)
+        pending_petition_email = create(:petition_blast_email, petition: petition, moderation_status: 'pending', organisation: @organisation)
+        approved_email = create(:petition_blast_email, petition: petition, moderation_status: 'approved', organisation: @organisation)
+        inappropriate_email = create(:inappropriate_petition_blast_email, petition: petition, organisation: @organisation)
+
+        get :moderation
+
+        assigns(:emails).should == [ pending_petition_email, pending_group_email ]
         assigns(:emails).should_not include approved_email
         assigns(:emails).should_not include inappropriate_email
       end
@@ -50,24 +53,24 @@ describe Org::EmailsController do
 
   describe "#update" do
     it "should update the moderation fields" do
-      PetitionBlastEmail.should_receive(:find).with('1').and_return(email = mock())
+      BlastEmail.should_receive(:find).with('1').and_return(email = mock())
       email.should_receive(:moderation_status).and_return('pending')
       email.should_receive(:moderation_reason=)
       email.should_receive(:moderation_status=)
 
-      PetitionBlastEmailsService.stub(:new).and_return(service = mock())
+      BlastEmailsService.stub(:new).and_return(service = mock())
       service.should_receive(:save).with(email)
 
       post :update, :id => 1, :petition_blast_email => {:moderation_status => 'approved', :moderation_reason => 'foo'}
     end
 
     it "should not allow updates if the email is already moderated" do
-      PetitionBlastEmail.should_receive(:find).with('1').and_return(email = mock())
+      BlastEmail.should_receive(:find).with('1').and_return(email = mock())
       email.should_receive(:moderation_status).and_return('approved')
       email.should_not_receive(:moderation_reason=)
       email.should_not_receive(:moderation_status=)
 
-      PetitionBlastEmailsService.stub(:new).and_return(service = mock())
+      BlastEmailsService.stub(:new).and_return(service = mock())
       service.should_not_receive(:save).with(email)
 
       post :update, :id => 1, :petition_blast_email => {:moderation_status => 'approved', :moderation_reason => 'foo'}

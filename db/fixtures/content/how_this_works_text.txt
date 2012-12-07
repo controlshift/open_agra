@@ -1,0 +1,10 @@
+<ul>
+  <li>
+    <span> Together with other members across the country we are applying pressure locally in our communities</span>
+  </li>
+  <li>
+    <span> We need local leaders like you to step up and take ownership of the campaign's success in your community</span>
+  </li>
+  <li>
+    <span> Local leaders will deliver the campaign to your local target.</span>
+</ul>

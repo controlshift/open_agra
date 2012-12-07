@@ -1,25 +1,27 @@
+require 'will_paginate/array'
 class Org::EmailsController < Org::OrgController
   def index
-    @emails = PetitionBlastEmail.paginate(order: 'petition_blast_emails.created_at DESC', page: params[:page])
-                                .joins(:petition).where(:petitions => {:organisation_id => current_organisation.id})
-                                .includes(:petition)
+    @emails = BlastEmail.where(:organisation_id => current_organisation.id).paginate(order: 'blast_emails.created_at DESC', page: params[:page])
   end
 
   def show
-    @email = PetitionBlastEmail.find params[:id]
+    @email = BlastEmail.find params[:id]
   end
   
   def moderation
-    @emails = PetitionBlastEmail.awaiting_moderation(current_organisation).paginate(order: 'petition_blast_emails.created_at DESC', page: params[:page])
+    @emails = BlastEmail.awaiting_moderation(current_organisation).paginate(order: 'blast_emails.created_at DESC', page: params[:page])
   end
 
   def update
-    @email = PetitionBlastEmail.find params[:id]
-    if @email.moderation_status == 'pending'
-      @email.moderation_status = params[:petition_blast_email][:moderation_status]
-      @email.moderation_reason = params[:petition_blast_email][:moderation_reason]
+    @email = BlastEmail.find params[:id]
 
-      if PetitionBlastEmailsService.new.save(@email)
+    blast_email_status = params.has_key?(:petition_blast_email) ? params[:petition_blast_email] : params[:group_blast_email]
+
+    if @email.moderation_status == 'pending'
+      @email.moderation_status = blast_email_status[:moderation_status]
+      @email.moderation_reason = blast_email_status[:moderation_reason]
+
+      if BlastEmailsService.new.save(@email)
         redirect_to moderation_org_emails_path
       else
         render :moderation

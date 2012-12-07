@@ -1,0 +1,41 @@
+<p>
+Dear Friends,
+</p>
+
+<p>
+Thank you for signing {{ petition.title }}
+<p>
+
+
+<p>
+This issue means a lot to me and I really appreciate your support.
+I'm emailing you to ask you to go one step further and share this petition with your friends and family.
+</p>
+
+<p>
+<a href="{% petition_url %}"> {% petition_url %} </a>
+</p>
+
+<p>
+Posting something on facebook or twitter will only take a second, but will mean that hundreds of people see the petition and can join our movement.
+</p>
+
+<p>
+Why not also tell your friends why you decided to sign the petition and why it's important to you – people are more likely to offer their support if they understand why the people they are close to support it too!
+</p>
+
+<p>
+<a href="{% petition_url %}"> {% petition_url %} </a>
+</p>
+
+<p>
+Real change happens when everyday people like you and I take a stand for what we believe in.
+</p>
+
+<p>
+Thank you for standing with me on this issue.
+</p>
+
+<p>
+{{ current_user.first_name }}
+</p>

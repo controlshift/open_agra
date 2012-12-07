@@ -3,6 +3,8 @@ load 'lib/liquid/tags.rb'
 
 SeedFu.quiet = true
 
+FacebookShareWidget.access_token_session_key = :facebook_access_token
+
 #keep failed jobs for retry
 Delayed::Worker.destroy_failed_jobs = false
 Delayed::Worker.max_attempts = 3

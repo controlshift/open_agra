@@ -12,9 +12,11 @@ class Ability
 
       can :manage, Group, users: {id: user.id}
 
+      can :update, Petition, user_id: nil
+
       if user.org_admin?
 
-        [Petition, User, Effort, Story, Group, Category].each do | klass|
+        [Petition, User, Effort, Story, Group, Category, Member].each do | klass|
           can :manage, klass, organisation_id: user.organisation_id
         end
 

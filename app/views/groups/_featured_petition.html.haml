@@ -1,5 +1,5 @@
 %li.span4
   %a.thumbnail{ href: petition_path(featured_petition) }
-    = petition_image(featured_petition, :hero)
+    = image_content(entity: featured_petition)
     .caption
       %h5= featured_petition.title

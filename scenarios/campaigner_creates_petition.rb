@@ -50,14 +50,24 @@ describe "Campaigner creates petition", type: :request do
 
       page.find("#status-text").should have_content "Image uploaded!"
       page.find(".petition-image img")[:src].should match "white.jpg"
-      
+
+      petition = Petition.last
+
+      wait_until { petition.reload.image.present? }
+      petition.image_file_name.should match "white.jpg"
+
+
       # select some categories
       click_on "Select Categories..."
+      page.should have_selector('.modal-header', visible: true)
       check "Category 2"
       check "Category 3"
       click_on "Save"
-      find('#selected-categories').should have_content "Category 2"
-      find('#selected-categories').should have_content "Category 3"
+
+      wait_until { petition.categories(true).any? }
+
+      categories = petition.categories.collect{|c| c.name}
+      categories.should == ["Category 2", "Category 3"]
 
       # and launch it
       click_on "launch-petition"
@@ -67,7 +77,7 @@ describe "Campaigner creates petition", type: :request do
       current_email.subject.should match(/Thanks for creating the petition/)
       current_email.from.first.should == @current_organisation.contact_email
 
-      page.should have_content('share your petition')
+      page.current_path.should == petition_manage_path('no-more-pokies')
 
       # verify that everything was saved properly.
       petition = Petition.last
@@ -100,6 +110,7 @@ describe "Campaigner creates petition", type: :request do
       create_petition("No more pokies")
       fill_and_submit_login_form("email2@test.com", "abc123", show_chevrons: true)
 
+      page.should have_css('.launch .chevron')
       page.should have_content('No more pokies')
     end
   end

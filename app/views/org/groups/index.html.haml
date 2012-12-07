@@ -1,15 +1,23 @@
 .row
   .span7
-    = title "Groups"
+    = title "Partner Groups"
   .span3
-    = link_to 'New Group', new_org_group_path, class: "btn btn-primary use-pjax", id: 'new-group'
+    = link_to 'New Group', new_org_group_path, class: "btn btn-primary", id: 'new-group'
 
 - if @groups.any?
   = table_for(@groups) do |t|
     = t.data do
-      - t.cell(:title) { |e| link_to(e.title, org_group_path(e.slug), {:class => 'use-pjax'}) }
+      - t.cell(:title) { |e| link_to(e.title, org_group_path(e.slug)) }
       - t.cell(:petitions) { |e| e.petitions.count }
       - t.cell(:public_view) {|e | link_to "(public view)", group_path(e)  }
   = will_paginate @groups
 - else
-  No groups found.
+  .row
+    .span4.offset4{style:"padding-top:50px;"}
+      %p
+        Groups are partner organisations that each have their own special area on the platform.
+      %p
+        Partner group admins can export signatures and track activity for the petitions that they and their members create.
+
+    .span1
+      = image_tag "target-arrow.png"

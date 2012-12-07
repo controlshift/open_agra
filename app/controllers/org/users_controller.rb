@@ -1,11 +1,14 @@
-require 'csv'
-
 class Org::UsersController < Org::OrgController
-  before_filter :load_and_authorize_user, except: [:index, :email, :export]
+  before_filter :load_and_authorize_user, except: [:index, :email, :export, :bad_postcodes]
 
   def index
     @users = User.paginate page: params[:page], order: 'created_at DESC', conditions: {organisation_id: current_organisation.id}
     render 'admin/users/index'
+  end
+
+  def bad_postcodes
+    users = current_organisation.users
+    @invalid_users = users.find_all{|u| !u.valid? }
   end
 
   def edit
@@ -13,10 +16,10 @@ class Org::UsersController < Org::OrgController
   end
 
   def update
-    @user.attributes = User.extract_accessible_attributes_symbol_hash_values(params[:user])
+    @user.attributes = params[:user].slice( *@user.accessible_attribute_names )
     @user.org_admin = params[:user][:org_admin]
     if @user.save
-      redirect_to org_users_path, notice: "#{@user.email} saved."
+      redirect_to org_members_path, notice: "#{@user.email} saved."
     else
       render 'admin/users/edit'
     end
@@ -32,16 +35,11 @@ class Org::UsersController < Org::OrgController
 
   end
 
-  def export
-    csv_string = Queries::People.new.people_as_csv(current_organisation.id)
-    filename = "users-#{Time.now.strftime("%Y%m%d")}.csv"
-    send_data(csv_string, type: 'text/csv; charset=utf-8; header=present', filename: filename)
-  end
-
 private
 
   def load_and_authorize_user
     @user = User.find(params[:id])
+    raise ActiveRecord::RecordNotFound if @user.organisation != current_organisation
     authorize_or_redirect! :manage, @user
   end
 

@@ -22,6 +22,8 @@ describe SignaturesService do
     it "should trigger service callbacks after create" do
       subject.should_receive(:send_thank_you_and_promotion_emails).and_return(true)
       subject.should_receive(:notify_partner_org)
+      subject.should_receive(:increment_petition_signatures_count)
+      subject.should_receive(:increment_effort_signatures_count)
 
       subject.save(@signature)
     end
@@ -119,26 +121,112 @@ describe SignaturesService do
 
     context "a petition and a signature" do
       before(:each) do
-        @petition = Factory(:petition)
+        @organisation = Factory(:organisation)
+        @petition = Factory(:petition, organisation: @organisation)
         @signature = Factory(:signature, petition: @petition)
         subject.stub(:current_object).and_return(@signature)
       end
 
-      it "should increment counter" do
-        subject.send(:increment_petition_signatures_count)
-        Rails.cache.read(@petition.signatures_count_key).should == 1
-        subject.send(:increment_petition_signatures_count)
-        Rails.cache.read(@petition.signatures_count_key).should == 2
-        @petition.cached_signatures_size.should == 2
+      describe "the petition counter" do
+        it "should increment" do
+          subject.send(:increment_petition_signatures_count)
+          Rails.cache.read(@petition.signatures_count_key).should == 1
+          subject.send(:increment_petition_signatures_count)
+          Rails.cache.read(@petition.signatures_count_key).should == 2
+          @petition.cached_signatures_size.should == 2
+        end
+
+        it "should increment/decrement" do
+          subject.send(:decrement_petition_signatures_count)
+          Rails.cache.read(@petition.signatures_count_key).should == 1
+          subject.send(:decrement_petition_signatures_count)
+          Rails.cache.read(@petition.signatures_count_key).should == 0
+          @petition.cached_signatures_size.should == 0
+        end
       end
 
-      it "should increment counter" do
-        subject.send(:decrement_petition_signatures_count)
-        Rails.cache.read(@petition.signatures_count_key).should == 1
-        subject.send(:decrement_petition_signatures_count)
-        Rails.cache.read(@petition.signatures_count_key).should == 0
-        @petition.cached_signatures_size.should == 0
+      describe "the organisation sig counter" do
+        it "should increment" do
+          subject.send(:increment_organisation_signatures_count)
+          Rails.cache.read(@organisation.signatures_count_key).should == 1
+          subject.send(:increment_organisation_signatures_count)
+          Rails.cache.read(@organisation.signatures_count_key).should == 2
+          @organisation.cached_signatures_size.should == 2
+        end
+
+        it "should increment/decrement" do
+          subject.send(:decrement_organisation_signatures_count)
+          Rails.cache.read(@organisation.signatures_count_key).should == 1
+          subject.send(:decrement_organisation_signatures_count)
+          Rails.cache.read(@organisation.signatures_count_key).should == 0
+          @organisation.cached_signatures_size.should == 0
+        end
       end
+    end
+
+    context "petition under an effort and a signature" do
+      describe "the effort signature counter" do
+        before(:each) do
+          @organisation = Factory(:organisation)
+          @effort = FactoryGirl.create(:effort)
+          @petition = FactoryGirl.create(:petition, organisation: @organisation, effort: @effort)
+          @signature = FactoryGirl.create(:signature, petition: @petition)
+          subject.stub(:current_object).and_return(@signature)
+        end
+
+        it "should increment" do
+          subject.send(:increment_effort_signatures_count)
+          Rails.cache.read(@effort.signatures_count_key).should == 1
+          subject.send(:increment_effort_signatures_count)
+          Rails.cache.read(@effort.signatures_count_key).should == 2
+          @effort.cached_signatures_size.should == 2
+        end
+
+        it "should take other petitions in the effort into account" do
+          @effort.stub(:signatures_size).and_return(99)
+          subject.send(:increment_effort_signatures_count)
+          Rails.cache.read(@effort.signatures_count_key).should == 99
+          subject.send(:increment_effort_signatures_count)
+          Rails.cache.read(@effort.signatures_count_key).should == 100
+          @effort.cached_signatures_size.should == 100
+        end
+
+        it "should increment/decrement" do
+          subject.send(:decrement_effort_signatures_count)
+          Rails.cache.read(@effort.signatures_count_key).should == 1
+          subject.send(:decrement_effort_signatures_count)
+          Rails.cache.read(@effort.signatures_count_key).should == 0
+          @effort.cached_signatures_size.should == 0
+        end
+      end
+    end
+  end
+
+  describe "group subscriptions and members" do
+    context "with a group" do
+      before(:each) do
+        @organisation = Factory(:organisation)
+        @group = Factory(:group, organisation: @organisation)
+
+        @petition = Factory(:petition, organisation: @organisation, group: @group)
+      end
+
+      it "should create a group subscription on signature creation" do
+        signature = Factory.build(:signature, petition: @petition, join_organisation: true)
+        SignaturesService.new.save(signature)
+        signature.member.email.should == signature.email
+        signature.member.group_subscriptions.collect{| gs | gs.group }.should include(@group)
+        @group.subscriptions.collect{|gs| gs.member}.should include(signature.member)
+      end
+    end
+
+    it "should not subscribe if join_organisation is false" do
+      group = Factory.build(:group)
+      petition = Factory.build(:petition, group: group)
+      signature = Factory.build(:signature, join_organisation: false, petition: petition)
+      subject.stub(:current_object).and_return(signature)
+      GroupSubscription.should_not_receive(:subscribe!)
+      subject.send(:create_group_subscription)
     end
   end
 end

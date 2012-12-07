@@ -2,10 +2,9 @@ require 'spec_helper'
 
 describe Groups::InvitationsController do
   include_context 'setup_default_organisation'
-
-  let(:invitation) { Factory(:group_member, user: nil) }
-  let(:group) { invitation.group }
-  let(:user) { Factory(:user, email: invitation.invitation_email) }
+  let(:group) { Factory(:group, organisation: @organisation) }
+  let(:invitation) { Factory(:group_member, user: nil, group: group) }
+  let(:user) { Factory(:user, email: invitation.invitation_email, organisation: @organisation) }
 
   describe '#show' do
     before :each do
@@ -40,7 +39,7 @@ describe Groups::InvitationsController do
         it 'redirects to root path' do
           get :show, group_id: group, id: invitation, group_member: {invitation_token: invitation.invitation_token}
           response.should redirect_to(root_path)
-          flash.alert.should include 'Incorrect token or email'
+          flash.alert.should include 'The invitation link you received is not correct.'
         end
       end
     end

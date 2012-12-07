@@ -1,12 +1,18 @@
 module DeviseAfterSignInPath
+  def token
+    @token
+  end
+
   def after_sign_in_path_for(resource)
-    token = params[:token] || @token
+    token = params[:token] || self.token
     if token.present?
       petition = Petition.find_by_token!(token)
       PetitionsService.new.link_petition_with_user!(petition, resource)
-      launch_petition_path(petition)
+      session[:user_return_to] || petitions_path
     elsif session[:user_return_to].present?
       session[:user_return_to]
+    elsif resource.org_admin?
+      org_path
     else
       petitions_path
     end

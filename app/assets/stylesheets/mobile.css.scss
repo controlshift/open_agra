@@ -30,7 +30,7 @@ body.mobile {
     background-color: #fff;
     @include background-image(linear-gradient(#ffffff 0%, #ffffff 100%));
     @include border-radius(0);
-    @include box-shadow(rgba(0, 0, 0, 0.25) 0 0 8px 0 false);
+    @include box-shadow(rgba(0, 0, 0, 0.25) 0 0 8px 0);
   }
   
   .btn-navbar {
@@ -49,7 +49,7 @@ body.mobile {
   
   .brand {
     margin-left: 0;
-    color: $fg-color;
+    color: $text-color;
     width: 154px;
     background: image-url('logo_mobile.png') no-repeat;
     background-position: 0 12px;
@@ -192,4 +192,50 @@ a.share.email { @include bg-image('btn-share-email.png') }
 
 .popover-inner {
   width: 210px;
+}
+
+.progressbar {
+  width:100%;
+  height:100%;
+  display: inline-block;
+  vertical-align: middle;
+
+  .total {
+    width: 100%;
+    height: 15px;
+    text-align: left;
+    overflow: hidden;
+    background-color: #e4e4e4;
+    background-image: none;
+    border: 0;
+    padding: 2px 0 0 2px;
+    @include border-radius(0);
+    @include box-shadow(#bcbcbc 0 2px 5px 0 inset);
+
+  }
+  .done {
+    vertical-align: top;
+    height: 14px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-image: url($bg-progress-done-url);
+    border: 0px solid #ddd;
+  }
+  .text {
+    display: inline;
+  }
+}
+
+.petition-signatures {
+  .number {
+  font-size: 30pt;
+  font-weight: bold;
+  color: $accent-color;
+  line-height: 34pt;
+  }
+  color: #252525;
+  font-size: 14pt;
+  font-weight: normal;
+  font-style: italic;
+  font-family: $subtitle-font-family;
 }

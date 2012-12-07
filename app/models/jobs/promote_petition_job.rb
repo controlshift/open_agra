@@ -16,7 +16,7 @@ module Jobs
     end
     
     def should_email(petition)
-      !petition.cancelled? && !petition.suppressed? && !petition.prohibited? && !petition.user.opt_out_site_email?
+      petition.user && !petition.cancelled? && !petition.suppressed? && !petition.prohibited? && !petition.user.opt_out_site_email?
     end
 
     def schedule_reminder_when_dormant(run_at, petition)
@@ -36,7 +36,7 @@ module Jobs
 
     def send_launch_kicker(petition)
       petition.reload
-      PromotePetitionMailer.send_launch_kicker(petition).deliver if !petition.launched? && !petition.user.opt_out_site_email?
+      PromotePetitionMailer.send_launch_kicker(petition).deliver if petition.user && !petition.launched? && !petition.user.opt_out_site_email?
     end
   end
 end

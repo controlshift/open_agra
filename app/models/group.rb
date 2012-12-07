@@ -20,7 +20,8 @@ class Group < ActiveRecord::Base
   has_many  :group_members
   belongs_to :organisation
   has_many :petitions
-  has_many :signatures, :through => :petitions
+  has_many :signatures, through: :petitions
+  has_many :subscriptions, class_name: 'GroupSubscription'
 
 
   validates :title, presence: true
@@ -31,4 +32,11 @@ class Group < ActiveRecord::Base
   has_paperclip_image styles: {hero: "330x330>", form: "200x122>"}
   include HasSlug
 
+  def subscribed_signatures
+    signatures.subscribed.all.uniq { |s| s.email }
+  end
+
+  def cached_signatures_size
+    petitions.inject(0) { |result, petition| result + petition.cached_signatures_size }
+  end
 end

@@ -1,4 +1,4 @@
-- cache("v4_org_admin_sidebar_#{current_organisation.cache_key}") do
+- cache("v7_org_admin_sidebar_#{current_organisation.cache_key}") do
   .org-admin-sidebar.well{ style: "padding: 8px 0" }
     %ul.nav.nav-list
       %li
@@ -11,7 +11,7 @@
           %i.icon-comment
           All
       %li
-        = link_to hot_org_petitions_path, {:class => 'use-pjax', :id => 'hot-petitions'} do
+        = link_to hot_org_petitions_path, {:id => 'hot-petitions', :class => 'use-pjax'} do
           %i.icon-fire
           Hot
       %li
@@ -33,9 +33,9 @@
           %i.icon-road
           Efforts
       %li
-        = link_to org_users_path, {:id => 'manage-users', :class => 'use-pjax'} do
+        = link_to org_members_path, {:id => 'manage-members', :class => 'use-pjax'} do
           %i.icon-user
-          Users
+          Members
       %li
         = link_to settings_org_path, {:id => 'settings', :class => 'use-pjax'} do
           %i.icon-tasks
@@ -60,7 +60,7 @@
 
       %li.nav-header CMS
       %li
-        = link_to org_stories_path, {:id => 'all-stories', :class => 'use-pjax'} do
+        = link_to org_contents_stories_path, {:id => 'all-stories', :class => 'use-pjax'} do
           %i.icon-comment
           Stories
       %li
@@ -74,9 +74,9 @@
 
       %li.nav-header Data
       %li
-        = link_to export_org_users_path, id: 'export-people-link' do
+        = link_to org_exports_path, id: 'export-people-link' do
           %i.icon-download
-          People
+          Export
       %li
         = link_to new_org_query_path, id: 'query-link' do
           %i.icon-th-list

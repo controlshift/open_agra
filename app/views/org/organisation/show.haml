@@ -10,7 +10,7 @@
 
 .admin_major_stat#total_signatures_count
   .number
-    = number_with_delimiter(current_organisation.signatures.size, :delimiter => "," )
+    = number_with_delimiter(current_organisation.cached_signatures_size, :delimiter => "," )
   .subtle
     Signatures Collected
 

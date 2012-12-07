@@ -13,76 +13,76 @@ class Petitions::SignaturesController < ApplicationController
   include MobileFuOverrides
 
   def create
-    @signature = Signature.new(params[:signature])
+    @signature = Signature.new(default_organisation_slug: current_organisation.slug)
+    @signature.assign_attributes(params[:signature])
     @signature.petition = @petition
 
     respond_to do | format|
       if SignaturesService.new.save(@signature)
         track! :opt_to_join_org if @signature.join_organisation?
         track! :sign_petition
-        format.html { redirect_to thanks_petition_path(@petition) }
+        format.any(:html, :mobile) { redirect_to thanks_petition_path(@petition) }
         format.js   { render :create, layout: false }
-      elsif @signature.errors[:email] && @signature.errors[:email].include?('has already signed')
-        format.html { redirect_to thanks_petition_path(@petition) }
+      elsif @signature.errors[:email] && @signature.errors[:email].include?('has already signed') && @signature.errors.size == 1
+        format.any(:html, :mobile) { redirect_to thanks_petition_path(@petition) }
         format.js   { render :create, layout: false }
       else
         @email = Email.new
-        format.html { render 'petitions/view/show', layout: 'application_sidebar' }
+        format.any(:html, :mobile) { render 'petitions/view/show', layout: 'application_sidebar' }
         format.js   { render :error, layout: false }
       end
     end
   end
 
   def index
-    respond_to do |format|
-      format.csv { render csv: @petition, filename: @petition.slug, fields: [:first_name, :last_name, :phone_number, :postcode] }
-    end
+    streaming_csv( Queries::Exports::PetitionSignaturesExport.new(petition: @petition, organisation: current_organisation) )
   end
 
   def manual_input
-    @signature = Signature.new
+    @signature = Signature.new(default_organisation_slug: current_organisation.slug)
     @signature.petition = @petition
-    @signatures_with_errors = []
-    @error_rows_json = '[]'
+    @error_rows = []
 
     render :manual_input
   end
 
   def save_manual_input
-    @signature = Signature.new
+    @signature = Signature.new(default_organisation_slug: current_organisation.slug)
     @signature.petition = @petition
-    @signatures_with_errors = []
+    @error_rows = []
+    @saved_signatures = 0
 
-    signatures = params[:signatures]
-    saved_signatures = 0
-
-    signatures.each do |hash|
-      if hash.any? { |k, v| !v.blank? }
-        signature = Signature.new(hash)
+    params[:signatures].each do |hash|
+      if hash.any? { |k, v| !v.blank? && k != 'join_organisation' }
+        signature = Signature.new(default_organisation_slug: current_organisation.slug)
+        signature.assign_attributes hash
         signature.petition = @petition
 
-        if signature.valid?
-          if SignaturesService.new.save(signature)
-            saved_signatures += 1
-          else
-            @signatures_with_errors << signature
-          end
+        if signature.valid? && SignaturesService.new.save(signature)
+          @saved_signatures += 1
         else
-          @signatures_with_errors << signature
+          @error_rows << signature.to_hash
         end
       end
     end
-
-    @error_rows_json = "[#{@signatures_with_errors.map { |sign| sign.to_json(methods: :errors) }.join(', ')}]"
-
     
-    if !@signatures_with_errors.empty?
-      flash.now.notice = "#{pluralize(saved_signatures, 'signature')} saved." unless saved_signatures == 0
-      flash.now.alert = "#{pluralize(@signatures_with_errors.count, 'signature')} cannot be saved." unless @signatures_with_errors.empty?
-      render :manual_input
-    else
-      flash.notice = "#{pluralize(saved_signatures, 'signature')} saved." unless saved_signatures == 0
-      redirect_to petition_manage_path(@petition)
+    @success_text = @saved_signatures > 0 ? "#{pluralize(@saved_signatures, 'signature')} saved." : ""
+    @error_text = @error_rows.empty? ? "" : "#{pluralize(@error_rows.count, 'signature')} cannot be saved."
+
+    respond_to do |format|
+      format.html do
+        flash.notice = @success_text if @success_text.present?
+        
+        if @error_rows.empty?
+          redirect_to petition_manage_path(@petition)
+        else
+          flash.now.alert = @error_text if @error_text.present?
+          render :manual_input
+        end
+      end
+      format.js do
+        render :manual_input, layout: false
+      end
     end
   end
 
@@ -116,7 +116,14 @@ class Petitions::SignaturesController < ApplicationController
   private
   
   def load_petition
-    @petition = Petition.find_by_slug!(params[:petition_id])
+    # TEMPORARY FIX FOR BUG!!! Revert sometime in 2013.
+    @petition = Petition.find_by_slug(params[:petition_id])
+    if @petition.nil?
+      @petition = PetitionBlastEmail.find_by_id!(params[:petition_id]).petition
+    end
+
+    raise ActiveRecord::RecordNotFound if @petition.nil?
+    raise ActiveRecord::RecordNotFound if @petition.organisation != current_organisation
   end
 
   def load_signature

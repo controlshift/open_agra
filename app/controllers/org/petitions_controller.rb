@@ -46,7 +46,9 @@ class Org::PetitionsController < Org::OrgController
       next_petition = Petition.awaiting_moderation(current_organisation.id).first
       redirect_to petition_path(next_petition ? next_petition : @petition), notice: "Moderation status of previous petition is updated successfully."
     else
-      @signature = Signature.new(current_user ? current_user.accessible_attributes_hash_values : {})
+      @signature = Signature.new(default_organisation_slug: current_organisation.slug)
+      signature_attributes = current_user.signature_attributes(@signature)
+      @signature.assign_attributes( signature_attributes )
       @email = Email.new
       render 'petitions/view/show'
     end
@@ -56,6 +58,7 @@ class Org::PetitionsController < Org::OrgController
 
   def load_and_authorize_petition
     @petition = Petition.find_by_slug!(params[:id])
+    raise ActiveRecord::RecordNotFound if @petition.organisation != current_organisation
     authorize! :manage, @petition
     authorize! :manage, current_user
   end

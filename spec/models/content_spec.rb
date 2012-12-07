@@ -9,8 +9,9 @@
 #  category        :string(255)
 #  body            :text
 #  filter          :string(255)     default("none")
-#  created_at      :datetime        not null
-#  updated_at      :datetime        not null
+#  created_at      :datetime
+#  updated_at      :datetime
+#  kind            :string(255)     default("text")
 #
 
 require 'spec_helper'
@@ -28,6 +29,31 @@ describe Content do
       @organisation.stub(:id).and_return(1)
       @organisation.stub(:slug).and_return('banana-slug')
     end
+
+    describe ".name_for" do
+      it "should display the slug if no content found" do
+        Content.should_receive(:find_by_slug_and_organisation_id).with('slug', @organisation.id).and_return(nil)
+        Content.should_receive(:find_by_slug_and_organisation_id).with('slug', nil).and_return(nil)
+
+        Content.name_for('slug', @organisation).should == '__slug__'
+      end
+
+      context "a content mock" do
+        before(:each) do
+          @content = mock()
+          @content.stub(:name).and_return('name')
+          @content.stub(:updated_at).and_return(Time.now)
+        end
+
+        it "should return the name" do
+          Content.should_receive(:find_by_slug_and_organisation_id).with('slug', @organisation.id).and_return(@content)
+          Content.should_not_receive(:find_by_slug_and_organisation_id).with('slug', nil)
+
+          Content.name_for('slug', @organisation).should == 'name'
+        end
+      end
+    end
+
 
     describe ".content_for" do
       context "a content mock" do

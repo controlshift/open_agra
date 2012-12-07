@@ -1,8 +1,18 @@
 class RegistrationsController < Devise::RegistrationsController
   prepend_before_filter :require_no_authentication, only: [:complete]
-  
+
+  layout :layout_by_resource
+
+  def layout_by_resource
+    if session[:header_content] == "lead_petition_breadcrumb_steps"
+      'application_sidebar'
+    else
+      'application'
+    end
+  end
+
   def new
-    defaults = {:email => params[:email]}
+    defaults = {email: params[:email], default_organisation_slug: current_organisation.slug}
     resource = build_resource(defaults.delete_if {|key, value| value.blank? })
     respond_with resource
   end
@@ -13,7 +23,7 @@ class RegistrationsController < Devise::RegistrationsController
       super
       PetitionsService.new.link_petition_with_user!(@petition, resource) if @petition && resource.persisted?
     else
-      flash[:alert] = "Did you receive an email with an invitation to use this site? If so, you can only register using that email address. You may have tried to use a different address; please click the back button and try again."
+      flash[:alert] = 'Did you receive an email with an invitation to use this site? If so, you can only register using that email address. You may have tried to use a different address; please click the back button and try again.'
       redirect_to intro_path
     end
   end
@@ -24,7 +34,7 @@ class RegistrationsController < Devise::RegistrationsController
   def complete
     build_resource
 
-    if resource.valid?
+    if resource_for_facebook_user_is_valid?
       create
       if session[:facebook_id]
         resource.facebook_id = session[:facebook_id]
@@ -37,27 +47,33 @@ class RegistrationsController < Devise::RegistrationsController
       render :completing
     end
   end
-  
+
+  def resource_for_facebook_user_is_valid?
+    # if you are creating an account while signed into facebook, you are only
+    # allowed to create accounts for that user.
+    raise('Someone is trying to hack the site!') if facebook_email_and_user_email_not_match?
+    resource.valid?
+  end
+
+  def facebook_email_and_user_email_not_match?
+    session[:facebook_email] && self.resource.email != session[:facebook_email]
+  end
+
   def is_user_registerable
     email = params[:user][:email]
     email.downcase! unless email.blank?
     email.blank? || EmailWhiteList.find_by_email(email) || current_organisation.skip_white_list_check?
   end
 
-  def build_resource(hash=nil)
-    hash ||= params[resource_name] || {}
-    hash = User.extract_accessible_attributes_symbol_hash_values(hash)
-    super(hash)
+  def build_resource(hash={})
+    super(default_organisation_slug: current_organisation.slug)
+    self.resource.assign_attributes(params[resource_name] || hash)
     self.resource.organisation = current_organisation
-    if session[:facebook_email]
-      # if you are creating an account while signed into facebook, you are only
-      # allowed to create accounts for that user.
-      raise('Someone is trying to hack the site!') if  (self.resource.email != session[:facebook_email])
-    end
+    self.resource
   end
 
   def after_sign_up_path_for(resource)
-    @petition ? launch_petition_path(@petition) : super
+    @petition.blank? ? super : session[:user_return_to]
   end
 
   def show_login_link

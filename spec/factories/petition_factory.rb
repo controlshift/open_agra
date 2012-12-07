@@ -22,8 +22,24 @@ FactoryGirl.define do
     title nil
   end
 
- factory :inappropriate_petition, parent: :petition do
+  factory :inappropriate_petition, parent: :petition do
     admin_status 'inappropriate'
     admin_reason 'It is not appropriate.'
+  end
+
+  factory :target_petition, parent: :petition do
+    admin_status 'good'
+    association(:target)
+    association(:location)
+    association(:effort)
+  end
+
+  factory :petition_without_leader, parent: :target_petition do
+    user nil
+  end
+
+  factory :petition_with_location, parent: :petition do
+    admin_status 'good'
+    association(:location)
   end
 end

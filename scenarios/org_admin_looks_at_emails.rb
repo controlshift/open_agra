@@ -11,7 +11,7 @@ describe "Org admin moderates a petition'", type: :request, nip: true do
     @user = Factory(:user, organisation: @admin.organisation)
     @petition = Factory(:petition, user: @user, organisation: @user.organisation)
     @signature = Factory(:signature, petition: @petition, join_organisation: true)
-    @email = Factory(:petition_blast_email, petition: @petition)
+    @email = Factory(:petition_blast_email, petition: @petition, organisation: @current_organisation)
     log_in(@admin.email, "onlyusknowit")
   end
 

@@ -2,21 +2,27 @@
 #
 # Table name: signatures
 #
-#  id                :integer         not null, primary key
-#  petition_id       :integer
-#  email             :string(255)     not null
-#  first_name        :string(255)
-#  last_name         :string(255)
-#  phone_number      :string(255)
-#  postcode          :string(255)
-#  created_at        :datetime
-#  join_organisation :boolean
-#  deleted_at        :datetime
-#  token             :string(255)
-#  unsubscribe_at    :datetime
+#  id                       :integer         not null, primary key
+#  petition_id              :integer
+#  email                    :string(255)     not null
+#  first_name               :string(255)
+#  last_name                :string(255)
+#  phone_number             :string(255)
+#  postcode                 :string(255)
+#  created_at               :datetime
+#  join_organisation        :boolean
+#  deleted_at               :datetime
+#  token                    :string(255)
+#  unsubscribe_at           :datetime
+#  external_constituent_id  :string(255)
+#  member_id                :integer
+#  additional_fields        :hstore
+#  cached_organisation_slug :string(255)
 #
 
 require 'spec_helper'
+require 'support/shared_examples/validates_postcode'
+
 
 describe Signature do
   before(:each) do
@@ -24,7 +30,10 @@ describe Signature do
   end
 
   subject { @signature }
-  
+
+  it_behaves_like "validates postcode"
+  it {should belong_to(:member)}
+
   it { should validate_presence_of(:email) }
   it { should validate_presence_of(:postcode) }
   it { should validate_presence_of(:first_name) }
@@ -184,7 +193,59 @@ describe Signature do
     end
   end
 
-  describe "caching" do
+  describe "lookup" do
+    let(:petition) { Factory(:petition) }
 
+    before(:each) do
+      @signature = Factory(:signature, petition: petition)
+    end
+
+    it "should allow lookups by email" do
+      Signature.lookup(@signature.email, petition).should == @signature
+    end
+
+    it "should return nil when it does not exist" do
+      Signature.lookup('george@washington.com', petition).should == nil
+    end
+
+    it "should be case insensitive" do
+      Signature.lookup(@signature.email.upcase, petition).should == @signature
+    end
+  end
+
+  describe "members" do
+    it "should create a member when created" do
+      petition = Factory(:petition)
+      signature = Signature.new(email: "george@washington.com", first_name: "George", last_name: "Washington", postcode: "11238", phone_number: "555-555-5555")
+      signature.petition = petition
+      signature.save
+      signature.member.should_not be_nil
+      signature.member.email.should == "george@washington.com"
+    end
+
+    it "should associate with an existing member" do
+      organisation = Factory(:organisation)
+      member = Member.create(email: "george@washington.com", organisation: organisation)
+      petition = Factory(:petition, organisation: organisation)
+      signature = Signature.new(email: "george@washington.com", first_name: "George", last_name: "Washington", postcode: "11238", phone_number: "555-555-5555")
+      signature.petition = petition
+      signature.save
+
+      member.reload
+      member.signatures.should_not be_empty
+      signature.member.should_not be_nil
+    end
+  end
+
+  describe "country" do
+    before(:each) do
+      @organisation = Factory(:organisation, country: 'US')
+      @petition = Factory(:petition, organisation: @organisation)
+      @signature = Factory(:signature, petition: @petition)
+    end
+
+    it "should have a country" do
+      @signature.country.should == 'US'
+    end
   end
 end

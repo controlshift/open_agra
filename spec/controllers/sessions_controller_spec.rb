@@ -14,7 +14,7 @@ describe SessionsController do
 
     it "should login campaigner and go to share page" do
       @request.env["devise.mapping"] = Devise.mappings[:user]
-      petition = Factory(:petition)
+      petition = Factory(:petition, organisation: @organisation)
 
       post :create, user: Factory.attributes_for(:user), token: petition.token
     end

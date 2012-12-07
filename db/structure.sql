@@ -22,6 +22,20 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
+--
+-- Name: hstore; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION hstore; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION hstore IS 'data type for storing sets of (key, value) pairs';
+
+
 SET search_path = public, pg_catalog;
 
 --
@@ -41,6 +55,50 @@ CREATE FUNCTION pc_chartoint(chartoconvert character varying) RETURNS integer
 SET default_tablespace = '';
 
 SET default_with_oids = false;
+
+--
+-- Name: blast_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE blast_emails (
+    id integer NOT NULL,
+    petition_id integer,
+    from_name character varying(255) NOT NULL,
+    from_address character varying(255) NOT NULL,
+    subject character varying(255) NOT NULL,
+    body text NOT NULL,
+    delayed_job_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    recipient_count integer,
+    moderation_status character varying(255) DEFAULT 'pending'::character varying,
+    delivery_status character varying(255) DEFAULT 'pending'::character varying,
+    moderated_at timestamp without time zone,
+    moderation_reason text,
+    type character varying(255),
+    group_id integer,
+    organisation_id integer
+);
+
+
+--
+-- Name: blast_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE blast_emails_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: blast_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE blast_emails_id_seq OWNED BY blast_emails.id;
+
 
 --
 -- Name: campaign_admins; Type: TABLE; Schema: public; Owner: -; Tablespace: 
@@ -109,6 +167,38 @@ ALTER SEQUENCE categories_id_seq OWNED BY categories.id;
 
 
 --
+-- Name: categorized_efforts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE categorized_efforts (
+    id integer NOT NULL,
+    category_id integer,
+    effort_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: categorized_efforts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE categorized_efforts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: categorized_efforts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE categorized_efforts_id_seq OWNED BY categorized_efforts.id;
+
+
+--
 -- Name: categorized_petitions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -153,7 +243,8 @@ CREATE TABLE contents (
     body text,
     filter character varying(255) DEFAULT 'none'::character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    kind character varying(255) DEFAULT 'text'::character varying
 );
 
 
@@ -245,7 +336,20 @@ CREATE TABLE efforts (
     image_file_size integer,
     image_updated_at timestamp without time zone,
     thanks_for_creating_email text,
-    ask_for_location boolean
+    ask_for_location boolean,
+    effort_type character varying(255) DEFAULT 'open_ended'::character varying,
+    leader_duties_text text,
+    how_this_works_text text,
+    training_text text,
+    training_sidebar_text text,
+    distance_limit integer DEFAULT 100,
+    prompt_edit_individual_petition boolean DEFAULT false,
+    featured boolean DEFAULT false,
+    image_default_file_name character varying(255),
+    image_default_content_type character varying(255),
+    image_default_file_size integer,
+    image_default_updated_at timestamp without time zone,
+    landing_page_welcome_text text
 );
 
 
@@ -335,6 +439,81 @@ ALTER SEQUENCE emails_id_seq OWNED BY emails.id;
 
 
 --
+-- Name: facebook_share_widget_shares; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE facebook_share_widget_shares (
+    id integer NOT NULL,
+    user_facebook_id character varying(255),
+    friend_facebook_id character varying(255),
+    url character varying(255),
+    message text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: facebook_share_widget_shares_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE facebook_share_widget_shares_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: facebook_share_widget_shares_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE facebook_share_widget_shares_id_seq OWNED BY facebook_share_widget_shares.id;
+
+
+--
+-- Name: group_blast_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE group_blast_emails (
+    id integer NOT NULL,
+    group_id integer,
+    from_name character varying(255) NOT NULL,
+    from_address character varying(255) NOT NULL,
+    subject character varying(255) NOT NULL,
+    body text NOT NULL,
+    delayed_job_id integer,
+    recipient_count integer,
+    moderation_status character varying(255) DEFAULT 'pending'::character varying,
+    delivery_status character varying(255) DEFAULT 'pending'::character varying,
+    moderated_at timestamp without time zone,
+    moderation_reason text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: group_blast_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE group_blast_emails_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: group_blast_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE group_blast_emails_id_seq OWNED BY group_blast_emails.id;
+
+
+--
 -- Name: group_members; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -345,6 +524,59 @@ CREATE TABLE group_members (
     invitation_email character varying(255),
     invitation_token character varying(60)
 );
+
+
+--
+-- Name: group_members_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE group_members_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: group_members_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE group_members_id_seq OWNED BY group_members.id;
+
+
+--
+-- Name: group_subscriptions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE group_subscriptions (
+    id integer NOT NULL,
+    group_id integer,
+    member_id integer,
+    unsubscribed_at timestamp without time zone,
+    token character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: group_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE group_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: group_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE group_subscriptions_id_seq OWNED BY group_subscriptions.id;
 
 
 --
@@ -386,25 +618,6 @@ ALTER SEQUENCE groups_id_seq OWNED BY groups.id;
 
 
 --
--- Name: groups_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE groups_users_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: groups_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE groups_users_id_seq OWNED BY group_members.id;
-
-
---
 -- Name: locations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -442,6 +655,38 @@ CREATE SEQUENCE locations_id_seq
 --
 
 ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
+
+
+--
+-- Name: members; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE members (
+    id integer NOT NULL,
+    email character varying(255),
+    organisation_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: members_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE members_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: members_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE members_id_seq OWNED BY members.id;
 
 
 --
@@ -494,47 +739,6 @@ ALTER SEQUENCE organisations_id_seq OWNED BY organisations.id;
 
 
 --
--- Name: petition_blast_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE petition_blast_emails (
-    id integer NOT NULL,
-    petition_id integer,
-    from_name character varying(255) NOT NULL,
-    from_address character varying(255) NOT NULL,
-    subject character varying(255) NOT NULL,
-    body text NOT NULL,
-    delayed_job_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    recipient_count integer,
-    moderation_status character varying(255) DEFAULT 'pending'::character varying,
-    delivery_status character varying(255) DEFAULT 'pending'::character varying,
-    moderated_at timestamp without time zone,
-    moderation_reason character varying(255)
-);
-
-
---
--- Name: petition_blast_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE petition_blast_emails_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: petition_blast_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE petition_blast_emails_id_seq OWNED BY petition_blast_emails.id;
-
-
---
 -- Name: petition_flags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -544,7 +748,8 @@ CREATE TABLE petition_flags (
     user_id integer,
     ip_address character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    reason text
 );
 
 
@@ -603,7 +808,10 @@ CREATE TABLE petitions (
     petition_letter_content_type character varying(255),
     petition_letter_file_size integer,
     petition_letter_updated_at timestamp without time zone,
-    alias character varying(255)
+    alias character varying(255),
+    achievements text,
+    bsd_constituent_group_id character varying(255),
+    target_id integer
 );
 
 
@@ -651,7 +859,11 @@ CREATE TABLE signatures (
     join_organisation boolean,
     deleted_at timestamp without time zone,
     token character varying(255),
-    unsubscribe_at timestamp without time zone
+    unsubscribe_at timestamp without time zone,
+    external_constituent_id character varying(255),
+    member_id integer,
+    additional_fields hstore,
+    cached_organisation_slug character varying(255)
 );
 
 
@@ -672,6 +884,38 @@ CREATE SEQUENCE signatures_id_seq
 --
 
 ALTER SEQUENCE signatures_id_seq OWNED BY signatures.id;
+
+
+--
+-- Name: simple_captcha_data; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE simple_captcha_data (
+    id integer NOT NULL,
+    key character varying(40),
+    value character varying(6),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: simple_captcha_data_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE simple_captcha_data_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: simple_captcha_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE simple_captcha_data_id_seq OWNED BY simple_captcha_data.id;
 
 
 --
@@ -714,6 +958,42 @@ ALTER SEQUENCE stories_id_seq OWNED BY stories.id;
 
 
 --
+-- Name: targets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE targets (
+    id integer NOT NULL,
+    name character varying(255),
+    phone_number character varying(255),
+    email character varying(255),
+    location_id integer,
+    organisation_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    slug character varying(255)
+);
+
+
+--
+-- Name: targets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE targets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: targets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE targets_id_seq OWNED BY targets.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -743,7 +1023,11 @@ CREATE TABLE users (
     confirmed_at timestamp without time zone,
     confirmation_sent_at timestamp without time zone,
     opt_out_site_email boolean,
-    facebook_id character varying(255)
+    facebook_id character varying(255),
+    external_constituent_id character varying(255),
+    member_id integer,
+    additional_fields hstore,
+    cached_organisation_slug character varying(255)
 );
 
 
@@ -928,6 +1212,13 @@ ALTER SEQUENCE vanity_participants_id_seq OWNED BY vanity_participants.id;
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY blast_emails ALTER COLUMN id SET DEFAULT nextval('blast_emails_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY campaign_admins ALTER COLUMN id SET DEFAULT nextval('campaign_admins_id_seq'::regclass);
 
 
@@ -936,6 +1227,13 @@ ALTER TABLE ONLY campaign_admins ALTER COLUMN id SET DEFAULT nextval('campaign_a
 --
 
 ALTER TABLE ONLY categories ALTER COLUMN id SET DEFAULT nextval('categories_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY categorized_efforts ALTER COLUMN id SET DEFAULT nextval('categorized_efforts_id_seq'::regclass);
 
 
 --
@@ -984,7 +1282,28 @@ ALTER TABLE ONLY emails ALTER COLUMN id SET DEFAULT nextval('emails_id_seq'::reg
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_members ALTER COLUMN id SET DEFAULT nextval('groups_users_id_seq'::regclass);
+ALTER TABLE ONLY facebook_share_widget_shares ALTER COLUMN id SET DEFAULT nextval('facebook_share_widget_shares_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY group_blast_emails ALTER COLUMN id SET DEFAULT nextval('group_blast_emails_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY group_members ALTER COLUMN id SET DEFAULT nextval('group_members_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY group_subscriptions ALTER COLUMN id SET DEFAULT nextval('group_subscriptions_id_seq'::regclass);
 
 
 --
@@ -1005,14 +1324,14 @@ ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY organisations ALTER COLUMN id SET DEFAULT nextval('organisations_id_seq'::regclass);
+ALTER TABLE ONLY members ALTER COLUMN id SET DEFAULT nextval('members_id_seq'::regclass);
 
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY petition_blast_emails ALTER COLUMN id SET DEFAULT nextval('petition_blast_emails_id_seq'::regclass);
+ALTER TABLE ONLY organisations ALTER COLUMN id SET DEFAULT nextval('organisations_id_seq'::regclass);
 
 
 --
@@ -1040,7 +1359,21 @@ ALTER TABLE ONLY signatures ALTER COLUMN id SET DEFAULT nextval('signatures_id_s
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY simple_captcha_data ALTER COLUMN id SET DEFAULT nextval('simple_captcha_data_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY stories ALTER COLUMN id SET DEFAULT nextval('stories_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY targets ALTER COLUMN id SET DEFAULT nextval('targets_id_seq'::regclass);
 
 
 --
@@ -1102,6 +1435,14 @@ ALTER TABLE ONLY categories
 
 
 --
+-- Name: categorized_efforts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY categorized_efforts
+    ADD CONSTRAINT categorized_efforts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: categorized_petitions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1150,6 +1491,30 @@ ALTER TABLE ONLY emails
 
 
 --
+-- Name: facebook_share_widget_shares_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY facebook_share_widget_shares
+    ADD CONSTRAINT facebook_share_widget_shares_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: group_blast_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY group_blast_emails
+    ADD CONSTRAINT group_blast_emails_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: group_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY group_subscriptions
+    ADD CONSTRAINT group_subscriptions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1174,6 +1539,14 @@ ALTER TABLE ONLY locations
 
 
 --
+-- Name: members_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY members
+    ADD CONSTRAINT members_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organisations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1185,7 +1558,7 @@ ALTER TABLE ONLY organisations
 -- Name: petition_blast_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY petition_blast_emails
+ALTER TABLE ONLY blast_emails
     ADD CONSTRAINT petition_blast_emails_pkey PRIMARY KEY (id);
 
 
@@ -1214,11 +1587,27 @@ ALTER TABLE ONLY signatures
 
 
 --
+-- Name: simple_captcha_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY simple_captcha_data
+    ADD CONSTRAINT simple_captcha_data_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: stories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY stories
     ADD CONSTRAINT stories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: targets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY targets
+    ADD CONSTRAINT targets_pkey PRIMARY KEY (id);
 
 
 --
@@ -1270,6 +1659,13 @@ ALTER TABLE ONLY vanity_participants
 
 
 --
+-- Name: by_effort_id_and_target_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX by_effort_id_and_target_id ON petitions USING btree (effort_id, target_id);
+
+
+--
 -- Name: by_experiment_id_and_alternative; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1312,10 +1708,24 @@ CREATE INDEX delayed_jobs_priority ON delayed_jobs USING btree (priority, run_at
 
 
 --
+-- Name: existing_signatures; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX existing_signatures ON signatures USING btree (petition_id) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: homepage_optimization; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX homepage_optimization ON petitions USING btree (organisation_id, admin_status, launched, cancelled, user_id, updated_at DESC);
+
+
+--
+-- Name: idx_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX idx_key ON simple_captcha_data USING btree (key);
 
 
 --
@@ -1403,6 +1813,27 @@ CREATE INDEX index_group_members_on_user_id_and_group_id ON group_members USING 
 
 
 --
+-- Name: index_group_subscriptions_on_group_id_and_unsubscribed_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_group_subscriptions_on_group_id_and_unsubscribed_at ON group_subscriptions USING btree (group_id, unsubscribed_at);
+
+
+--
+-- Name: index_group_subscriptions_on_member_id_and_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_group_subscriptions_on_member_id_and_group_id ON group_subscriptions USING btree (member_id, group_id);
+
+
+--
+-- Name: index_group_subscriptions_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_group_subscriptions_on_token ON group_subscriptions USING btree (token);
+
+
+--
 -- Name: index_groups_on_organisation_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1431,13 +1862,6 @@ CREATE INDEX index_locations_on_query ON locations USING btree (query);
 
 
 --
--- Name: index_organisations_on_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_organisations_on_host ON organisations USING btree (host);
-
-
---
 -- Name: index_organisations_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1448,7 +1872,7 @@ CREATE UNIQUE INDEX index_organisations_on_slug ON organisations USING btree (sl
 -- Name: index_petition_blast_emails_on_petition_id_and_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_petition_blast_emails_on_petition_id_and_created_at ON petition_blast_emails USING btree (petition_id, created_at);
+CREATE INDEX index_petition_blast_emails_on_petition_id_and_created_at ON blast_emails USING btree (petition_id, created_at);
 
 
 --
@@ -1494,6 +1918,13 @@ CREATE INDEX index_petitions_on_location_id ON petitions USING btree (location_i
 
 
 --
+-- Name: index_petitions_on_organisation_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_petitions_on_organisation_id_and_user_id ON petitions USING btree (organisation_id, user_id);
+
+
+--
 -- Name: index_petitions_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1515,6 +1946,13 @@ CREATE INDEX index_petitions_on_user_id ON petitions USING btree (user_id);
 
 
 --
+-- Name: index_signatures_on_member_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_signatures_on_member_id ON signatures USING btree (member_id);
+
+
+--
 -- Name: index_signatures_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1526,6 +1964,27 @@ CREATE UNIQUE INDEX index_signatures_on_token ON signatures USING btree (token);
 --
 
 CREATE INDEX index_stories_on_organisation_id_and_featured ON stories USING btree (organisation_id, featured);
+
+
+--
+-- Name: index_targets_on_location_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_targets_on_location_id ON targets USING btree (location_id);
+
+
+--
+-- Name: index_targets_on_organisation_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_targets_on_organisation_id ON targets USING btree (organisation_id);
+
+
+--
+-- Name: index_users_on_member_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_member_id ON users USING btree (member_id);
 
 
 --
@@ -1564,6 +2023,20 @@ CREATE INDEX index_vanity_participants_on_experiment_id ON vanity_participants U
 
 
 --
+-- Name: lower_case_members_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX lower_case_members_email ON members USING btree (lower((email)::text), organisation_id);
+
+
+--
+-- Name: lower_case_organisations_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX lower_case_organisations_host ON organisations USING btree (lower((host)::text));
+
+
+--
 -- Name: lower_case_signatures_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1578,6 +2051,20 @@ CREATE UNIQUE INDEX lower_case_users_email ON users USING btree (lower((email)::
 
 
 --
+-- Name: name_autocomplete; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX name_autocomplete ON targets USING btree (lower((name)::text) varchar_pattern_ops);
+
+
+--
+-- Name: org_petitions; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX org_petitions ON petitions USING btree (organisation_id, created_at) WHERE (user_id IS NOT NULL);
+
+
+--
 -- Name: recent_signatures_desc; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1585,10 +2072,31 @@ CREATE INDEX recent_signatures_desc ON signatures USING btree (created_at DESC, 
 
 
 --
+-- Name: target_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX target_name ON targets USING btree (name);
+
+
+--
+-- Name: target_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX target_slug ON targets USING btree (slug);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+
+
+--
+-- Name: unique_share; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_share ON facebook_share_widget_shares USING btree (user_facebook_id, friend_facebook_id, url);
 
 
 --
@@ -1807,3 +2315,87 @@ INSERT INTO schema_migrations (version) VALUES ('20120607001834');
 INSERT INTO schema_migrations (version) VALUES ('20120615064341');
 
 INSERT INTO schema_migrations (version) VALUES ('20120618163622');
+
+INSERT INTO schema_migrations (version) VALUES ('20120620040026');
+
+INSERT INTO schema_migrations (version) VALUES ('20120628073733');
+
+INSERT INTO schema_migrations (version) VALUES ('20120705144357');
+
+INSERT INTO schema_migrations (version) VALUES ('20120812102524');
+
+INSERT INTO schema_migrations (version) VALUES ('20120813031444');
+
+INSERT INTO schema_migrations (version) VALUES ('20120814050150');
+
+INSERT INTO schema_migrations (version) VALUES ('20120821091934');
+
+INSERT INTO schema_migrations (version) VALUES ('20120823090038');
+
+INSERT INTO schema_migrations (version) VALUES ('20120824064258');
+
+INSERT INTO schema_migrations (version) VALUES ('20120824090758');
+
+INSERT INTO schema_migrations (version) VALUES ('20120827103901');
+
+INSERT INTO schema_migrations (version) VALUES ('20120903031021');
+
+INSERT INTO schema_migrations (version) VALUES ('20120905031812');
+
+INSERT INTO schema_migrations (version) VALUES ('20120917055603');
+
+INSERT INTO schema_migrations (version) VALUES ('20120917061131');
+
+INSERT INTO schema_migrations (version) VALUES ('20120918171907');
+
+INSERT INTO schema_migrations (version) VALUES ('20120921061143');
+
+INSERT INTO schema_migrations (version) VALUES ('20120925032435');
+
+INSERT INTO schema_migrations (version) VALUES ('20120926004254');
+
+INSERT INTO schema_migrations (version) VALUES ('20120926022106');
+
+INSERT INTO schema_migrations (version) VALUES ('20120928015413');
+
+INSERT INTO schema_migrations (version) VALUES ('20121003155622');
+
+INSERT INTO schema_migrations (version) VALUES ('20121005190618');
+
+INSERT INTO schema_migrations (version) VALUES ('20121011061445');
+
+INSERT INTO schema_migrations (version) VALUES ('20121011072905');
+
+INSERT INTO schema_migrations (version) VALUES ('20121015082756');
+
+INSERT INTO schema_migrations (version) VALUES ('20121018060708');
+
+INSERT INTO schema_migrations (version) VALUES ('20121018070511');
+
+INSERT INTO schema_migrations (version) VALUES ('20121022061308');
+
+INSERT INTO schema_migrations (version) VALUES ('20121022061544');
+
+INSERT INTO schema_migrations (version) VALUES ('20121022070755');
+
+INSERT INTO schema_migrations (version) VALUES ('20121022081458');
+
+INSERT INTO schema_migrations (version) VALUES ('20121024113139');
+
+INSERT INTO schema_migrations (version) VALUES ('20121026192939');
+
+INSERT INTO schema_migrations (version) VALUES ('20121029015052');
+
+INSERT INTO schema_migrations (version) VALUES ('20121030022346');
+
+INSERT INTO schema_migrations (version) VALUES ('20121031192945');
+
+INSERT INTO schema_migrations (version) VALUES ('20121107161738');
+
+INSERT INTO schema_migrations (version) VALUES ('20121107162433');
+
+INSERT INTO schema_migrations (version) VALUES ('20121107163738');
+
+INSERT INTO schema_migrations (version) VALUES ('20121109162621');
+
+INSERT INTO schema_migrations (version) VALUES ('20121114000419');

@@ -2,6 +2,8 @@ class Petitions::EmailsController < ApplicationController
   before_filter :load_and_authorize_petition, :verify_petition_is_launched, :verify_petition_can_be_managed,
                 :verify_user_can_send_email
 
+  layout 'application_sidebar'
+
   def new
     @email = PetitionBlastEmail.new(body: (render_to_string partial: 'petitions/emails/blast_email_body_template',
                                                             locals: {petition: @petition}))
@@ -11,8 +13,9 @@ class Petitions::EmailsController < ApplicationController
     @email = PetitionBlastEmail.new(params[:petition_blast_email].merge(from_name: current_user.full_name,
                                                                         from_address: current_user.email))
     @email.petition = @petition
+    @email.organisation = @petition.organisation
 
-    if PetitionBlastEmailsService.new.save(@email)
+    if BlastEmailsService.new.save(@email)
       if @email.in_delivery?
         notice = 'Your email has been sent to your supporters.'
       else
@@ -48,6 +51,7 @@ class Petitions::EmailsController < ApplicationController
 
   def load_and_authorize_petition
     @petition = Petition.find_by_slug!(params[:petition_id])
+    raise ActiveRecord::RecordNotFound if @petition.organisation != current_organisation
     authorize! :manage, @petition
   end
 

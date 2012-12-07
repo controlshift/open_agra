@@ -17,7 +17,6 @@ describe "Campaigner set petition short url", type: :request do
   end
 
   def set_petition_short_url
-    click_on "Edit Petition"
     click_on "Set Short URL"
     wait_until { find('#petition-alias-modal').visible? }
     
@@ -30,8 +29,7 @@ describe "Campaigner set petition short url", type: :request do
     click_on "Confirm"
     wait_until { !find('#petition-alias-modal').visible? }
     
-    find('#petition-url-text').text.should include petition_alias_path("save-whales")
-    page.should_not have_selector("#set-short-url")
+    page.should_not have_selector("#set-short-url", visible: true)
   end
 
   def visit_petition_with_alias

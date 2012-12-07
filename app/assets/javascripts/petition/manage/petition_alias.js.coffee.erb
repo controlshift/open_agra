@@ -1,0 +1,72 @@
+class @PetitionAliasSelector
+  constructor: ->
+    @confirmed_once = false
+    @alias_check_url  =  $('#petition-alias-modal').data('alias-check-url')
+    @alias_update_url =  $('#petition-alias-modal').data('alias-update-url')
+    $('#petition-alias-textbox').keyup (event) =>
+      throttle($(event), this.keyupHandler(), 250)
+    $('#petition-alias-textbox').keydown (event) =>
+      this.hideConfirmation()
+
+    $('#btn-confirm').on 'click', (event) =>
+        unless $(event.target).hasClass('disabled')
+          if @confirmed_once
+            this.saveAlias()
+          else
+            this.showConfirmation()
+
+  showConfirmation: ->
+    @confirmed_once = true
+    $('.double-confirm').show()
+    $('.double-confirm').animate({ right: "0" }, 300)
+
+  hideConfirmation: ->
+    @confirmed_once = false
+    $('.double-confirm').hide()
+    $('.double-confirm').css("right", "-355px")
+
+  saveAlias: ->
+    alias_value = $('#petition-alias-textbox').val()
+    $.ajax
+      url: @alias_update_url
+      type: "post"
+      data: { alias: alias_value }
+      dataType: 'json'
+      success: (resp) ->
+        $('#petition-alias-view-modal .petition-alias-url').html(resp.url)
+        $('#petition-alias-modal').modal('hide')
+        $('#set-short-url').hide()
+        $('#view-short-url').show()
+
+      error: (jqXHR, textStatus, errorThrown) ->
+        result = $.parseJSON(jqXHR.responseText)
+        $('#petition-alias-modal .help-inline').html("#{result.message}")
+
+  keyupHandler: ->
+    alias_value = $('#petition-alias-textbox').val()
+    if alias_value == ""
+      $('#petition-alias-modal .help-inline').html('')
+      $('#petition-alias-modal .indicator').html('')
+    else
+      if alias_value.length < 3
+        $('#petition-alias-modal .help-inline').html('is too short (minimum is 3 characters)')
+        $('#petition-alias-modal .indicator').html("<img src=\"<%= asset_path('cross.png')%>\" />")
+      else
+        $('#petition-alias-modal .indicator').html('<img src="<%= asset_path('ajax-loader-16.gif') %>" />')
+        $.ajax
+          url: @alias_check_url
+          type: "post"
+          dataType: 'json'
+          data: { alias: alias_value }
+          success: (resp) ->
+            $('#btn-confirm').removeClass('disabled')
+            $('#petition-alias-modal .indicator').html("<img src=\"<%=asset_path('tick.png')%>\" />")
+            $('#petition-alias-modal .help-inline').html('')
+          error: (jqXHR, textStatus, errorThrown) ->
+            result = $.parseJSON(jqXHR.responseText)
+            $('#btn-confirm').addClass('disabled')
+            $('#petition-alias-modal .indicator').html("<img src=\"<%= asset_path('cross.png')%>\" />")
+            $('#petition-alias-modal .help-inline').html("#{result.message}")
+
+
+

@@ -1,0 +1,37 @@
+- content_for :head do
+  %script{ type: "text/javascript", src:"http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"}
+  = javascript_include_tag 'location'
+
+.row
+  .span9.effort-content
+    .row
+      .effort-title.span8
+        = title @effort.title
+
+    .row.mt20
+      .span3
+        - unless @effort.image_file_name.blank?
+          .effort-image
+            =image_tag(@effort.image.url(:hero))
+        .effort-progress.mt10
+          = render partial: 'efforts/near/effort_progress', locals: {effort: @effort}
+      .span5
+        = simple_format(@effort.description)
+
+  .span3.mt20
+    .title
+      Find your local campaign
+    .subtitle
+      Your Location
+    %form.filter.effort-location-search.pull-left{ action: effort_path{@effort}, method: 'GET' }
+      #efforts-near-container.local-campaign-search
+        = render :partial => 'efforts/search_container'
+
+.featured-petitions
+  - if @petitions
+    .separator.mt30
+    .title.mt20.mb20.petition-count
+      campaigns (#{@petitions.size})
+    %ul.thumbnails
+      = render partial: "/efforts/featured_petition", collection: @petitions
+

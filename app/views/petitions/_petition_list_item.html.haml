@@ -13,8 +13,8 @@
 
     %div
       %cite
-        - if petition_list_item.user != current_user
+        - if petition_list_item.user.present? && petition_list_item.user != current_user
           created by #{petition_list_item.user.full_name}
   .list-item-progressbar
     = render partial: "petitions/view/petition_progress",
-             locals: { petition: petition_list_item }
+             locals: { petition: petition_list_item, has_text: true }

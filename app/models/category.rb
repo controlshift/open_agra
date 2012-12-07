@@ -8,6 +8,7 @@
 #  updated_at      :datetime        not null
 #  organisation_id :integer
 #  slug            :string(255)
+#  external_id     :string(255)
 #
 
 class Category < ActiveRecord::Base
@@ -20,6 +21,9 @@ class Category < ActiveRecord::Base
   belongs_to :organisation
   has_many :categorized_petitions, dependent: :delete_all
   has_many :petitions, through: :categorized_petitions
+
+  has_many :categorized_efforts, dependent: :delete_all
+  has_many :efforts, through: :categorized_efforts
 
   strip_attributes only: [:name]
   

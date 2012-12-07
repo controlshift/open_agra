@@ -1,0 +1,8 @@
+.progressbar
+  .progressbar.total
+    .progressbar.done{ :style => "width:#{petition.percent_to_goal}%"}
+  - if local_assigns.has_key?(:has_text)
+    .progressbar.text
+      = number_with_delimiter(petition.cached_signatures_size)
+      of
+      = pluralize(number_with_delimiter(petition.goal), "signature")

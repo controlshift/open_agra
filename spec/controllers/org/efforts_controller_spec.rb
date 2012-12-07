@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Org::EffortsController do
   include_context "setup_default_organisation"
-  
+
   before(:each) do
     @user = Factory(:org_admin, organisation: @organisation)
     sign_in @user
@@ -21,75 +21,94 @@ describe Org::EffortsController do
     end
 
     it { should assign_to :effort }
-    it { should render_template :new}
+    it { should render_template :new }
   end
 
   describe "#edit" do
     before(:each) do
       @effort = Factory(:effort, organisation: @organisation)
-      get :edit, :id => @effort.slug
+      get :edit, id: @effort.slug
     end
 
     it { should assign_to :effort }
-    it { should render_template :edit}
+    it { should render_template :edit }
   end
 
   describe "#create" do
     describe "success" do
       before(:each) do
         @effort = Factory.attributes_for(:effort)
-        post :create, :effort => @effort
+        post :create, effort: @effort
       end
 
       it { should assign_to :effort }
-      it { should redirect_to(org_effort_path(assigns(:effort)))}
+      it { should redirect_to(org_effort_path(assigns(:effort))) }
     end
-
 
     describe "failure" do
       before(:each) do
-        post :create, :effort => {:title => 'title'}
+        post :create, effort: {title: 'title'}
       end
 
       it { should assign_to :effort }
-      it { should render_template :new}
+      it { should render_template :new }
     end
   end
 
   describe "#show" do
-    before(:each) do
-      @effort = Factory(:effort,  organisation: @organisation)
-      get :show, :id => @effort
+    shared_context "render open ended effort" do
+      it { should assign_to :effort }
+      it { should assign_to :petitions }
+      it { should render_template :show }
     end
 
-    it { should assign_to :effort }
-    it { should assign_to :petitions}
-    it { should render_template :show}
+    context "open ended effort" do
+      include_context "render open ended effort"
+
+      before(:each) do
+        @effort = Factory(:effort, organisation: @organisation)
+        get :show, id: @effort
+      end
+    end
+
+    context "specific targets effort" do
+      before(:each) do
+        @effort = Factory(:specific_targets_effort, organisation: @organisation)
+        Factory(:target_petition, effort: @effort)
+        Factory(:petition_without_leader, effort: @effort)
+
+        get :show, id: @effort
+      end
+
+      it { should assign_to :effort }
+      it { should assign_to :petitions }
+      it { should render_template :show_targets }
+    end
   end
 
   describe "#update" do
     before(:each) do
-      @effort = Factory(:effort,  organisation: @organisation)
+      @effort = Factory(:effort, organisation: @organisation)
     end
 
     describe "success" do
       before(:each) do
         attributes = Factory.attributes_for(:effort)
-        put :update, :effort => attributes, :id => @effort.slug
+        put :update, effort: attributes, id: @effort.slug
       end
 
       it { should assign_to :effort }
-      it { should redirect_to(org_effort_path(assigns(:effort)))}
+      it { should redirect_to(org_effort_path(assigns(:effort))) }
     end
 
 
     describe "failure" do
       before(:each) do
-        put :update, :effort => {:title => ''}, :id => @effort.slug
+        put :update, effort: {title: ''}, id: @effort.slug
       end
 
       it { should assign_to :effort }
-      it { should render_template :edit}
+      it { should render_template :edit }
     end
 
   end

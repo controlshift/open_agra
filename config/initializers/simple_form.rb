@@ -61,6 +61,11 @@ SimpleForm.setup do |config|
     end
   end
 
+  config.wrappers :checkbox_inline do |b|
+    b.use :input, tag: :span, class: :'mr5'
+    b.use :label
+  end
+
   # Method used to tidy up errors.
   # config.error_method = :first
 

@@ -9,46 +9,48 @@ describe Jobs::BlastEmailJob do
   end
 
   describe "#perform" do
-    it "should perform sending blast email" do
-
-      2.times { Factory(:signature, petition: @petition, join_organisation: true) }
-      
+    it "should perform sending petition blast email" do
+      Factory(:signature, petition: @petition, join_organisation: true)
       signatures = @petition.signatures.subscribed
-
-      mailer_obj = mock()
-      mailer_obj.stub(:deliver).and_return(true)
-
-      CampaignerMailer.should_receive(:email_supporters).once.with(@email, signatures.map(&:email), signatures.map(&:token)).and_return(mailer_obj)
+      BlastEmailWorker.should_receive(:perform_async).once.with(@email.id, signatures.map(&:email), signatures.map(&:token)).and_return(true)
 
       @job.perform
+    end
+
+    it "should perform sending group blast email" do
+
+      group = create(:group)
+      petition = create(:petition, group: group)
+      email = create(:group_blast_email, group: group)
+      signature = create(:signature, petition: petition, join_organisation: true)
+      member = signature.member
+      subscription = GroupSubscription.create(member: member, group: group)
+
+      job = Jobs::BlastEmailJob.new(email)
+
+      BlastEmailWorker.should_receive(:perform_async).once.with(email.id, [subscription].map(&:email), [subscription].map(&:token)).and_return(true)
+
+      job.perform
     end
 
     it "should slice and send blast email in batches" do
       3.times { Factory(:signature, petition: @petition, join_organisation: true) }
 
-      signatures = @petition.signatures.subscribed
-      
+      signatures = @petition.signatures.subscribed.order('signatures.id ASC')
+
       @job.stub(:email_batch_size).and_return(2)
 
-      mailer_obj = mock()
-      mailer_obj.stub(:deliver).and_return(true)
-
-      CampaignerMailer.should_receive(:email_supporters).once.ordered.with(@email, signatures[0, 2].map(&:email), signatures[0,2].map(&:token)).and_return(mailer_obj)
-      CampaignerMailer.should_receive(:email_supporters).once.ordered.with(@email, signatures.drop(2).map(&:email), signatures.drop(2).map(&:token)).and_return(mailer_obj)
+      BlastEmailWorker.should_receive(:perform_async).once.ordered.with(@email.id, signatures[0,2].map(&:email), signatures[0,2].map(&:token))
+      BlastEmailWorker.should_receive(:perform_async).once.ordered.with(@email.id, [signatures.last].map(&:email), [signatures.last].map(&:token))
 
       @job.perform
     end
     
     it "should notify organisation when error occurs during the sending" do
-      2.times { Factory(:signature, petition: @petition, join_organisation: true) }
+      Factory(:signature, petition: @petition, join_organisation: true)
       signatures = @petition.signatures.subscribed
-      mailer_exception_obj = mock()
-      mailer_exception_obj.stub(:deliver).and_raise(Exception)
-      
-      mailer_obj = mock()
-      mailer_obj.stub(:deliver).and_return(true)
 
-      CampaignerMailer.should_receive(:email_supporters).once.ordered.with(@email, signatures.map(&:email), signatures.map(&:token)).and_return(mailer_exception_obj)
+      BlastEmailWorker.should_receive(:perform_async).once.with(@email.id, signatures.map(&:email), signatures.map(&:token)).and_raise(Exception.new)
       ExceptionNotifier::Notifier.should_receive(:background_exception_notification)
 
       @job.perform

@@ -8,13 +8,13 @@ root.alert_message_error = (message) ->
   $(".alert.alert-error p").text(message)
   $(".alert.alert-error").show()
 
-clientSideValidations.callbacks.element.after = (element, eventData) ->
-  errorSpan = $("span.help-inline", $(element).parent())
-  inputLabel = $('label[for=' + element.attr('id') + ']')
-  errorSpan.insertAfter(inputLabel)
+#ClientSideValidations.callbacks.element.after = (element, eventData) ->
+#  errorSpan = $("span.help-inline", $(element).parent())
+#  inputLabel = $('label[for=' + element.attr('id') + ']')
+#  errorSpan.insertAfter(inputLabel)
 
 # email address checking
-domains = ['hotmail.com', 'gmail.com', 'aol.com', 'yahoo.com', 'yahoo.com.au', "bigpond.com", "optusnet.com.au", "tpg.com.au", "iinet.net.au"]
+domains = ['hotmail.com', 'gmail.com', 'aol.com', 'yahoo.com', 'yahoo.com.au', 'yahoo.co.uk', "bigpond.com", "optusnet.com.au", "tpg.com.au", "iinet.net.au"]
 
 root.email_suggest_apply = (selector, value) ->
   $(selector).val(value)

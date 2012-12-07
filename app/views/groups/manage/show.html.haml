@@ -3,6 +3,12 @@
 
 =title @group.title
 
+.manage-buttons
+  .group2.btn-group
+    = link_to group_path(@group), id: "view-group-button", class: "btn btn-manage" do
+      %i.icon-eye-open
+      View
+
 .row
   .span7
     .admin_major_stat#total_petitions_count

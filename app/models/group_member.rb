@@ -30,7 +30,7 @@ class GroupMember < ActiveRecord::Base
   end
 
   def user_email
-    errors.add(:user_id, 'User does not have the same email as the invitation.') unless self.user.email == self.invitation_email
+    errors.add(:user_id, 'User does not have the same email as the invitation.') unless self.user.email.downcase == self.invitation_email.downcase
   end
 
 end

@@ -12,7 +12,9 @@
     %h4
       Invite New Group Administrator
     %p.mb10
-      The administrators that you invite will have access to a special admin area where they will be able to see
+      The administrators that you invite will have access to a
+      = link_to "special admin area", group_manage_path(@group)
+      where they will be able to see
       all of the petitions that are created inside the group
       and export a CSV of all the signatures that includes email address.
 

@@ -1,0 +1,6 @@
+= title "Edit #{@target.name}"
+.row
+  .mt20.mb20.span7
+    Editing a target's information here will change the target on this effort and any other effort the target is attached to.
+  .span7
+    = render partial: 'target_form', locals: {collection: @target, post_path: org_effort_target_path(@effort, @target), is_edit: true }

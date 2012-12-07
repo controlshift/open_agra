@@ -7,13 +7,18 @@
     = stylesheet_link_tag  "organisations/#{current_organisation.slug}/application"
   - else
     = stylesheet_link_tag  'organisations/default/application'
+  - unless Rails.env.test?
+    %link{rel: "stylesheet", type: "text/css", href: "/fonts/font-awesome.css" }
   /[if IE 8]
     = stylesheet_link_tag  'ie8'
   /[if IE 7]
     = stylesheet_link_tag  'ie7'
+    - unless Rails.env.test?
+      %link{rel: "stylesheet", type: "text/css", href: "/fonts/font-awesome-ie7.css" }
+
 
   - if Rails.env.production?
-    %script{ type: 'text/javascript', src: 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js' }
+    %script{ type: 'text/javascript', src: 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js' }
   - else
     = javascript_include_tag 'jquery'
 

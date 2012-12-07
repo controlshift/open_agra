@@ -1,0 +1,12 @@
+- content_for :sidebar do
+  = render partial: "manage_menu_bar", locals: {highlight_id: "manage-training"}
+.manage-deliver
+  .row
+    .span9
+      = manage_title "Training"
+
+      %hr
+      .training-box
+        = @petition.effort.training_text_in_organisation(current_organisation).html_safe
+
+

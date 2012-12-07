@@ -1,0 +1,50 @@
+class @PetitionSelector
+  constructor: ->
+    @petition_check_url  =  $('#petition-modal').data('petition-check-url')
+    @petition_action_url =  $('#petition-modal').data('petition-action-url')
+    $('#petition-slug-textbox').keyup (event) =>
+      throttle($(event), this.keyupHandler(), 250)
+
+    $('#btn-confirm').on 'click', (event) =>
+      this.updatePetition()
+
+  updatePetition: ->
+    url =  "#{@petition_action_url}/petitions/#{$('#petition-slug-textbox').val()}/move"
+    $.ajax
+      url: url
+      type: "POST"
+      dataType: 'json'
+      success: (resp) ->
+        # hack for now, replace with proper AJAX
+        document.location.reload()
+
+      error: (jqXHR, textStatus, errorThrown) ->
+        result = $.parseJSON(jqXHR.responseText)
+        $('#petition-modal .help-inline').html("#{result.message}")
+
+  keyupHandler: ->
+    slug_value = $('#petition-slug-textbox').val()
+    if slug_value == ""
+      $('#petition-modal .help-inline').html('')
+      $('#petition-modal .indicator').html('')
+    else
+      if slug_value.length < 3
+        $('#petition-modal .help-inline').html('is too short (minimum is 3 characters)')
+        $('#petition-modal .indicator').html("<img src=\"<%= asset_path('cross.png')%>\" />")
+      else
+        $('#petition-modal .indicator').html('<img src="<%= asset_path('ajax-loader-16.gif') %>" />')
+        url =  "#{@petition_action_url}/petitions/#{$('#petition-slug-textbox').val()}/check"
+        $.ajax
+          url: url
+          type: "GET"
+          dataType: 'json'
+          success: (resp) ->
+            $('#btn-confirm').removeClass('disabled')
+            $('#petition-modal .indicator').html("<img src=\"<%=asset_path('tick.png')%>\" />")
+            $('#petition-modal .help-inline').html('')
+
+          error: (jqXHR, textStatus, errorThrown) ->
+            result = $.parseJSON(jqXHR.responseText)
+            $('#btn-confirm').addClass('disabled')
+            $('#petition-modal .indicator').html("<img src=\"<%= asset_path('cross.png')%>\" />")
+            $('#petition-modal .help-inline').html("#{result.message}")

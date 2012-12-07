@@ -14,6 +14,12 @@
         %i.icon-fire
         Hot
 
+    %li.nav-header Blast Emails
+    %li
+      = link_to new_group_email_path(@group), {:id => 'create-group-blast-email'} do
+        %i.icon-edit
+        Create
+
     %li.nav-header Export
     %li
       = link_to export_group_manage_path do

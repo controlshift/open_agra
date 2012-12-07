@@ -1,0 +1,22 @@
+<p>Dear Friends,</p>
+
+<p>I just found out that a decision will be made about our issue this week.  So we need to deliver our petition soon!  There are two ways you can help:</p>
+
+<p> 1. Spread the word on social media about the petition today, so we can collect as many last minute names as possible, and deliver the biggest petition we can muster.</p>
+
+<p>
+  Go  share the petition.
+  <a href="{% petition_url %}">{% petition_url %}</a>
+</p>
+
+<p>
+2. If you're in town, come along to the petition delivery so we can that the names on the petition are real people, who really care.  The details of the petition delivery are below:
+</p>
+
+When: Insert Date and Time<br/>
+Where: Insert location (With directions on how to get there) <br/>
+RSVP: Just reply to this email if you can make it.<br/>
+
+<p>Thank you for everything you do and hopefully I'll see you at the petition delivery!  </p>
+
+<p> {{ current_user.first_name }} </p>

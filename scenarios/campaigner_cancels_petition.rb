@@ -27,7 +27,7 @@ describe "Campaigner", type: :request do
   end
 
   def views_and_manages
-    click_on "View the petition"
+    click_on "View"
     page.should have_content "been hidden"
     page.should have_link "Reactivate it?"
   end

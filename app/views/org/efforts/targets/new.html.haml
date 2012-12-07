@@ -1,0 +1,11 @@
+.breadcrumbs
+  = link_to 'Efforts', org_efforts_path
+  >
+  = link_to "Manage #{@effort.title}", org_effort_path(@effort)
+  >
+  Add Target
+
+= title "Add Target"
+
+= render partial: 'target_form', locals: {collection: @target, post_path: org_effort_targets_path(@effort), is_edit: false}
+

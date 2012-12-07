@@ -1,5 +1,5 @@
 rvm_install_on_use_flag=1
-rvm use --create 1.9.3-p0@agra
+rvm use --create ruby-1.9.3-p286-perf@agra
 
 export RUBY_HEAP_MIN_SLOTS=1000000
 export RUBY_HEAP_SLOTS_INCREMENT=1000000

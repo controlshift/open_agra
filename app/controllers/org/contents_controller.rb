@@ -3,7 +3,7 @@ class Org::ContentsController < Org::OrgController
   def index
     if params[:category]
       if Content::CATEGORIES.include? params[:category]
-        @contents = Content.where(organisation_id: nil, category: params[:category])
+        @contents = Content.text.where(organisation_id: nil, category: params[:category])
       else
         flash[:alert] = 'Unknown category'
         redirect_to org_contents_path
@@ -12,7 +12,7 @@ class Org::ContentsController < Org::OrgController
   end
 
   def new
-    old_content = Content.find_by_slug_and_organisation_id(params[:id], nil)
+    old_content = Content.text.where(slug: params[:id], organisation_id: nil).first
     @content = Content.new :slug => old_content.slug,
                            :body => old_content.body,
                            :filter => old_content.filter,
@@ -33,9 +33,9 @@ class Org::ContentsController < Org::OrgController
   end
 
   def edit
-    @content = Content.find_by_slug_and_organisation_id(params[:id], current_organisation.id)
+    @content = Content.text.where(slug: params[:id], organisation_id: current_organisation.id).first
     if @content.nil?
-      @content = Content.find_by_slug_and_organisation_id(params[:id], nil)
+      @content = Content.text.where(slug: params[:id], organisation_id: nil).first
       redirect_to new_org_content_path(:id => @content.slug)
     else
       render :edit
@@ -43,7 +43,7 @@ class Org::ContentsController < Org::OrgController
   end
 
   def update
-    @content = Content.find_by_slug_and_organisation_id(params[:content][:slug], current_organisation.id)
+    @content = Content.text.where(slug: params[:content][:slug], organisation_id: current_organisation.id).first
     if @content.update_attributes params[:content].except(:organisation_id)
       redirect_to org_contents_path
     else

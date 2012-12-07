@@ -1,0 +1,18 @@
+- content_for :head do
+  %script{ type: "text/javascript", src:"http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"}
+  = javascript_include_tag 'location'
+
+.effort-title.text-left.mt30
+  = title effort.title
+.welcome-text.mt10
+  %p
+    = @effort.landing_page_welcome_text
+
+
+.location-label.mt5.clearfix.center
+  .title.pull-left
+    Your Location
+  .search-area.pull-left
+    %form.big-efforts-search.effort-location-search{ action: effort_near_index_path(effort), method: 'GET' }
+      #efforts-near-container.near-effort-search.query-container.span6{'data-organisation-country' => current_organisation.settings[:country]}
+        = render :partial => 'efforts/search_container'

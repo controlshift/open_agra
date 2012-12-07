@@ -1,0 +1,12 @@
+= title "#{@petition.title} Flags"
+
+- if @flags.any?
+  = table_for(@flags) do |t|
+    = t.data do
+      - t.cell(:reason) {|f| f.reason}
+      - t.cell(:date) {|f| pretty_date_format(f.created_at)}
+
+  = will_paginate @flags
+
+- else
+  No flags found.

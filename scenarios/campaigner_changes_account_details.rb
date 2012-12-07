@@ -15,12 +15,12 @@ describe "Campaigner changes account details", type: :request do
     fill_in "First name", with: "Justin"
     fill_in "Last name", with: "Bieber"
     fill_in "Phone Number", with: "654321"
-    fill_in "Postcode", with: "2064"
+    fill_in "user_postcode", with: "2064"
     click_on "Save"
     
     page.should have_content "Your account details have been updated!"
     page.should have_content "Justin Bieber"
     find_field('Phone Number').value.should have_content "654321"
-    find_field('Postcode').value.should have_content "2064"
+    find_field("user_postcode").value.should have_content "2064"
   end
 end

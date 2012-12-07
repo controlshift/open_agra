@@ -2,43 +2,55 @@
 #
 # Table name: users
 #
-#  id                     :integer         not null, primary key
-#  email                  :string(255)     default(""), not null
-#  encrypted_password     :string(128)     default(""), not null
-#  reset_password_token   :string(255)
-#  reset_password_sent_at :datetime
-#  remember_created_at    :datetime
-#  sign_in_count          :integer         default(0)
-#  current_sign_in_at     :datetime
-#  last_sign_in_at        :datetime
-#  current_sign_in_ip     :string(255)
-#  last_sign_in_ip        :string(255)
-#  created_at             :datetime        not null
-#  updated_at             :datetime        not null
-#  first_name             :string(255)
-#  last_name              :string(255)
-#  admin                  :boolean
-#  phone_number           :string(255)
-#  postcode               :string(255)
-#  join_organisation      :boolean
-#  organisation_id        :integer         not null
-#  org_admin              :boolean         default(FALSE)
-#  confirmation_token     :string(255)
-#  confirmed_at           :datetime
-#  confirmation_sent_at   :datetime
-#  opt_out_site_email     :boolean
-#  facebook_id            :string(255)
+#  id                       :integer         not null, primary key
+#  email                    :string(255)     default(""), not null
+#  encrypted_password       :string(128)     default(""), not null
+#  reset_password_token     :string(255)
+#  reset_password_sent_at   :datetime
+#  remember_created_at      :datetime
+#  sign_in_count            :integer         default(0)
+#  current_sign_in_at       :datetime
+#  last_sign_in_at          :datetime
+#  current_sign_in_ip       :string(255)
+#  last_sign_in_ip          :string(255)
+#  created_at               :datetime
+#  updated_at               :datetime
+#  first_name               :string(255)
+#  last_name                :string(255)
+#  admin                    :boolean
+#  phone_number             :string(255)
+#  postcode                 :string(255)
+#  join_organisation        :boolean
+#  organisation_id          :integer         not null
+#  org_admin                :boolean         default(FALSE)
+#  confirmation_token       :string(255)
+#  confirmed_at             :datetime
+#  confirmation_sent_at     :datetime
+#  opt_out_site_email       :boolean
+#  facebook_id              :string(255)
+#  external_constituent_id  :string(255)
+#  member_id                :integer
+#  additional_fields        :hstore
+#  cached_organisation_slug :string(255)
 #
 
 require 'spec_helper'
+require 'support/shared_examples/validates_postcode'
 
 describe User do
   before(:each) do
     @user = User.new
   end
 
+  subject{ @user }
+
+  it_behaves_like "validates postcode"
+
+
   it { should have_many :petitions }
-  
+  it { should belong_to :organisation }
+  it { should belong_to(:member)}
+
   it { should validate_presence_of(:first_name) }
   it { should validate_presence_of(:last_name) }
   it { should validate_presence_of(:email) }
@@ -98,6 +110,7 @@ describe User do
     end
 
   end
+
 
   describe "#strip_attributes" do
     it "should strip attributes" do
@@ -209,60 +222,6 @@ describe User do
     end
   end
 
-  describe "#extract_accessible_attributes_symbol_hash_values" do
-    it "should extract only accessible attributes" do
-      user_attributes = Factory.attributes_for(:user, password_confirmation: nil, remember_me: false,
-                                                      join_organisation: false, organisation: nil)
-      user_attributes.keys.include?(:organisation)
-      user_attributes.keys.should include :email
-      user_attributes.keys.should include :password
-      user_attributes.keys.should include :password_confirmation
-      user_attributes.keys.should include :remember_me
-      user_attributes.keys.should include :first_name
-      user_attributes.keys.should include :last_name
-      user_attributes.keys.should include :phone_number
-      user_attributes.keys.should include :postcode
-      user_attributes.keys.should include :join_organisation
-      user_attributes.keys.should include :agree_toc
-      user_attributes.keys.should include :organisation
-
-      user_accessible_attributes = User.extract_accessible_attributes_symbol_hash_values(user_attributes)
-      user_accessible_attributes.keys.should include :email
-      user_accessible_attributes.keys.should include :password
-      user_accessible_attributes.keys.should include :password_confirmation
-      user_accessible_attributes.keys.should include :remember_me
-      user_accessible_attributes.keys.should include :first_name
-      user_accessible_attributes.keys.should include :last_name
-      user_accessible_attributes.keys.should include :phone_number
-      user_accessible_attributes.keys.should include :postcode
-      user_accessible_attributes.keys.should include :join_organisation
-      user_accessible_attributes.keys.should include :agree_toc
-      user_accessible_attributes.keys.should_not include :organisation
-    end
-
-    it "should handle string keys" do
-      user_attributes = Factory.attributes_for(:user, join_organisation: false, organisation: nil)
-
-      user_attributes.keys.should include :join_organisation
-      user_attributes.keys.should include :organisation
-
-      user_attributes.stringify_keys!
-
-      user_accessible_attributes = User.extract_accessible_attributes_symbol_hash_values(user_attributes)
-
-      user_accessible_attributes.keys.should include :join_organisation
-      user_accessible_attributes.keys.should_not include :organisation
-    end
-  end
-
-  describe "#accessible_attributes_hash_values" do
-    it "should extract accessible one from it's attributes'" do
-      user = Factory.build(:user)
-      User.should_receive(:extract_accessible_attributes_symbol_hash_values).with(user.attributes)
-      user.accessible_attributes_hash_values
-    end
-  end
-
   describe "factory" do
     before(:each) do
       @user = Factory(:user)
@@ -300,6 +259,15 @@ describe User do
         @user.manageable_petitions.should include(@petition)
         @user.manageable_petitions.should include(@petition_2)
       end
+    end
+  end
+
+  describe "#signature_fields" do
+    it "should extract the fields that apply to a signature" do
+      user = Factory.build(:user)
+      fields = user.signature_attributes(Signature.new)
+      fields.should_not == {}
+      fields[:first_name].should == user.first_name
     end
   end
 end

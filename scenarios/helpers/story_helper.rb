@@ -3,7 +3,7 @@ module StoryHelper
     @org_admin = Factory(:org_admin, organisation: @current_organisation)
     log_in(@org_admin.email, "onlyusknowit")
     
-    visit new_org_story_path
+    visit new_org_contents_story_path
     
     check "Featured"
     fill_in "Title", with: title

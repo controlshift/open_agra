@@ -9,8 +9,9 @@
 #  category        :string(255)
 #  body            :text
 #  filter          :string(255)     default("none")
-#  created_at      :datetime        not null
-#  updated_at      :datetime        not null
+#  created_at      :datetime
+#  updated_at      :datetime
+#  kind            :string(255)     default("text")
 #
 
 class Content < ActiveRecord::Base
@@ -18,13 +19,16 @@ class Content < ActiveRecord::Base
   FILTER_TYPES = ['textile', 'none', 'liquid']
   validates_inclusion_of :filter, :in => FILTER_TYPES
   
-  CATEGORIES = ['Home', 'Footer', 'Petitions', 'Petition Manage', 'Petition Landing', 'Email', 'Social']
+  CATEGORIES = ['Home', 'Footer', 'Petitions', 'Petition Manage', 'Petition Landing', 'Email', 'Social', 'Efforts']
   validates_inclusion_of :category, :in => CATEGORIES
   
   validates_uniqueness_of :slug, :scope => 'organisation_id'
 
   belongs_to :organisation
   attr_protected :organisation_id
+
+  scope :text, where(kind: 'text')
+  scope :email_template, where(kind: 'email_template')
 
   def self.for_slug_and_organisation(slug, organisation)
     Content.find_by_slug_and_organisation_id(slug, organisation.id) || Content.find_by_slug_and_organisation_id(slug, nil)
@@ -35,6 +39,15 @@ class Content < ActiveRecord::Base
     content =  for_slug_and_organisation(slug, organisation)
     if content
       content.render(context, "#{organisation.slug}#{slug}#{content.updated_at.to_i}")
+    else
+      "__#{slug}__"
+    end
+  end
+
+  def self.name_for(slug, organisation)
+    content = for_slug_and_organisation(slug, organisation)
+    if content
+      content.name
     else
       "__#{slug}__"
     end

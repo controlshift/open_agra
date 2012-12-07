@@ -1,73 +1,82 @@
-jQuery(document).ready(function ($) {
-  $.getScript('//platform.twitter.com/widgets.js', function () {
-    var twitterCallbacks = {
+var twitterWidget = {
+  extractURL: function(target) {
+    if (target && target.nodeName == 'A') {
+      return twitterWidget.extractParamFromUri(target.href, 'url');
+    }
+    else {
+      return null;
+    }
+  },
 
-      extractURL:function(target){
-        if (target && target.nodeName == 'A') {
-          return twitterCallbacks.extractParamFromUri(target.href, 'url');
-        } else {
-          return null;
-        }
-      },
+  // take the twitter intent link and extract the share URL from the parameters being passed to that URL.
+  // really twitter, you could not have just put this in the intent hash?
+  extractParamFromUri: function(uri, paramName) {
+    if (!uri) return;
+    var regex = new RegExp('[\\?&#]' + paramName + '=([^&#]*)');
+    var params = regex.exec(uri);
+    if (params != null) {
+      return decodeURI(params[1]);
+    }
+    return;
+  },
 
-      // take the twitter intent link and extract the share URL from the parameters being passed to that URL.
-      // really twitter, you could not have just put this in the intent hash?
-      extractParamFromUri:function(uri, paramName) {
-        if (!uri) {
-          return;
-        }
-        var regex = new RegExp('[\\?&#]' + paramName + '=([^&#]*)');
-        var params = regex.exec(uri);
-        if (params != null) {
-          return decodeURI(params[1]);
-        }
-        return;
-      },
-
-      pushToGaq:function(intent_event){
-        if (!_gaq) {
-          return;
-        }
-        _gaq.push(['_trackEvent', 'twitter', intent_event.type, twitterCallbacks.extractURL(intent_event.target)]);
-      },
-
-      // Define our custom event hanlders
-      clickEventToAnalytics:function (intent_event) {
-        if (intent_event) {
-          twitterCallbacks.pushToGaq(intent_event);
-        }
-      },
-
-      tweetIntentToAnalytics:function (intent_event) {
-        if (intent_event) {
-          twitterCallbacks.pushToGaq(intent_event);
-        }
-      },
-
-      favIntentToAnalytics:function (intent_event) {
-        twitterCallbacks.tweetIntentToAnalytics(intent_event);
-      },
-
-      retweetIntentToAnalytics:function (intent_event) {
-        if (intent_event) {
-          twitterCallbacks.pushToGaq(intent_event);
-        }
-      },
-
-      followIntentToAnalytics:function (intent_event) {
-        if (intent_event) {
-          twitterCallbacks.pushToGaq(intent_event) ;
-        }
+  pushToGaq: function(intent_event) {
+    if (typeof _gaq !== "undefined" && _gaq !== null) {
+      _gaq.push(['_trackEvent', 'twitter', intent_event.type, twitterWidget.extractURL(intent_event.target)]);
+    }
+  },
+  
+  handlers: {
+    // Define our custom event hanlders
+    click: function(intent_event) {
+      if (intent_event) {
+        twitterWidget.pushToGaq(intent_event);
+        twitterWidget.callbacks.click(intent_event);
       }
-    };
-    // Wait for the asynchronous resources to load
+    },
+    tweet: function(intent_event) {
+      if (intent_event) {
+        twitterWidget.pushToGaq(intent_event);
+        twitterWidget.callbacks.tweet(intent_event);
+      }
+    },
+    favorite: function(intent_event) {
+      if (intent_event) {
+        twitterWidget.pushToGaq(intent_event);
+        twitterWidget.callbacks.favorite(intent_event);
+      }
+    },
+    retweet: function(intent_event) {
+      if (intent_event) {
+        twitterWidget.pushToGaq(intent_event);
+        twitterWidget.callbacks.retweet(intent_event);
+      }
+    },
+    follow: function(intent_event) {
+      if (intent_event) {
+        twitterWidget.pushToGaq(intent_event) ;
+        twitterWidget.callbacks.follow(intent_event);
+      }
+    }
+  },
+  
+  callbacks: {
+    click:    function(intent_event) {},
+    tweet:    function(intent_event) {},
+    favorite: function(intent_event) {},
+    retweet:  function(intent_event) {},
+    follow:   function(intent_event) {}
+  }
+};
+
+$(function() {
+  $.getScript('//platform.twitter.com/widgets.js', function () {
     twttr.ready(function (twttr) {
-      // Now bind our custom intent events
-      twttr.events.bind('click', twitterCallbacks.clickEventToAnalytics);
-      twttr.events.bind('tweet', twitterCallbacks.tweetIntentToAnalytics);
-      twttr.events.bind('retweet', twitterCallbacks.retweetIntentToAnalytics);
-      twttr.events.bind('favorite', twitterCallbacks.favIntentToAnalytics);
-      twttr.events.bind('follow', twitterCallbacks.followIntentToAnalytics);
+      twttr.events.bind('click',    twitterWidget.handlers.click);
+      twttr.events.bind('tweet',    twitterWidget.handlers.tweet);
+      twttr.events.bind('retweet',  twitterWidget.handlers.retweet);
+      twttr.events.bind('favorite', twitterWidget.handlers.favorite);
+      twttr.events.bind('follow',   twitterWidget.handlers.follow);
     });
   });
 });

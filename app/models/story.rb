@@ -13,7 +13,9 @@
 #  image_file_size    :integer
 #  image_updated_at   :datetime
 #  organisation_id    :integer
+#  link               :string(255)
 #
+
 require 'uri'
 
 class Story < ActiveRecord::Base

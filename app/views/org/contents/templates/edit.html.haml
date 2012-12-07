@@ -1,0 +1,10 @@
+.breadcrumbs
+  = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
+  >
+  = link_to 'Blast Email Templates', org_contents_templates_path, {:class => 'use-pjax'}
+  >
+  Edit Template
+
+= title "Edit #{@content.name}"
+
+= render :partial => 'form'

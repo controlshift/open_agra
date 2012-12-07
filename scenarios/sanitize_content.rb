@@ -17,7 +17,7 @@ describe "Sanitize content", :type => :request do
     log_in(@user.email)
   end
   
-  def asset_no_tag_or_script
+  def assert_no_tag_or_script
     page.html.should_not include "<b>Bold Title</b>"
     page.html.should_not include "<script> alert('why') </script>"
     page.html.should_not include "<script> alert('what') </script>"
@@ -27,7 +27,7 @@ describe "Sanitize content", :type => :request do
   it "should escape content on petition public page" do
     visit petition_path(@petition)
 
-    asset_no_tag_or_script
+    assert_no_tag_or_script
     find("h1.title").native.inner_html.should include "&lt;b&gt;Bold Title&lt;/b&gt;"
     find("pre.what").native.inner_html.should include "&lt;i&gt;What&lt;/i&gt; with &lt;script&gt; alert('what') &lt;/script&gt; tag."
     find("pre.why").native.inner_html.should include "&lt;i&gt;Why&lt;/i&gt; with &lt;script&gt; alert('why') &lt;/script&gt; tag."
@@ -39,7 +39,7 @@ describe "Sanitize content", :type => :request do
     
     visit launch_petition_path(@petition)
     
-    asset_no_tag_or_script
+    assert_no_tag_or_script
     find("h1").native.inner_html.should include "&lt;b&gt;Bold Title&lt;/b&gt;"
     find("pre.what").native.inner_html.should include "&lt;i&gt;What&lt;/i&gt; with &lt;script&gt; alert('what') &lt;/script&gt; tag."
     find("pre.why").native.inner_html.should include "&lt;i&gt;Why&lt;/i&gt; with &lt;script&gt; alert('why') &lt;/script&gt; tag."
@@ -50,16 +50,15 @@ describe "Sanitize content", :type => :request do
     
     visit root_path
     
-    asset_no_tag_or_script
+    assert_no_tag_or_script
     find(".petition-title h3").native.inner_html.should include "&lt;b&gt;Bold Title&lt;/b&gt;"
     find(".petition-why").native.inner_html.should include "&lt;i&gt;Why&lt;/i&gt; with &lt;script&gt; alert('why') &lt;/script&gt; tag."
   end
   
   it "should escape share email content" do
-    visit share_petition_path(@petition)
+    visit petition_manage_path(@petition)
     
-    asset_no_tag_or_script
+    assert_no_tag_or_script
     find("#body-field").native.inner_html.should include "&lt;b&gt;Bold Title&lt;/b&gt;"
-    find("#body-field").native.inner_html.should include "&lt;i&gt;Why&lt;/i&gt; with &lt;script&gt; alert('why') &lt;/script&gt; tag."
   end
 end

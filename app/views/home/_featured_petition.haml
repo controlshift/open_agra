@@ -10,7 +10,7 @@
               =image_tag featured_petition.image.url(:hero)
           - else
             .petition-image
-              =image_tag "petition-image-placeholder-home.png"
+              =image_tag "image-placeholder-home.png"
         .petition-progress
           = render :partial => "petitions/view/petition_progress",
                    :locals => { petition: featured_petition, no_text: true }

@@ -1,28 +1,27 @@
 class Petitions::ManageController < ApplicationController
-  include PetitionAttributesHelpers
-  
+  include PetitionFilters
+  include PetitionUpdateHelper
+
   before_filter :load_and_authorize_petition
   before_filter :verify_petition_can_be_managed, except: [:show, :edit, :update, :contact_admin]
   before_filter :verify_petition_is_launched
 
+  layout :set_layout
+
   def show
     if @petition.prohibited?
       @email = Email.new
-      render "show_inappropriate"
+      render "show_inappropriate", layout: "application"
     else
-      render :show, layout: "application_sidebar"
+      render :show
     end
   end
 
-  def edit
-  end
-
   def update
-    petition_attributes = attributes_for_petition(params[:petition])
-    petition_attributes[:categorized_petitions_attributes] = attributes_for_categorized_petitions(@petition, params[:petition][:category_ids])
-    if @success = PetitionsService.new.update_attributes(@petition, petition_attributes)
+    @success = update_petition(@petition, params[:petition], params[:location])
+    if @success
       respond_to do |format|
-        format.html { redirect_to petition_manage_path(@petition), notice: "The petition has been successfully updated!" }
+        format.html { redirect_to petition_path(@petition), notice: "The petition has been successfully updated!" }
         format.js { render layout: false }
       end
     else
@@ -45,25 +44,24 @@ class Petitions::ManageController < ApplicationController
   def update_alias
     @petition.alias = params[:alias]
     if @petition.save
-      render json: {}, status: :ok
+      render json: { url: petition_alias_url(@petition.alias) }, status: :ok
     else
       render json: { message: "Failed to update petition alias" }, status: :not_acceptable
     end
   end
 
-  def offline
-  end
-
-  def deliver
-  end
-
   def download_letter
-    Delayed::Job.enqueue Jobs::GeneratePetitionLetterJob.new(@petition, "#{@petition.slug}_form.pdf")
-    redirect_to deliver_petition_manage_path(@petition), notice: "You will receive an email with download instructions shortly."
+    if @petition.cached_signatures_size > 500
+      Delayed::Job.enqueue Jobs::GeneratePetitionLetterJob.new(@petition, "#{@petition.slug}_form.pdf", current_user)
+      redirect_to deliver_petition_manage_path(@petition), notice: "#{current_user.email} will receive an email with download instructions as soon as the PDF has been generated."
+    else
+      output = Documents::PetitionLetter.new(petition: @petition).render
+      send_data output, filename: "#{@petition.slug}_letter.pdf", type: "application/pdf"
+    end
   end
 
   def download_form
-    output = PetitionLetter.create_pdf(@petition, true)
+    output = Documents::PetitionForm.new(petition: @petition).render
     send_data output, filename: "#{@petition.slug}_form.pdf", type: "application/pdf"
   end
 
@@ -94,11 +92,19 @@ class Petitions::ManageController < ApplicationController
   end
 
   private
-  
+
   def load_and_authorize_petition
     @petition = Petition.find_by_slug!(params[:petition_id])
     authorize! :manage, @petition, message: "You are not authorized to view that page."
+    raise  ActiveRecord::RecordNotFound  if @petition.organisation != current_organisation
   end
 
-  include PetitionFilters
+  def set_layout
+    if request.headers['X-PJAX']
+      'pjax'
+    else
+      'application_sidebar'
+    end
+  end
+
 end

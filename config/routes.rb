@@ -1,6 +1,13 @@
+require 'sidekiq/web'
+
 Agra::Application.routes.draw do
   devise_for :users, controllers: {registrations: 'registrations', sessions: 'sessions', confirmations: 'confirmations', passwords: 'passwords', omniauth_callbacks: 'users/omniauth_callbacks'} do
     match '/users/auth/facebook/setup', to: 'users/omniauth_callbacks#setup'
+  end
+
+  constraint = lambda { |request| request.env["warden"].authenticate? and request.env['warden'].user.admin? }
+  constraints constraint do
+    mount Sidekiq::Web => '/sidekiq'
   end
 
   root to: 'home#index'
@@ -55,9 +62,18 @@ Agra::Application.routes.draw do
         get 'flagged'
         get 'moderation_queue'
       end
+      resources :signatures, only: [:index], controller: 'petitions/signatures' do
+        collection do
+          get 'email'
+        end
+
+        member do
+          put 'unsubscribe'
+        end
+      end
       resource :note, only: [:update], controller: 'petitions/note'
+      resources :flags, only: [:index], controller: 'petitions/flags'
     end
-    resources :stories
     resources :categories, except: ['show']
     resources :emails, only: [:index, :show, :update] do
       collection do
@@ -65,12 +81,40 @@ Agra::Application.routes.draw do
       end
     end
     
-    resources :efforts
+    resources :efforts do
+      resources :leaders, controller: 'efforts/leaders', only: [:show, :destroy]
+      resources :petitions, controller: 'efforts/petitions', only: [] do
+        member do
+          get 'check'
+          post 'move'
+          put 'note'
+        end
+      end
+      resources :targets, controller: 'efforts/targets', only: [:new, :create, :index, :edit, :update] do
+        collection do
+          get 'find'
+          post 'add'
+        end
+        member {delete 'remove'}
+      end
+    end
+
     resources :groups do
       resources :invitations, controller: 'groups/invitations', only: [:create]
       resources :users, controller: 'groups/users'
+      resources :petitions, controller: 'groups/petitions', only: [] do
+        member do
+          get 'check'
+          post 'move'
+        end
+      end
     end
     resources :email_white_lists, only: [:new, :create]
+
+    namespace :contents do
+      resources :stories
+      resources :templates
+    end
 
     resources :contents do
       collection do
@@ -79,15 +123,29 @@ Agra::Application.routes.draw do
         get 'export'
       end
     end
-    
-    resources :users do
+
+    resources :members, only: [:show, :index] do
       collection do
-        get 'export'
         get 'email'
       end
     end
 
+    resources :users do
+      collection do
+        get 'export'
+        get 'email'
+        get 'bad_postcodes'
+      end
+    end
+
     resource :query, only: [:new, :create]
+    resources :exports, only: [:index] do
+      collection do
+        get 'petitions'
+        get 'signatures'
+        get 'members'
+      end
+    end
   end
 
   match '/petition/new' => 'petitions#new', as: :new_petition
@@ -104,9 +162,12 @@ Agra::Application.routes.draw do
       get 'launch', to: 'petitions#launching'
       put 'launch'
       get 'thanks', to: 'petitions/view#thanks'
-      post 'contact'
       get 'show', to: 'petitions/view#show'
     end
+
+    resources :contacts, controller: 'petitions/contacts', only: [:create]
+
+    resource :categories, controller: 'petitions/categories', only: [:show, :update]
 
     resource :manage, controller: 'petitions/manage', only: [:edit, :update, :show] do
       get 'download_letter'
@@ -118,6 +179,7 @@ Agra::Application.routes.draw do
       post 'contact_admin'
       post 'check_alias'
       post 'update_alias'
+      get 'training'
     end
 
     resources :admins, controller: 'petitions/admins', only: [:new, :create, :show, :destroy]
@@ -145,11 +207,20 @@ Agra::Application.routes.draw do
   end
 
   resources :efforts, only: [:show] do
-    resources :petitions, controller: 'efforts/petitions', only: [:new]
+    member { get 'locations' }
+    resources :petitions, controller: 'efforts/petitions', only: [:new, :edit, :update] do
+      member do
+        get 'leading'
+        put 'lead'
+        get 'training'
+        put 'train'
+      end
+    end
     resources :near, controller: 'efforts/near', only: [:new, :index]
   end
 
   resources :groups, only: [:show, :index] do
+    resources :unsubscribes, controller: 'groups/unsubscribes', only: [:show, :update]
     resources :invitations, controller: 'groups/invitations', only: [:show, :update]
     resources :petitions, controller: 'groups/petitions', only: [:index, :new] do
       collection do
@@ -159,7 +230,14 @@ Agra::Application.routes.draw do
     resource  :manage, controller: 'groups/manage', only: [:index, :show] do
       get 'export'
     end
+    resources :emails, controller: 'groups/emails', only: [:new, :create] do
+      collection do
+        post 'test', to: 'groups/emails#test'
+      end
+    end
   end
+
+  match 'cached_url/*uri' => 'cached_url#retrieve', as: :cached_embedly
 
   get 'errors/pingdom'   #makes sure the app is up.
   get 'errors/exception' #convenient way to test if exception notification is working

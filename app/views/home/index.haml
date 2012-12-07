@@ -36,6 +36,9 @@
 .row
   .span5
     .featured-petitions-logo
+    .featured-effort
+      - if @featured_effort.present?
+        = render partial: "featured_effort", locals:{effort: @featured_effort}
     .featured-petitions
       - cache("home_index_#{current_organisation.id}_featured", expires_in: 1.minute) do
         = render partial: "/home/featured_petition", collection: @featured_petitions

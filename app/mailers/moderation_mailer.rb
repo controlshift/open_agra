@@ -21,35 +21,32 @@ class ModerationMailer < ActionMailer::Base
 
   def notify_campaigner_of_approval(blast_email)
     @blast_email = blast_email
-    @petition = blast_email.petition
-    
+
     subject = "Your email has been approved"
     mail(to: blast_email.from, 
-        from: @petition.organisation.contact_email_with_name, 
+        from: @blast_email.organisation.contact_email_with_name,
         subject: subject, 
-        organisation: @petition.organisation)
+        organisation: @blast_email.organisation)
   end
   
   def notify_campaigner_of_rejection(blast_email)
     @blast_email = blast_email
-    @petition = blast_email.petition
-    
-    subject = "Your email has been deemed inappropriate"
+    @new_email_path = blast_email.new_email_path
+
+    subject = "A message from #{@blast_email.organisation.name} about your email"
     mail(to: blast_email.from, 
-        from: @petition.organisation.contact_email_with_name, 
+        from: @blast_email.organisation.contact_email_with_name,
         subject: subject, 
-        organisation: @petition.organisation)
+        organisation: @blast_email.organisation)
   end
   
   def notify_admin_of_new_blast_email(blast_email)
     @blast_email = blast_email
-    @petition = blast_email.petition
-    @blast_email = blast_email
 
     subject = "An email needs to be moderated"
-    mail(to: @petition.organisation.admin_email, 
-        from: @petition.organisation.admin_email, 
+    mail(to: @blast_email.organisation.admin_email,
+        from: @blast_email.organisation.admin_email,
         subject: subject, 
-        organisation: @petition.organisation)
+        organisation: @blast_email.organisation)
   end
 end

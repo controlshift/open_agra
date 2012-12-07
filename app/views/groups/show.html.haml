@@ -1,9 +1,13 @@
 .row
-  .span12
+  .group-title.span9
     = title @group.title
-    - if can?(:manage, @group)
-      %i.icon-pencil
-      = link_to "Manage this group", org_group_path(@group), class: "admin-link"
+
+  - if can?(:manage, @group)
+    .manage-buttons
+      .btn-group
+        = link_to group_manage_path(@group), id: "manage-petition-button", class: "btn btn-manage" do
+          %i.icon-cog
+          Manage
 
 .mt20
 .row
@@ -32,7 +36,7 @@
     = render "groups/more_campaigns"
 
   - else
-    %h3 No campaign has been started yet
+    %h3 No campaigns have been created yet.
     %br
     Be the first
-    = link_to 'to create one.', new_group_petition_path(@group)
+    = link_to 'to start one.', new_group_petition_path(@group)

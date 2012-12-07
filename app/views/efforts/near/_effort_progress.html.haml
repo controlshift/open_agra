@@ -1,0 +1,15 @@
+.progressbar
+  .progressbar.total.gray
+    .progressbar.done{ :style => "width:#{effort.percent_to_goal}%" }
+  - unless local_assigns.has_key?(:no_text)
+    .signature-count.petition-signatures
+      .number= number_with_delimiter(effort.cached_signatures_size)
+      .text
+        .goal
+          of
+          %span.strong= number_with_delimiter(effort.goal)
+          signatures
+        .petition-count
+          across
+          %span.strong= number_with_delimiter(effort.petitions.size)
+          local campaigns

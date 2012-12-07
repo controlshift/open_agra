@@ -1,4 +1,11 @@
-= title "Campaign Admins for '#{@petition.title}'"
+- content_for :sidebar do
+  = render partial: 'petitions/manage/manage_menu_bar', locals: {highlight_id: ''}
+
+= manage_title "Campaign Admins", {kind: 'edit'}
+:coffeescript
+  $ ->
+    pages.admins.initialize()
+
 .row.mt20
   .span5
     %h4
@@ -7,11 +14,11 @@
       The administrators that you invite will have access to manage this campaign.
 
     = simple_form_for @campaign_admin, url: petition_admins_path(@petition), wrapper: :compact  do |f|
-      = f.input :invitation_email, label: 'Email'
+      = f.input :invitation_email, label: 'Email', input_html: { type: 'email' }
       = f.button :submit, 'Send invitation'
 
 .row.mt20
-  .span10
+  .span9
     %h4
       Current Campaign Administrators
 
@@ -26,3 +33,5 @@
                                              method: :delete, class: 'btn btn-danger') unless admin.is_a?(User)}
     - else
       This campaign has no admins.
+- content_for :end_of_body do
+  = render partial: "petitions/view/email_template"

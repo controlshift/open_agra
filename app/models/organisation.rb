@@ -4,8 +4,8 @@
 #
 #  id                           :integer         not null, primary key
 #  name                         :string(255)
-#  created_at                   :datetime        not null
-#  updated_at                   :datetime        not null
+#  created_at                   :datetime
+#  updated_at                   :datetime
 #  slug                         :string(255)
 #  host                         :string(255)
 #  contact_email                :string(255)
@@ -27,14 +27,19 @@
 #
 
 class Organisation < ActiveRecord::Base
+  include BooleanFields
   store :settings, accessors: [:notifiers, :requires_user_confirmation_on_sign_up,
-                               :fb_app_id, :fb_app_secret, :enable_facebook_login, 
+                               :fb_app_id, :fb_app_secret, :enable_facebook_login,
+                               :salesforce_host, :salesforce_consumer_key, :salesforce_consumer_secret,
+                               :salesforce_username, :salesforce_security_token,
                                :bsd_host, :bsd_api_id, :bsd_api_secret,
-                               :google_maps_key,
+                               :bsd_new_members_cons_group_id, :bsd_all_signatures_cons_group_id,
+                               :bsd_campaign_creator_cons_group_id, :google_maps_key, :country,
                                :show_share_buttons_on_petition_page, :show_petition_category_on_creation,
                                :action_kit_host, :action_kit_username, :action_kit_password, 
                                :action_kit_country, :action_kit_signature_page, :action_kit_petition_page,
-                               :requires_location_for_campaign, :always_join_parent_org_when_sign_up, :join_label]
+                               :requires_location_for_campaign, :always_join_parent_org_when_sign_up, :join_label,
+                               :hide_signatures_csv_download_link, :signature_disclaimer]
   
   validates :name, :slug, :host, presence: true, uniqueness: true
   validates :host, format: {with: /^(?!http:\/\/).+/, message: 'only include the hostname, not the protocol'}
@@ -43,14 +48,20 @@ class Organisation < ActiveRecord::Base
   has_many :petitions
   has_many :stories
   has_many :categories
-  has_many :signatures, :through => :petitions
-  has_many :blast_emails, :through => :petitions
+  has_many :signatures, through: :petitions
+  has_many :blast_emails
   has_many :users
+  has_many :members
+  has_many :targets
 
   liquid_methods :name, :host, :campaigner_feedback_link, :has_campaigner_feedback_link?
 
+  boolean_fields :enable_facebook_login, :show_share_buttons_on_petition_page, :requires_user_confirmation_on_sign_up,
+                 :requires_location_for_campaign, :always_join_parent_org_when_sign_up,
+                 :show_petition_category_on_creation, :hide_signatures_csv_download_link
+
   def self.find_by_host(host)
-    where("lower(host) = ?", host.downcase).first
+    where('lower(host) = ?', host.downcase).first
   end
 
   def contact_email_with_name
@@ -68,30 +79,6 @@ class Organisation < ActiveRecord::Base
   def has_campaigner_feedback_link?
     self.campaigner_feedback_link.present?
   end
-  
-  def enable_facebook_login?
-    self.enable_facebook_login == '1'
-  end
-  
-  def show_share_buttons_on_petition_page?
-    self.show_share_buttons_on_petition_page == '1'
-  end
-  
-  def requires_user_confirmation_on_sign_up?
-    self.requires_user_confirmation_on_sign_up == '1'
-  end
-
-  def requires_location_for_campaign?
-    self.requires_location_for_campaign == '1'
-  end
-
-  def always_join_parent_org_when_sign_up?
-    self.always_join_parent_org_when_sign_up == '1'
-  end
-
-  def show_petition_category_on_creation?
-    self.show_petition_category_on_creation == '1'
-  end
 
   def skip_white_list_check?
     !use_white_list?
@@ -102,4 +89,24 @@ class Organisation < ActiveRecord::Base
     n += " and #{parent_name}" if parent_name.present?
     n
   end
+
+  def signatures_count_key
+    "#{id}_organisation_signatures_count"
+  end
+
+  def cached_signatures_size
+    return @cached_signatures_size if defined?(@cached_signatures_size) # return immediately if we have already calculated this
+
+    @cached_signatures_size = Rails.cache.fetch(signatures_count_key, raw: true) do
+      signatures.size
+    end
+    @cached_signatures_size  = @cached_signatures_size.to_i # we need to do this, because we store as raw in memcached.
+  end
+
+  def salesforce_client
+    @salesforce_client ||= Salesforce.initialize_client({host: salesforce_host, client_id: salesforce_consumer_key, client_secret: salesforce_consumer_secret,
+                                  username: salesforce_username, password: salesforce_security_token})
+  end
+
+
 end

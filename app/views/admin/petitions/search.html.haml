@@ -11,9 +11,9 @@
       - t.cell(:signatures, cell_html: { class: "center" }) { |p| p.cached_signatures_size }
       - t.cell(:flags, cell_html: { class: "center" }) { |p| p.flags.size }
       - t.cell(:cancelled, cell_html: { class: "center" }) { |p| p.cancelled? ? "&#10003".html_safe : "" }
-      - t.cell(:created_by) { |p| p.user.nil? ? "Nil" : link_to(p.user.full_name, org_admin? ? edit_org_user_path(p.user) : edit_admin_user_path(p.user)) }
-      - t.cell(:email) { |p| p.user.email }
-      - t.cell(:phone) { |p| p.user.phone_number }
+      - t.cell(:created_by) { |p| link_to_edit_user(p.user) }
+      - t.cell(:email) { |p| printable_attribute(p.user, :email)}
+      - t.cell(:phone) { |p| printable_attribute(p.user, :phone_number)}
       - t.cell(:admin_status)
   = will_paginate @query.petitions
 - else

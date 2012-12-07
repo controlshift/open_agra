@@ -6,8 +6,9 @@
 #  petition_id :integer
 #  user_id     :integer
 #  ip_address  :string(255)
-#  created_at  :datetime        not null
-#  updated_at  :datetime        not null
+#  created_at  :datetime
+#  updated_at  :datetime
+#  reason      :text
 #
 
 require "spec_helper"
@@ -37,13 +38,13 @@ describe PetitionFlag do
     before(:each) do
       user = Factory(:user)
       petition = Factory(:petition)
-      @valid_attr = {user_id: user, petition_id: petition, ip_address: "127.0.0.1"}
+      @valid_attr = {user: user, petition: petition, ip_address: "127.0.0.1", reason: "some reason"}
     end
 
     context "user is not log in" do
 
       before(:each) do
-        @not_log_in_attr = @valid_attr.merge(user_id: nil)
+        @not_log_in_attr = @valid_attr.merge(user: nil)
       end
 
       it "should not be able to flag the same petition with the same ip address" do

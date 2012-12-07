@@ -1,0 +1,32 @@
+= title 'Export'
+
+%p
+  Exporting raw data is a good way to move information to other systems, or to perform offline analysis of your site's activity.
+
+%p
+  The Query tool can be used to perform ad-hoc data analysis and real time reporting.
+
+
+%table{:class => "table table-striped"}
+  %thead
+    %tr
+      %th
+        Type
+      %th
+        Description
+  %tr{:class => "odd"}
+    %td
+      = link_to "Members", members_org_exports_path,  id: 'export-people-link'
+    %td
+      All users and signatures who have opted to receieve email from your organisation. This is the best export to use while importing
+      people into your CRM.
+
+  %tr{:class => "even"}
+    %td
+      =link_to "Petitions", petitions_org_exports_path
+    %td Raw data about all petitions.
+
+  %tr{:class => "odd"}
+    %td
+      = link_to "Signatures", signatures_org_exports_path
+    %td Raw data about all signatures.

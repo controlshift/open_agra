@@ -1,0 +1,71 @@
+.breadcrumbs
+  = link_to 'Members', org_members_path
+  >
+  #{@member.email}
+
+.leader-info-box.clearfix.mt30.mb30
+  .leader-icon.pull-left.mr20.ml20
+    - if @member.info.facebook_id.present?
+      = image_tag "http://graph.facebook.com/#{@member.info.facebook_id}/picture", class: 'profile-image'
+    - else
+      %i.icon-user
+  .leader-info.pull-left.mr20
+    .leader-name.mb10
+      = @member.info.full_name
+    .email= @member.info.email
+    .phone-number= @member.info.phone_number
+    - @member.info.additional_fields.each do |key, value|
+      .additional-fields
+        %b= "#{key.humanize}:"
+        %span= value
+
+    - if @member.user.present?
+      .edit-user.ml5.mt10
+        = link_to 'Edit User',  edit_org_user_path(@member.user)
+    - else
+      This member has not yet created a user account.
+
+%h3
+  Signatures
+- if @member.signatures.any?
+
+  = table_for(@member.signatures) do |t|
+    = t.data do
+      - t.cell(:campaign){|s| link_to s.petition.title, s.petition }
+      - t.cell(:first){|s| s.first_name}
+      - t.cell(:last) {|s| s.last_name}
+      - t.cell(:postcode)
+      - t.cell(:phone) {|s| s.phone_number}
+      - t.cell(:join, cell_html: { class: "center" }) { |p| p.join_organisation ? "&#10003".html_safe : "" }
+      - t.cell(:unsubscribed_at) {|s| s.unsubscribe_at ? pretty_date_format(s.unsubscribe_at) : button_to("unsubscribe", unsubscribe_org_petition_signature_path(s.petition, s.id, { redirect_to: org_member_path(@member)}), method: :put) }
+      - t.cell(:created_at) {|s| pretty_date_format(s.created_at)}
+
+- else
+  This member has not signed any campaigns.
+
+- if @member.user.present?
+  %h3
+    Campaigns
+
+  - if @member.user.manageable_petitions.any?
+
+    = table_for(@member.user.manageable_petitions) do |t|
+      = t.data do
+        - t.cell(:title) { |p| link_to(p.title, petition_path(p), class: petition_class(p)) }
+        - t.cell(:signatures, cell_html: { class: "center" }) { |p| link_to(number_with_delimiter(p.cached_signatures_size, :delimiter => ','), org_petition_signatures_path(p)) }
+        - t.cell(:cancelled, cell_html: { class: "center" }) { |p| p.cancelled? ? "&#10003".html_safe : "" }
+        - t.cell(:created_at)
+        - t.cell(:admin_status)
+
+  - else
+    This user has no campaigns.
+
+  %h3
+    Groups
+  - if @member.user.groups.any?
+
+    %ul
+      - @member.user.groups.each do |group|
+        %li= link_to(group.title, group)
+  - else
+    This member is not the administrator of any groups.

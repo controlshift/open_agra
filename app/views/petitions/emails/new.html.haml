@@ -1,9 +1,25 @@
-- content_for :before_content do
-  = render partial: 'petitions/manage/petition_manage_breadcrumbs'
-  = render partial: 'petitions/manage/petition_manage_menu', locals: {highlight_id: 'manage-email'}
+- content_for :campaign_tips do
+
+  .campaign-tips.mb30
+    %hr.mt50
+    %h4
+      =image_tag "icon-bulb.png"
+      Email Tips
+    %ul
+      %li Your subject line is the first thing people will see – and it's how people will decide if they want to open your email.  Keep it short and punchy and test it out on your friends.
+      %li Double check your emails for spelling and grammar mistakes – better yet, have a friend read over it for you.
+      %li Most people only skim emails – so keep it short and bold important information.
+    %hr
+
+- content_for :sidebar do
+  = render partial: 'petitions/manage/manage_menu_bar', locals: {highlight_id: 'manage-email'}
+
+- content_for :end_of_body do
+  = render partial: "petitions/view/email_template"
+
   
 = render partial: 'shared/errors', locals: {error_obj: @email}
-= title 'Email supporters'
+= manage_title 'Email supporters'
 %br
 .row
   .span9.email-supporters-form
@@ -26,23 +42,12 @@
       .mb10
       = text_area_tag :petition_blast_email_body, @email.body, rows: 15, name: 'petition_blast_email[body]', class: 'tinymce'
       .mt20
-        %a.btn.btn-secondary#send-test-email-btn{href: '#', rel: :popover, 'data-placement' => 'above',
+        %a.btn.btn-secondary#send-test-email-btn{href: '#', rel: :popover, 'data-placement' => 'left',
                                                  'data-content' => 'Send a test email to yourself - this is so you can see what the email looks like, double check for bugs or spelling and grammar errors.  (It will send to the email adress you use to login)',
                                                  'data-original-title' => 'send test email to myself'} Send test email to myself
         .btn-desc
           to #{pluralize(@petition.signatures.count, 'supporter')}
         = f.button :submit, 'Send', class: 'btn-primary', disable_with: 'Sending…', id: 'send-email-btn'
-
-  .span3
-    .email-supporters-tips
-      %h4 Tips:
-      %ul
-        %li Your subject line is the first thing people will see – and it's how people will decide if they want to open your email.  Keep it short and punchy and test it out on your friends.
-        %li Double check your emails for spelling and grammar mistakes – better yet, have a friend read over it for you. 
-        %li Most people only skim emails – so keep it short and bold important information.
-        - if current_organisation.blog_link.present?
-          %br Read more tips
-          = link_to 'on our blog', current_organisation.blog_link, target: '_blank'
 
 
 %br
@@ -54,119 +59,36 @@
       If you copy a template you will need to proof read it closely.
     They are generic and have many occasions where you have to insert information specific to your campaign.
   .row
-    .span12
+    .span9
       %a{ name: 'templates' }
       .template-container
         %ul#template-selector
           %li.first.active
-            %a{href: '#share-on-social-media'} Share on social media
+            %a{href: '#share-on-social-media', id:'share-on-social-media-anchor'}
+              = Content.name_for('email_template_share_on_social_media', current_organisation)
           %li
-            %a{href: '#we-had-a-win'} We had a win
+            %a{href: '#we-had-a-win'}
+              = Content.name_for('email_template_we_had_a_win', current_organisation)
           %li
-            %a{href: '#report-back'} Report Back
+            %a{href: '#report-back'}
+              = Content.name_for('email_template_report_back', current_organisation)
           %li.last
-            %a{href: '#delivery'} Delivery
+            %a{href: '#delivery', id:'delivery-anchor'}
+              = Content.name_for('email_template_delivery', current_organisation)
+
         #template-content
           .template#share-on-social-media
-            %p Dear Friends, 
-
-            %p 
-              Thank you for signing 
-              = @petition.title
-
-            %p This issue means a lot to me and I really appreciate your support.  I'm emailing you to ask you to go one step further and share this petition with your friends and family. 
-
-            %p 
-              = link_to petition_url(@petition), petition_url(@petition)
-
-            %p Posting something on facebook or twitter will only take a second, but will mean that hundreds of people see the petition and can join our movement.  
-
-            %p Why not also tell your friends why you decided to sign the petition and why it's important to you – people are more likely to offer their support if they understand why the people they are close to support it too!   
-
-            %p 
-              = link_to petition_url(@petition), petition_url(@petition)
-
-            %p Real change happens when everyday people like you and I take a stand for what we believe in.  
-
-            %p Thank you for standing with me on this issue. 
-
-            %p 
-              = @current_user.first_name
+            = Content.content_for('email_template_share_on_social_media', current_organisation, {'petition'=> @petition, 'current_user'=> current_user})
 
           .template#we-had-a-win
-            %p Dear Friends,
-
-            %p Exciting news – our campaign got mentioned in a major newspaper this week!  
-
-            %p Here is what they said: 
-
-            %p “Insert quote”. 
-
-            %p This wouldn't have been possible without your support.  We have an opportunity now to build on this momentum and bring more people into our movement. 
-
-            %p Can you take a moment and tell your friends and family about our win on social media? 
-
-            %p 
-              = link_to petition_url(@petition), petition_url(@petition)
-
-            %p You can also spread the good news by forwarding the email below to your friends or colleagues.  A little while ago when I started this petition I never thought we'd get this far – thank you for helping make it happen. 
-
-            %p 
-              = @current_user.first_name
-
-            %p ++++++
-
-            %p Dear Friends,
-
-            %p My work just got mentioned in a major newspaper – this is what they had to say: 
-
-            %p “Insert Quote”.
-
-            %p I signed a petition about this issue because I think it's incredibly important – and obviously there are people out there who agree with me too!
-
-            %p Can you add your name as well?  It will only take a minute and would mean a lot to me. 
-
-            %p 
-              = link_to petition_url(@petition), petition_url(@petition)
-
-            %p Thanks
+            = Content.content_for('email_template_we_had_a_win', current_organisation, {'petition'=> @petition, 'current_user'=> current_user})
 
           .template#report-back
-            %p Dear Friends,
-
-            %p Yesterday we delivered the petition – it was a fantastic day and was great meeting so many of you in person. 
-
-            %p You can see photos of the action by clicking the link below: 
-
-            %p INSERT FLICKR LINK HERE
-
-            %p Thank you for helping to make it happen,
-
-            %p Your name.
-
-            %p PS – Why not share these photos on facebook?  It's a great way to show people that ordinary people like you and me can create real change! 
+            = Content.content_for('email_template_report_back', current_organisation, {'petition'=> @petition, 'current_user'=> current_user})
 
           .template#delivery
-            %p Dear Friends,
+            = Content.content_for('email_template_delivery', current_organisation, {'petition'=> @petition, 'current_user'=> current_user})
 
-            %p I just found out that a decision will be made about our issue this week.  So we need to deliver our petition soon!  There are two ways you can help: 
-
-            %p 1. Spread the word on social media about the petition today, so we can collect as many last minute names as possible, and deliver the biggest petition we can muster.
-
-            %p 
-              Go to this link to share the petition. 
-              = link_to petition_url(@petition), petition_url(@petition)
-
-            %p 2. If you're in town, come along to the petition delivery so we can that the names on the petition are real people, who really care.  The details of the petition delivery are below: 
-
-            %p When: Insert Date and Time 
-            %br Where: Insert location (With directions on how to get there) 
-            %br RSVP: Just reply to this email if you can make it. 
-
-            %p Thank you for everything you do and hopefully I'll see you at the petition delivery! 
-
-            %p 
-              = @current_user.first_name
 
         %a.btn#apply-template-btn{ href: '#' } Apply
 
@@ -175,10 +97,12 @@
 
 :javascript
   $(function() {
+    pages.settings_sidebar.initialize();
+
     initVerticalTabs();
-    
+
     tinyMCE.init({
-      mode : 'textareas',
+      mode : 'exact',
       theme: 'advanced',
       plugins : 'paste',
       theme_advanced_toolbar_location : 'top',
@@ -192,14 +116,15 @@
       relative_urls : false,
       remove_script_host : false,
       document_base_url : getDirPath(document.URL),
-      content_css : '/tinymce_content.css'
+      content_css : '/tinymce_content.css',
+      elements: 'petition_blast_email_body'
     });
-    
+
     $('#send-email-btn').click(function() {
       tinyMCE.triggerSave();
       return confirm('Proceed sending email to your supporters?');
     });
-    
+
     $('#send-test-email-btn').click(function() {
       $('#send-test-email-btn').addClass('disabled');
       $('#send-test-email-btn').text('Sending...');
@@ -216,7 +141,7 @@
 
           alert_message(resp['message']);
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+          error: function(jqXHR, textStatus, errorThrown) {
           $('#send-test-email-btn').removeClass('disabled');
           $('#send-test-email-btn').text('Send test email to myself');
 
@@ -226,12 +151,12 @@
           }
         }
       });
-      
+
       return false;
     });
 
     $('#apply-template-btn').click(function() {
-      var template = $('.template:visible').html();
+      var template = $('#template-content > .template:visible').html();
       tinyMCE.activeEditor.setContent(template);
     });
   });
@@ -240,7 +165,7 @@
       var result = unescape(URL.substring(0,(URL.lastIndexOf('/')) + 1))
       return result
   }
-  
+
   function initVerticalTabs() {
     $('.template#share-on-social-media').show();
     $('#template-selector li, #template-selector li a').click(function() {

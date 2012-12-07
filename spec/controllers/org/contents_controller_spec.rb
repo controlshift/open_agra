@@ -21,7 +21,10 @@ describe Org::ContentsController do
     
     describe "#index with catgegory" do
       before(:each) do
-        Content.should_receive(:where).with(:organisation_id => nil, :category => Content::CATEGORIES[0]).and_return(@contents = mock())
+        finder = mock()
+        finder.should_receive(:where).with(:organisation_id => nil, :category => Content::CATEGORIES[0]).and_return(@contents = mock())
+        Content.should_receive(:text).and_return(finder)
+
         get :index, :category => Content::CATEGORIES[0]
       end
       

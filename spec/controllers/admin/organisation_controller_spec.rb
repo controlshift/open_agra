@@ -43,26 +43,19 @@ describe Admin::OrganisationsController do
 
     describe "#update" do
       it "should allow people to update names" do
-        post :update, id: @organisation.id, organisation: {name: 'foo'}
-        @organisation.reload
-        @organisation.name.should == 'foo'
+        post :update, id: @organisation.id, organisation: {name: 'foo', uservoice_widget_link: 'foo.uservoice.com'}
+        assigns(:organisation).name.should == 'foo'
+        assigns(:organisation).uservoice_widget_link.should == 'foo.uservoice.com'
         response.should redirect_to admin_organisations_path
         flash[:notice].should == "Organisation was updated successfully"
       end
 
       it "should now allow invalid updates" do
         post :update, id: @organisation.id, organisation: {host: 'http://www.google.com/'}
-        @organisation.host.should_not == "http://www.google.com/"
+        assigns(:organisation).should have_at_least(1).error_on(:host)
         response.should_not redirect_to admin_organisations_path
         response.should render_template :edit
       end
-
-      it "should allow updates to uservoice_widget_link" do
-        post :update, id: @organisation.id, organisation: {uservoice_widget_link: 'foo.uservoice.com'}
-        @organisation.reload
-        @organisation.uservoice_widget_link.should == 'foo.uservoice.com'
-      end
-
     end
   end
 end

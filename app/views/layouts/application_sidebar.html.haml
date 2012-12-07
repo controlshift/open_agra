@@ -4,6 +4,9 @@
     = render partial: 'layouts/common_html_head'
     = render partial: 'layouts/customised_html_head'
     = yield :head
+    = javascript_include_tag 'petition/manage'
+    = stylesheet_link_tag "facebook_share_widget/application"
+    = javascript_include_tag "facebook_share_widget/application"
 
   %body{ class: "body-#{controller_name} body-#{controller_name}-#{action_name}" }
     .main
@@ -14,13 +17,16 @@
       .main-content-sidebar
         .container
           .row
-            .span8
-              .content-wrapper
+            .span9
+              %div{'class' => 'content-wrapper', 'data-pjax-container' => true}
+                .loader{style: "display:none;"}
+                  .mt10
+                    =image_tag 'ajax-loader-16.gif'
                 = render 'layouts/page_banner'
                 = render 'layouts/flash_messages'
                 = yield
               
-            .span4
+            .span3
               .sidebar-wrapper
                 = yield :sidebar
       
@@ -32,10 +38,13 @@
     
     :javascript
       function resizeSidebarBackground() {
-        $(".sidebar").width($(document).width() - $(".sidebar-wrapper").position().left - 40);
+        $(".sidebar").width($(document).width() - $(".sidebar-wrapper").position().left - 31);
         var contentHeight = $(".footer").position().top - $(".main-content-sidebar").position().top;
-        if ($(".sidebar").height() < contentHeight) {
+        sidebarHeight = $(".sidebar").height();
+        if (sidebarHeight < contentHeight) {
           $(".sidebar").height(contentHeight);
+        } else {
+          $(".sidebar").height(sidebarHeight);
         }
       }
   
@@ -44,5 +53,9 @@
       });
   
       $(window).resize(function() {
+        resizeSidebarBackground();
+      });
+      
+      $('.content-wrapper').resize(function() {
         resizeSidebarBackground();
       });

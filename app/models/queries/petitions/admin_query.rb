@@ -16,8 +16,7 @@ module Queries
         end
 
         query.all_of do
-          with(:organisation_id, @organisation.id) if @organisation
-          without(:user_id, nil)
+          with(:organisation_id, organisation.id) if organisation
         end
         query.paginate page: @page, per_page: 10
         query.order_by :created_at, :desc

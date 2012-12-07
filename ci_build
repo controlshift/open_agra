@@ -1,64 +1,108 @@
 #!/bin/bash
 
-# First argument is the tag name of a good build.
-# For instance using Jenkins: $BUILD_NUMBER
+export RAILS_ENV=test
 
-if [ $# -ne 2 ]; then
-  echo "Usage: ci2_build <build_number> <ruby_version>"
-  echo "Example: ci2_build 1 1.9.3-p0"
-  exit 1
-fi
-ruby_version=$2
+function prepare_rvm {
+  ruby_version=$1
+  ruby_version=${ruby_version:=1.9.3-p0}
+  [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+  if [ $? -ne 0 ]; then
+    echo An error occur with rvm script
+    exit 1
+  fi
 
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-if [ $? -ne 0 ]; then
-  echo An error occur with rvm script
-  exit 1
-fi
-
-# Installing ruby if it does not exist
-echo checking ruby version $ruby_version
-rvm use $ruby_version
-if [ $? -ne 0 ]; then
-  rvm install $ruby_version
+  # Installing ruby if it does not exist
+  echo checking ruby version $ruby_version
   rvm use $ruby_version
-fi
+  if [ $? -ne 0 ]; then
+    rvm install $ruby_version
+    rvm use $ruby_version
+  fi
+  workspace=$PWD
+  cd ..
+  rvm rvmrc untrust $workspace
+  cd $workspace
+  rvm use --create ruby-$ruby_version@agra
+}
 
-# Installing bundler if it does not exit
-echo checking bundler
-bundle -v
-if [ $? -ne 0 ]; then
-  gem install bundler
-fi
+function prepare_bundle {
+  # Installing bundler if it does not exit
+  echo checking bundler
+  bundle -v
+  if [ $? -ne 0 ]; then
+    gem install bundler --pre
+  fi
+  bundle check || bundle install
+}
 
-# if there is any error, the script will terminate
-set -e
+function migrate_db {
+   bundle exec rake db:migrate
+}
 
-export S3_ENABLED=true
+function ci_build {
+  prepare_rvm $1
+  prepare_bundle
+  migrate_db
+  set -e
+  #TODO: waiting for tijuana api or stub server to get fixed
+#  bundle exec rake spec external external_private integration scenarios
+  bundle exec rake spec external integration scenarios
+}
 
+function tag_build {
+  tag_name=$1
+  echo tagging the build...
+  git tag $tag_name
+  git push origin $tag_name
+  echo $tag_name > ../last_successful_build.tag
+  echo tagging $tag_name successful!
+}
 
-workspace=$PWD
-cd ..
-rvm rvmrc untrust $workspace
+function tag_master {
+  build_number=$(printf %06d $1)
+  tag_name="goodbuild_$build_number"
+  tag_build $tag_name
+}
 
-cd $workspace
+function tag_branch {
+  build_number=$(printf %06d $1)
+  tag_name="goodbuild_target_$build_number"
+  tag_build $tag_name
+}
 
-rvm use --create ruby-$ruby_version@agra
+function spec_upload_to_s3 {
+  prepare_rvm $1
+  prepare_bundle
+  migrate_db
+  set -e
+  #use the spec for verify the cloud upload
+  rspec ./scenarios/campaigner_edits_petition.rb:21
+}
 
-bundle check || bundle install --without staging production
+function push {
+  git pull --rebase && \
+  ci_build && \
+  git push
+}
 
-bundle exec rake db:migrate
+function show_help {
+  echo "Usage: ci_build <subcommand>"
+  echo "Example 1: ./ci_build normal 1.9.0-p0"
+  echo "Example 2: ./ci_build s3_spec 1.9.0-p0"
+  echo "Example 3: ./ci_build tag_build 1"
+}
 
-bundle exec rake spec external external_private integration scenarios
+function main {
+  sub_command=$1
+  shift
+	case $sub_command in
+		normal) ci_build $@;;
+		s3_spec) spec_upload_to_s3 $@;;
+		tag_build) tag_master $@;;
+		tag_branch) tag_branch $@;;
+		push) push;;
+		*) show_help;exit 1;;
+	esac
+}
 
-# tag the build
-echo tagging the build...
-build_number=$(printf %06d $1)
-tag_name="goodbuild_$build_number"
-
-git tag $tag_name
-
-git push origin $tag_name
-
-echo $tag_name > ../last_successful_build.tag
-echo tagging $tag_name successful!
+main $@

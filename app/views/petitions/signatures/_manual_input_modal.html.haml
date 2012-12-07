@@ -1,0 +1,125 @@
+.modal.hide.fade#input-signatures-modal{ style: "width: 940px; margin-left: -470px" }
+  .modal-header
+    %button.close{ "data-dismiss" => "modal" } x
+    %h3 Enter Petition Signatures
+  .modal-body
+    .hide
+      - signature = Signature.new({default_organisation_slug: current_organisation.slug})
+      - signature.petition = @petition
+      = simple_form_for signature, url: "", validate: true, wrapper: :compact do |f|
+        = f.input :first_name, input_html: { validate: { format: false } }
+        = f.input :last_name, input_html: { validate: { format: false } }
+        = f.input :email, input_html: { type: 'email' }
+        = f.input :phone_number
+        = f.input :postcode
+
+    %form{ id: "manual-input-form", action: "#{manual_input_petition_signatures_path(@petition, format: :js)}", method: "post", data: { "ref-form-id" => "new_signature", validate: true, remote: true }, style: "margin-bottom:0px;" }
+      = hidden_field_tag "authenticity_token", form_authenticity_token
+
+      .manual-input-signatures
+        %p Enter petition signatures below. Save as you go so you don't lose any of your work.
+        %br
+        %table{ id: "table-input", class: "condensed-table" }
+          %thead
+            %tr
+              %th
+                First name
+                %abbr *
+              %th
+                Last name
+                %abbr *
+              %th
+                Email
+                %abbr *
+              %th Phone
+              %th
+                Postcode
+                %abbr *
+              %th
+                - if !current_organisation.always_join_parent_org_when_sign_up?
+                  = join_label
+          %tbody
+          %tfoot
+            %tr
+              %td{ colspan: 6 }
+                %button.btn{ id: "btn-add" } Add Row
+                .right.subtle
+                  %abbr * required fields
+                  
+  .modal-footer
+    %span.alert.alert-success
+    %span.alert.alert-error
+    %a.btn.btn-primary#btn-save{ href: "#" } Save Signatures
+
+:javascript
+  function errorOrDefault(errors, field) {
+    if (errors[field] === undefined) {
+      return undefined;
+    }
+    else {
+      return errors[field][0];
+    }
+  }
+  
+  function addNewRow(firstName, lastName, email, phoneNumber, postcode, joinOrganisation, firstNameError, lastNameError, emailError, phoneNumberError, postcodeError) {
+    var row = $("#table-input tbody tr").length;
+    
+    var html = "<tr valign=top>";
+    html += constructColumn(row, "first_name", "string", "span2", firstName, firstNameError);
+    html += constructColumn(row, "last_name", "string", "span2", lastName, lastNameError);
+    html += constructColumn(row, "email", "string", "span3", email, emailError);
+    html += constructColumn(row, "phone_number", "string", "span2", phoneNumber, phoneNumberError);
+    html += constructColumn(row, "postcode", "string", "span2", postcode, postcodeError);
+    #{'html += constructColumn(row, "join_organisation", "boolean", "span1", joinOrganisation, "");' if !current_organisation.always_join_parent_org_when_sign_up?}
+    #{'html += constructColumn(row, "join_organisation", "hidden",  "span1", joinOrganisation, "");' if current_organisation.always_join_parent_org_when_sign_up?}
+
+    html += "</tr>";
+    $("#table-input tbody").append(html);
+  }
+  
+  function constructColumn(row, fieldName, fieldType, inputClass, defaultValue, errorMessage) {
+    inputId = 'signatures_' + row + '_' + fieldName;
+    inputName = 'signatures[][' + fieldName + "]";
+    validatorName = 'signature[' + fieldName + ']';
+    defaultValue = defaultValue || "";
+    inputClass = inputClass || "span2";
+
+    if (fieldType == "hidden") {
+      return '<td style="vertical-align:middle"><div class="control-group center"><input id="' + inputId + '" name="' + inputName + '" type="hidden" value="1" ' + defaultValue + ' /></div></td>';
+    }
+
+    if (fieldType == "boolean") {
+      return '<td style="vertical-align:middle"><div class="control-group center"><input id="' + inputId + '" name="' + inputName + '" type="checkbox" value="1" ' + defaultValue + ' /></div></td>';
+    }
+    else {
+      if (errorMessage != undefined && errorMessage.length > 0)
+        return '<td><div class="control-group error"><input class="' + inputClass + '" data-validate="true" data-validator-name="' + validatorName + '" data-valid="false" id="' + inputId + '" name="' + inputName + '" type="text" value="' + defaultValue + '"><span class="help-inline">' + errorMessage + '</span></div></td>';
+      else
+        return '<td><div class="control-group"><input class="' + inputClass + '" data-validate="true" data-validator-name="' + validatorName + '" id="' + inputId + '" name="' + inputName + '" type="text" value="' + defaultValue + '"></div></td>';
+    }
+  }
+  
+:coffeescript
+  if(window.ClientSideValidations && window.ClientSideValidations.forms['new_signature'])
+    window.ClientSideValidations.forms['manual-input-form'] = window.ClientSideValidations.forms['new_signature']
+
+  ClientSideValidations.callbacks.element.before = (element, eventData) ->
+    row = element.closest("tr")
+    isBlankRow = row.find(":input:text").filter(-> $(this).val().length > 0).length == 0
+    $("input:text", row).trigger("element:validate:reset") if isBlankRow
+  
+  $("#manual-input-form input").live 'focusin', ->
+    lastInputs = $("#table-input tbody tr:last :input")
+    addNewRow() if lastInputs.is($(this))
+  
+  $("#btn-add").click ->
+    addNewRow()
+    false
+    
+  $("#btn-save").click ->
+    $('#manual-input-form').submit()
+    false
+
+  $ ->
+    for num in [1..5]
+      addNewRow()
