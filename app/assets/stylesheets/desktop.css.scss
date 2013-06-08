@@ -98,6 +98,7 @@ a { cursor: pointer; }
   #nav-user {
     color: $accent-color;
     padding-left: 10px;
+    width: 100%;
 
     .caret {
       position: relative;
@@ -209,6 +210,7 @@ a { cursor: pointer; }
   .sidebar-wrapper {
     position: relative;
   }
+
 }
 
 .sidebar {
@@ -225,8 +227,11 @@ a { cursor: pointer; }
 
   .container { width: 190px; padding: 0 !important; margin: 0 }
   .sidebar-box { margin-bottom: 30px; }
-  .sidebar-box.share { margin-bottom:80px;}
-
+  .sidebar-box.share { margin-bottom:40px; }
+  .sidebar-box.comment textarea { width:185px; }
+  .fixed {position: fixed; top: 30px;}
+  .div-height {height: 45px; }
+  #sign_petition {height: auto;}
   h2 {
     display: inline-block;
     color: #252525;
@@ -626,11 +631,16 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
 
 #location-map {
   height: 420px;
-  width: 580px;
+  width: 100%;
   img {
     max-width: none;
   }
   margin: 3px auto;
+}
+
+#location-categories {
+  input, label { display: inline;}
+  label { margin-right: 20px;}
 }
 
 // =============================================
@@ -669,8 +679,48 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
   font-weight: normal;
   font-style: italic;
   font-family: $subtitle-font-family;
+
+}.btn-facebook-login {
+  position: relative;
+  font: normal 1.1em "Helvetica Neue",Helvetica,Arial,sans-serif;;
+  line-height: 1em;
+  float: left;
+  text-transform: none;
+  @include border-radius(6px);
+  @include background-image(linear-gradient(#5181c5 20%, #315d9b 100%));
+  background-color: #315d9b;
+  border-color: #7b9fd4 #5181c5 #315d9b;
+  color: #ffffff;
+  @include text-shadow(rgba(0, 0, 0, 0.25) 0 -1px 0);
+  white-space: nowrap;
+  padding: 5px 20px 8px 45px;
+  filter: none; //blanks out this IE8 specific fill... sass does not seam to process the filter parameters correctly
+
+  &:hover {
+    background-color: #315d9b;
+    color: #ffffff;
+  }
+
+  img {
+    position: absolute;
+    bottom: 1px;
+    left: 10px;
+  }
+
+  .logo-separator {
+    position: absolute;
+    top: 0;
+    left: 30px;
+    height: 100%;
+    width: 1px;
+    background-color: #7b9fd4;
+    border-right: solid 1px #315d9b;
+  }
 }
 
+.input-ysmall {
+  height: 70px;
+}
 // =============================================
 //	Progressbar Styles
 // =============================================
@@ -709,4 +759,41 @@ a.share.email { @include toggle-bg-image('btn-icon-email.png') }
   .text {
     display: inline;
   }
+}
+//===============================================
+// Comments page
+//===============================================
+.table#comments {
+  td.petition-name {
+    width: 250px;
+  }
+  td.comment-text {
+    width: 500px;
+  }
+  td.status {
+    padding-left: 10px;
+  }
+  td.approve-action {
+    width: 50px;
+  }
+  td.remove-action {
+    width: 50px;
+  }
+  i.icon-ok {
+    color: #008000;
+  }
+  i.icon-remove {
+    color: #B0171F;
+  }
+}
+//===============================================
+// Facebook Modal
+//===============================================
+.modal#facebook-modal {
+  width: 630px;
+  top: 33%;
+}
+
+.table-striped{
+  clear: both;
 }

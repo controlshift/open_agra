@@ -87,6 +87,7 @@ describe Org::Efforts::TargetsController do
     context "update target with invalid information" do
       it "should alert error message when phone number is invalid" do
         put :update, target: {phone_number: "abc123", email: "abc@123.com"}, location: @updated_location, effort_id: @effort.slug, id: @target.slug
+
         response.should render_template :edit
         assigns(:target).errors.count.should == 1
         assigns(:target).errors.messages[:phone_number][0].should == "is invalid"

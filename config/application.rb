@@ -1,10 +1,11 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
+require 'active_record/connection_adapters/postgis_adapter/railtie'
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
-  Bundler.require(*Rails.groups(:assets => %w(development test)))
+  Bundler.require(*Rails.groups(:assets => %w(development test profile)))
   # If you want your assets lazily compiled in production, use this line
   # Bundler.require(:default, :assets, Rails.env)
 end
@@ -14,10 +15,15 @@ end
 module Agra
   class Application < Rails::Application
 
+    # don't attempt to auto-require the moonshine manifests into the rails env
+    config.paths['app/manifests'] = 'app/manifests'
+    config.paths['app/manifests'].skip_eager_load!
+
     config.middleware.use Rack::Pjax
 
     # we need this, because we use psql specific db index definitions for performance.
     # see: http://guides.rubyonrails.org/migrations.html#types-of-schema-dumps
+    # According to the postgis adapter, this will not work properly with geometry. Uh oh.
     config.active_record.schema_format =  :sql
 
     # Settings in config/environments/* take precedence over those specified here.
@@ -47,7 +53,8 @@ module Agra
     config.encoding = "utf-8"
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password]
+    config.filter_parameters += [:password, :salesforce_consumer_key, :salesforce_consumer_secret, :salesforce_security_token,
+                                 :bsd_api_id, :bsd_api_secret, :fb_app_id, :fb_app_secret, :action_kit_username, :action_kit_password]
 
     # Enable the asset pipeline
     config.assets.enabled = true
@@ -55,6 +62,7 @@ module Agra
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
+    config.i18n.available_locales = ['en','en-IN']
     # otherwise, the app tries to access the database, and precompilation fails.
     # see: http://stackoverflow.com/questions/8622297/heroku-cedar-assetsprecompile-has-beef-with-attr-protected
     config.assets.initialize_on_precompile = false
@@ -62,35 +70,12 @@ module Agra
     config.assets.precompile += [/organisations\/[\w_]+\/application/]
     config.assets.precompile += ['ie7.css']
     config.assets.precompile += ['ie8.css']
+    config.assets.precompile += ['jquery.Jcrop.css']
     config.assets.precompile += ['mobile.js']
     config.assets.precompile += ['facebook_share.js']
-    config.assets.precompile += ['location.js', 'efforts_location.js', 'petition/manage.js', 'create_effort.js', 'petition/contact_user.js']
-    config.assets.precompile += ['tinymce-jquery']
-
-    config.action_controller.asset_host = ENV["S3_HOST_ALIAS"]
-
-    if ENV["S3_ENABLED"]
-      config.paperclip_options = {
-        storage: :s3,
-        s3_host_alias: ENV["S3_HOST_ALIAS"],
-        url: ':s3_alias_url',
-        path: "/:class/:attachment/:id/:style/:filename",
-        s3_credentials: {url: :s3_alias_url, access_key_id: ENV["S3_KEY"], secret_access_key: ENV["S3_SECRET"], bucket: ENV["S3_BUCKET"], s3_host_name: ENV["S3_REGION"]},
-        s3_headers: { 'Cache-Control' => 'public, max-age=1314000' }
-      }
-      config.paperclip_file_options = config.paperclip_options.merge({
-        path: "/:class/:attachment/:id/:timestamp/:filename"
-      })
-    else
-      config.paperclip_options = {
-        url: "/system/:class/:attachment/:id/:style/:filename",
-        storage: :filesystem
-      }
-      config.paperclip_file_options = config.paperclip_options.merge({
-        url: "/system/:class/:attachment/:id/:timestamp/:filename"
-      })
-    end
-
+    config.assets.precompile += ['facebook_share_widget/facebook_friend_view.js']
+    config.assets.precompile += ['location.js', 'efforts_location.js', 'petition/manage.js', 'petition/sidebar-resize.js', 'create_effort.js', 'petition/contact_user.js']
+    config.assets.precompile += ['tinymce-jquery', 'jquery.Jcrop.js', 'petition/show.js', 'jquery.jcarousel.min.js', 'markerwithlabel_packed.js', 'markerclusterer_packed.js']
     config.flagged_petitions_threshold = 5
 
     ActiveSupport::Deprecation.silenced = true

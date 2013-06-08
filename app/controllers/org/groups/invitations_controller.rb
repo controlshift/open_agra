@@ -6,7 +6,7 @@ class Org::Groups::InvitationsController < Org::OrgController
 
     if invitation = GroupMember.find_by_invitation_email_and_group_id(email, @group.id)
       InvitationMailer.delay.send_to_group_admin(invitation)
-      redirect_to org_group_users_path(@group), notice: "Invitation has been sent to #{email}"
+      redirect_to org_group_users_path(@group), notice: t('controllers.org.groups.invitation.success_email', email: email)
     else
       invitation = GroupMember.new(invitation_email: email)
       invitation.group = @group
@@ -14,7 +14,7 @@ class Org::Groups::InvitationsController < Org::OrgController
 
       if invitation.save
         InvitationMailer.delay.send_to_group_admin(invitation)
-        redirect_to org_group_users_path(@group), notice: "Invitation has been sent to #{email}"
+        redirect_to org_group_users_path(@group), notice: t('controllers.org.groups.invitation.success_email', email: email)
       else
         redirect_to org_group_users_path(@group), alert: "#{invitation.errors.full_messages.join(". ")}"
       end

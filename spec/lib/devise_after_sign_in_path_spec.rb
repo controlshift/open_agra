@@ -3,10 +3,11 @@ require 'spec_helper'
 class DummyController
   include Rails.application.routes.url_helpers
   include DeviseAfterSignInPath
-  attr_accessor :params, :session, :token
+  attr_accessor :params, :session, :token, :request
   def initialize
     @params = {}
     @session = {}
+    @request ={}
   end
 end
 
@@ -53,9 +54,15 @@ describe DeviseAfterSignInPath do
       controller.after_sign_in_path_for(resource).should == "http://testtest.com"
     end
 
+    it 'should return to the path from where user redirected for authentication' do 
+      controller.request.stub(:env) {{"omniauth.origin" => "http://redirect.com"}}
+      controller.after_sign_in_path_for(resource).should == "http://redirect.com"
+    end
+
     context 'as a normal user' do
       before(:each) do
         resource.stub(:org_admin?).and_return(false)
+        controller.request.stub(:env) {{"omniauth.origin" => ""}}
       end
 
       it 'should return petitions path' do
@@ -66,6 +73,7 @@ describe DeviseAfterSignInPath do
     context 'as an org admin' do
       before(:each) do
         resource.stub(:org_admin?).and_return(true)
+        controller.request.stub(:env) {{"omniauth.origin" => ""}}
       end
 
       it 'should return petitions path' do

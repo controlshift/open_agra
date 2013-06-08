@@ -1,21 +1,26 @@
-.breadcrumbs
-  = link_to 'Groups', org_groups_path, {:class => 'use-pjax'}
-  >
-  = link_to @group.title, org_group_path(@group), {:class => 'use-pjax'}
-  >
-  Users
+%ul.breadcrumb
+  %li
+    = link_to 'Partners', org_groups_path, {:class => 'use-pjax'}
+    %span.divider
+      >
+  %li
+    = link_to @group.title, org_group_path(@group), {:class => 'use-pjax'}
+    %span.divider
+      >
+  %li.active
+    Admins
 
-= title 'Group Admin Users'
+= title 'Partner Admin Users'
 
 .row.mt20
   .span5
     %h4
-      Invite New Group Administrator
+      Invite New Partner Administrator
     %p.mb10
       The administrators that you invite will have access to a
       = link_to "special admin area", group_manage_path(@group)
       where they will be able to see
-      all of the petitions that are created inside the group
+      all of the petitions that are created inside the partnership
       and export a CSV of all the signatures that includes email address.
 
     = render partial: 'send_invitation_form'
@@ -23,7 +28,7 @@
 .row.mt20
   .span10
     %h4
-      Current Group Administrators
+      Current Partner Administrators
 
     - if @users.any?
       = table_for(@users) do |t|
@@ -32,4 +37,4 @@
           - t.cell(:organisation) {| u | u.organisation.name  }
           - t.cell(:delete) {|u| button_to 'remove admin', org_group_user_path(@group, u), :method => :delete }
     - else
-      This group has no administrators.
+      This partner has no administrators.

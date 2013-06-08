@@ -11,13 +11,17 @@ describe "Campaigner creates petition", type: :request do
   context 'when user is logged in' do
     before(:each) do
       # create a category
+      case ActionMailer::Base.delivery_method
+        when :test then ActionMailer::Base.deliveries.clear
+        when :cache then ActionMailer::Base.clear_cache
+      end
       @org_admin = Factory(:org_admin, organisation: @current_organisation)
       log_in(@org_admin.email, 'onlyusknowit')
       add_new_category 'Category 1'
       add_new_category 'Category 2'
       add_new_category 'Category 3'
       log_out
-      
+
       register
     end
 
@@ -67,16 +71,20 @@ describe "Campaigner creates petition", type: :request do
       wait_until { petition.categories(true).any? }
 
       categories = petition.categories.collect{|c| c.name}
-      categories.should == ["Category 2", "Category 3"]
+      categories.should include("Category 2", "Category 3")
+
 
       # and launch it
       click_on "launch-petition"
 
       # check that all the pieces have been appropriately saved.
-      open_last_email_for('email@test.com')
-      current_email.subject.should match(/Thanks for creating the petition/)
-      current_email.from.first.should == @current_organisation.contact_email
+      mail_for_creation = find_email("email@test.com", {subject: /Thanks for creating the petition/})
+      mail_for_creation.from.first.should == @current_organisation.contact_email
 
+      open_last_email_for('email@test.com')
+      current_email.subject.should match(/Get started on your petition/)
+      current_email.from.first.should == @current_organisation.contact_email
+      
       page.current_path.should == petition_manage_path('no-more-pokies')
 
       # verify that everything was saved properly.

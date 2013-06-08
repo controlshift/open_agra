@@ -25,7 +25,7 @@ describe UnsubscribeHelper do
     end
     it "should return a group unsub link" do
       url = helper.blast_email_unsubscribe_url(email)
-      url.should == "http://test.host/groups/1001/unsubscribes/___token___"
+      url.should == "http://test.host/partnerships/1001/unsubscribes/___token___"
     end
   end
 end

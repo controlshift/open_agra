@@ -1,0 +1,114 @@
+= simple_form_for [:org, @effort], url: @effort.persisted? ? org_landing_page_path(@effort) : org_landing_pages_path, validate: true, :wrapper => 'compact' do |form|
+  = form.input :title,        input_html: { class:  'span7', rel: 'popover', 'data-content' => "The name of your landing page"}
+  = form.input :description,  input_html: { class:  'span7', rows: 8, rel: 'popover', 'data-content' => "Landing page description. Appears on the hub page"}
+  .upload-image-box-horizontal
+    .upload-image.upload-image-switcher{'data-changed-placeholder-url' => asset_path('image-placeholder-form-changed.png') }
+      = image_content(entity: @effort, style: :form, content_class: 'preview-image')
+      .arrow
+      .upload-field
+        = form.input :image,
+          as: :file,
+          label: 'Upload an image', input_html: { accept: 'image/jpeg,image/gif,image/png' }
+      .clear
+
+  = form.input :effort_type, as: :hidden, value: 'open_ended'
+
+  #advanced.mt20
+    %ul.nav.nav-tabs
+      %li#petition-text-tab.active
+        %a{"href" => "#petition-text", "data-toggle" => "tab"}Petition Text
+      %li#petition-form-tab
+        %a{"href" => "#petition-form", "data-toggle" => "tab"}Petition Form
+      %li#petition-email-tab
+        %a{"href" => "#email-templates", "data-toggle" => "tab"}Email Templates
+      %li#petition-settings-tab
+        %a{"href" => "#petition-settings", "data-toggle" => "tab"}Settings
+
+    .tab-content
+      #petition-text.tab-pane.active
+        .row
+          .span7
+            %p
+              These settings allow you to control pre-filled, editable default text for petitions created through your landing page.
+            %p
+              They can be left blank.
+            %br
+        .ml5
+          - {:title => "Default Petition Title text for petitions created inside the effort",
+             :who => "Default target for petitions inside the effort. Only used for open-ended efforts. If you have multiple targets to specify in advance, use a specific targets effort"}.each do |petition_field, help|
+            = form.input "#{petition_field}_default", as: :String, label: "Default #{petition_field.capitalize} Text", input_html: {class: 'span7', rel: 'popover', 'data-content' => help}, wrapper_html: {class: "#{petition_field}_wrapper"}
+
+          - {what: "Default 'What do you want them to do?' text for petitions created inside the effort",
+             why: "Default 'Why is this important?' text for petitions created inside the effort"}.each do |petition_field, help|
+            = form.input "#{petition_field}_default", label: "Default #{petition_field.capitalize} Text", input_html: {class: 'span7', rows: 8, rel: 'popover', 'data-content' => help}
+
+          .default-image
+            .upload-image-box-horizontal
+              %label Default Image
+              .upload-image.upload-image-switcher{'data-changed-placeholder-url' => asset_path('image-placeholder-form-changed.png') }
+                = image_content(entity: @effort, style: :form, content_class: 'preview-image petition-image', image_field: 'image_default')
+                .arrow
+                .upload-field
+                  = form.input :image_default, as: :file, label: 'Upload an image', input_html: { accept: 'image/jpeg,image/gif,image/png', id: 'default_image' }
+                .clear
+          .default-categories
+            = render partial: '/petitions/form_categories', locals: { f: form }
+
+      #petition-form.tab-pane
+        .row
+          .span7
+            %p
+              These settings control the new and edit petition forms look like on the landing page.
+            %p
+              Changing these prompts and help text can be a good way to ask your members to create focused sets of campaigns on specific issues.
+              Leaving the fields blank causes the default form labels and help text to be used.
+            %br
+
+        .ml5
+          - [:title, :who, :what, :why].each do |petition_field|
+            = form.input "#{petition_field}_label", input_html: { class:  'span7', rows: 8}
+            = form.input "#{petition_field}_help", input_html: { class:  'span7', rows: 8}
+
+      #email-templates.tab-pane
+        .row
+          .span7
+            %p
+              These settings allow you to control the content of emails that the system sends for petitions created through the landing page.
+            %br
+
+            .ml5
+              = form.input :thanks_for_creating_email, label: "Thanks for creating petition email",
+                            input_html: { class:  'span7', rows: 10, rel: 'popover',
+                                          'data-content' => "Every person who creates a petition in the effort will receive this thank you email. Edit it to provide a customized welcome message.",
+                                          value: (@effort.thanks_for_creating_email_in_organisation(current_organisation).html_safe) }
+              - if @effort.default_welcome_email_in_organisation(current_organisation)
+                %a.btn#apply-default-btn Reset Email Text to Default
+                :javascript
+
+                  $("#apply-default-btn").click(function() {
+                    var template = $("#default_thanks_email").html();
+                    $("#effort_thanks_for_creating_email").val(template);
+                  });
+                .hidden#default_thanks_email
+                  = @effort.default_welcome_email_in_organisation(current_organisation).body.html_safe
+
+      #petition-settings.tab-pane
+        .row
+          .span7
+            .feature-effort.ml5
+              = form.input :featured, as: :boolean, wrapper: :checkbox_inline, label: "<b>Featured</b> Display the landing page hub on the site homepage. Only the most recently featured landing page or effort will be displayed."
+            .ask-for-location.ml5.mt10
+              = form.input :ask_for_location, as: :boolean, wrapper: :checkbox_inline, label: "<b>Ask for location</b> toggles whether or not we ask the user for a location while creating a petition."
+            .distance-limit.ml5.mt10
+              = form.input :distance_limit, as: :string, label: "Distance Limit (Kilometers)", input_html: {:validate => false, rel: 'popover',
+                        'data-content' => "How far should we look for campaigns that a member may participate in? Leave blank for no limit"}
+            .landding-page-welcome-text.ml5
+              = form.input :landing_page_welcome_text, label: "Landing Page Welcome Text",
+                            input_html: { class:  'span7', rows: 10 }
+
+
+
+  .actions.mt20
+    = form.button :submit, value: "Save Page"
+
+= javascript_include_tag 'create_effort'

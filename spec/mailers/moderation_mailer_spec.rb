@@ -43,7 +43,7 @@ describe ModerationMailer do
       subject { @email }
       specify { ActionMailer::Base.deliveries.should_not be_empty }
       specify { subject.subject.should include("has been approved") }
-      specify { subject.to.should == [@blast_email.from_address] }
+      specify { subject.to.should == [@blast_email.petition.email] }
       specify { subject.from.should == [@petition.organisation.contact_email] }
       specify { subject.body.should include("has been approved") }
     end
@@ -59,7 +59,7 @@ describe ModerationMailer do
       subject { @email }
       specify { ActionMailer::Base.deliveries.should_not be_empty }
       specify { subject.subject.should include("about your email") }
-      specify { subject.to.should == [@blast_email.from_address] }
+      specify { subject.to.should == [@blast_email.petition.email] }
       specify { subject.from.should == [@petition.organisation.contact_email] }
       specify { subject.body.should include("A member of the team") }
     end

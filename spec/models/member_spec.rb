@@ -7,6 +7,7 @@
 #  organisation_id :integer
 #  created_at      :datetime        not null
 #  updated_at      :datetime        not null
+#  external_id     :string(255)
 #
 
 require 'spec_helper'

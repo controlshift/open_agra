@@ -51,6 +51,12 @@ module PetitionHelper
     click_on 'Sign'
   end
 
+  def leave_a_comment(comment = "This is a test comment")
+    fill_in 'comment_text', with: comment
+
+    click_on 'Save'
+  end
+
   def edit_petition(petition_slug, title = 'This is my petition',
       who = 'Fred Daman, CEO of Fredcorp',
       what = 'Tell Fred to pay everyone more money',
@@ -66,5 +72,4 @@ module PetitionHelper
       check category
     end
   end
-
 end

@@ -7,5 +7,9 @@
       = petition.location.query
   .petition-map
     .map
-      = google_static_map(location: petition.location, size: "200x180")
+      - if petition.location
+        = google_static_map(location: petition.location, size: "200x180")
+      - elsif petition.target.geography
+        = google_static_map(geography: petition.target.geography, size: "200x180")
+
     .shadow

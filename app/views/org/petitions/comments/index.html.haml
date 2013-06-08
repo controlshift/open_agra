@@ -1,0 +1,26 @@
+.clear
+.table-container{style: 'position: relative'}
+  %ul.breadcrumb
+    %li
+      = link_to 'Petitions', org_petitions_path, {:class => 'use-pjax'}
+      %span.divider
+        >
+    %li
+      = link_to @petition.title, org_petition_path(@petition)
+      %span.divider
+        >
+    %li.active
+      Comments
+.clear
+
+= title @petition.title, class: 'left mt30'
+%h2
+  Manage Comments
+.clear
+
+  - if @comments.any?
+    .all_comments
+      = render partial: 'comments_table', locals: { show_petition: false }
+
+  - else
+    %h4.mt10 No comments found.

@@ -13,9 +13,12 @@
 #  image_updated_at   :datetime
 #  created_at         :datetime        not null
 #  updated_at         :datetime        not null
+#  settings           :text
 #
 
 class Group < ActiveRecord::Base
+  include BooleanFields
+
   has_many  :users, :through => :group_members
   has_many  :group_members
   belongs_to :organisation
@@ -23,6 +26,10 @@ class Group < ActiveRecord::Base
   has_many :signatures, through: :petitions
   has_many :subscriptions, class_name: 'GroupSubscription'
 
+  store :settings, accessors: [:signature_disclaimer, :opt_in_label, :display_opt_in]
+  boolean_fields :display_opt_in
+
+  validates :opt_in_label, presence: true, if: :display_opt_in?
 
   validates :title, presence: true
   validates :description, presence: true

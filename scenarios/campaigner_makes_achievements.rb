@@ -17,6 +17,7 @@ describe "Campaigner makes achievements", :type => :request do
     find("#group-share_on_facebook .accordion-toggle img")[:src].should include "bullet-round-pending.png"
     find("#group-share_on_twitter .accordion-toggle img")[:src].should include "bullet-round-pending.png"
     find("#group-share_via_email .accordion-toggle img")[:src].should include "bullet-round-pending.png"
+    find("#group-share_with_friends_on_facebook .accordion-toggle img")[:src].should include "bullet-round-pending.png"
     find("#collapse-share_on_facebook")[:class].should include "in"
     
     # share on facebook
@@ -34,6 +35,7 @@ describe "Campaigner makes achievements", :type => :request do
     find("#group-share_on_facebook .accordion-toggle img")[:src].should include "bullet-round-done.png"
     find("#group-share_on_twitter .accordion-toggle img")[:src].should include "bullet-round-pending.png"
     find("#group-share_via_email .accordion-toggle img")[:src].should include "bullet-round-done.png"
-    find("#collapse-share_on_twitter")[:class].should include "in"
+    find("#group-share_with_friends_on_facebook .accordion-toggle img")[:src].should include "bullet-round-pending.png"
+    find("#collapse-share_with_friends_on_facebook")[:class].should include "in"
   end
 end

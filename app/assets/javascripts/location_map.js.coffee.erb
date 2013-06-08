@@ -4,32 +4,52 @@
 
 $ ->
   class LocationMap extends Backbone.View
-    initialize: ->
-      @collection.on('reset', @renderMarkers, this)
-      @.on('completed_render_markers', @fitBounds, this)
-      @collection.fetch()
+    initialize:(options = {})->
+      @defaultBounds = options.defaultBounds
+      @disableZoom = options.disableZoom
       @render()
+      @.on('completed_render_markers', @fitBounds, this)
+      @markers = []
+      unless @collection.length
+        @collection.on('reset', @renderMarkers, this)
+        @collection.fetch()
+      else
+        do @renderMarkers
 
     render: ->
       @renderMap()
+      if MarkerClusterer?
+        clustererOptions =
+          averageCenter: true
+          clusterClass: 'petition-map-cluster'
+        @clusterer = new MarkerClusterer @map, [],clustererOptions
+
 
     renderMap: ->
       latlng = new google.maps.LatLng(-33, -151)
-      mapOptitions = {
+      mapOptions = {
           zoom: 1,
           center: latlng,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          scrollwheel: (not @disableZoom)
       }
-      @map = new google.maps.Map(@el, mapOptitions)
+      @map = new google.maps.Map(@el, mapOptions)
 
-    setBounds: ->
+
+
+    setBounds: =>
       @bounds = new google.maps.LatLngBounds()
 
     renderMarkers: ->
+      @clearMarkers()
       if @collection.length
         @setBounds()
         @collection.each(@renderMarker)
         @trigger('completed_render_markers')
+
+    clearMarkers: ->
+      for marker in @markers
+        marker.remove()
 
     fitBounds: =>
       google.maps.event.addListenerOnce(@map, "zoom_changed", @adjustBounds)
@@ -40,26 +60,76 @@ $ ->
         @map.setZoom(15)
 
     renderMarker: (location) =>
-      markerView = new MarkerView(model: location)
-      markerView.render(@map,@bounds)
+      markerView = new MarkerView(model: location, parent: this)
+      markerView.defaultBounds = @defaultBounds
+      markerView.render(@map, @bounds, clusterer: @clusterer)
+      @markers.push markerView
+
+    renderCluster: (cluster)->
+      @clearMarkers()
+      center = new google.maps.LatLng(cluster.get('latitude'), cluster.get('longitude'))
+      @bounds = new google.maps.LatLngBounds(center)
+
+      @cluster = new LocationMarkers cluster.get('locations')
+      @cluster.each(@renderMarker)
+      @trigger('completed_render_markers')
+      @clusterZoom = @map.getZoom()
+      @clusterZoomListener = google.maps.event.addListener(@map, "zoom_changed", @refreshClusters)
+
+    refreshClusters: =>
+      if @cluster and @map.getZoom() < @clusterZoom
+        @cluster = null
+        @renderMarkers()
+        @clusterZoomListener.remove()
+        @clusterZoomListener = null
+
 
   class MarkerView extends Backbone.View
+    initialize: (options)->
+      @mapView = options.parent
 
-    render: (map, bounds)->
+    render: (map, bounds, options = {})->
       slug = $(".effort-id").text()
       location = new google.maps.LatLng(@model.get('latitude'), @model.get('longitude'))
       map.setCenter(location)
-      marker = new google.maps.Marker(
-        position: location,
-        map: map,
+
+      MarkerClass = if MarkerWithLabel?
+        MarkerWithLabel
+      else
+        google.maps.Marker
+
+      label = if (petitionCount = @model.get('locations')?.length)
+        "#{petitionCount} campaign#{if petitionCount > 1 then 's' else ''}"
+      else
+        @model.get('query')
+      @marker = marker = new MarkerClass
+        position: location
+        map: map
+        title: label
         icon: "<%= asset_path("marker.png")%>"
-      )
+        labelContent: label
+        labelClass: 'petition-map-label'
+        labelAnchor: new google.maps.Point(-15, 48)
+        labelVisible: label?
+
+      options.clusterer?.addMarker @marker
+
 
       google.maps.event.addListener marker, "click", =>
-        window.location = "http://#{ document.location.host}/efforts/#{ slug }/near?#{ @model.queryString() }"
+        if @model.get('locations')?.length
+          # Rerender the clustered locations
+          @mapView.renderCluster @model
+        else
+          window.location = if slug
+            "http://#{ document.location.host}/efforts/#{ slug }/near?#{ @model.queryString() }"
+          else
+            "http://#{ document.location.host}/petitions/near?#{ @model.queryString() }&redirect=true"
 
-      bounds.extend(marker.getPosition())
+      unless @defaultBounds && (marker.getPosition().lat() > @defaultBounds.lat.max or marker.getPosition().lng() > @defaultBounds.lon.max or marker.getPosition().lat() < @defaultBounds.lat.min or marker.getPosition().lng < @defaultBounds.lon.min)
+        bounds.extend(marker.getPosition())
 
+    remove: ->
+      @marker.setMap null
 
   class LocationMarker extends Backbone.Model
     queryString: ->
@@ -73,9 +143,18 @@ $ ->
   class LocationMarkers extends Backbone.Collection
     model: LocationMarker
 
-    initialize: (options) ->
-      @url = "/efforts/#{options.effort_id}/locations"
+    initialize: (models = {}, options = {}) ->
+      @url = if options.effort_id
+        "/efforts/#{options.effort_id}/locations"
+      else
+        category = $('#location-categories input:checked').val() or ''
+        country = $('#location-map').data('country') or ''
+        "/petitions/locations?category=#{category}&country=#{country}"
+
 
   if $('#location-map').length
-    locations = new LocationMarkers(effort_id: $(".effort-id").text())
-    location_map = new LocationMap(collection: locations, el: $("#location-map"))
+    location_models = JSON.parse(locations_json) if (locations_json = $('.locations-json').text())
+    effort_id = $('.effort-id').text()
+    category = $('#location-categories input:checked').val()
+    locations = new LocationMarkers location_models, {effort_id, category}
+    location_map = new LocationMap(collection: locations, el: $("#location-map"), defaultBounds: $("#location-map").data('default-bounds'), disableZoom: $("#location-map").data('disable-zoom'))

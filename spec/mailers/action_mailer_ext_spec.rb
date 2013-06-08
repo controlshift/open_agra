@@ -12,10 +12,6 @@ describe DummyMailer do
   describe "with an organisation" do
     let (:organisation) { Factory(:organisation) }
 
-    it "should set default host for mailer" do
-      DummyMailer.send_mail(organisation).deliver
-      ActionMailer::Base.default_url_options[:host].should == organisation.host
-    end
 
     it "should return a message object" do
       DummyMailer.send_mail(organisation).deliver.should be_kind_of Mail::Message
@@ -25,13 +21,6 @@ describe DummyMailer do
       DummyMailer.send_mail(organisation).deliver
       ActionMailer::Base.smtp_settings[:user_name].should == organisation.sendgrid_username
       ActionMailer::Base.smtp_settings[:password].should == organisation.sendgrid_password
-    end
-  end
-
-  describe "without an organisation" do
-    it "should set a sensible default" do
-      DummyMailer.send_mail(nil).deliver
-      ActionMailer::Base.default_url_options[:host].should == 'localhost'
     end
   end
 end

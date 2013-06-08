@@ -276,14 +276,14 @@
   }
 }
 
-.featured-petitions, .featured-effort {
+.featured-petitions{
   a:hover { text-decoration: none; }
 
   .featured-petition {
     margin-top: 20px;
   }
 
-  .petition-image, .effort-image {
+  .petition-image {
     width: 300px;
     height: 170px;
     padding: 0px;
@@ -296,7 +296,7 @@
     }
   }
 
-  .petition-progress, .effort-progress {
+  .petition-progress {
     margin-top: 2px;
     height: 10px;
 
@@ -325,7 +325,7 @@
     }
   }
 
-  .petition-title h3, .effort-title h3 {
+  .petition-title h3{
     width: 300px;
     color: $title-color;
     font: $title-font;
@@ -348,7 +348,7 @@
     line-height: 13pt;
   }
 
-  .petition-signatures, .effort-signatures {
+  .petition-signatures {
     .number {
       font-size: 14pt;
       font-weight: bold;

@@ -62,9 +62,9 @@ describe Jobs::PromotePetitionJob do
   
   describe "reminder_when_dormant" do
     it "should schedule delay email for coming weeks" do
-      subject.should_receive(:delay).with(run_at: petition.created_at + 1.week) { delayed_job }
-      subject.should_receive(:delay).with(run_at: petition.created_at + 2.week) { delayed_job }
-      subject.should_receive(:delay).with(run_at: petition.created_at + 3.week) { delayed_job }
+      subject.class.should_receive(:delay_until).with(petition.created_at + 1.week) { delayed_job }
+      subject.class.should_receive(:delay_until).with(petition.created_at + 2.week) { delayed_job }
+      subject.class.should_receive(:delay_until).with(petition.created_at + 3.week) { delayed_job }
       delayed_job.should_receive(:send_reminder_when_dormant).with(petition).exactly(3).times
       subject.promote(petition, :reminder_when_dormant)
     end
@@ -88,31 +88,31 @@ describe Jobs::PromotePetitionJob do
         PromotePetitionMailer.should_receive(:reminder_when_dormant).with(petition) { mailer }
         mailer.should_receive(:deliver)
 
-        subject.send_reminder_when_dormant(petition)
+        Jobs::PromotePetitionJob.send_reminder_when_dormant(petition)
       end
       
       it "should not send reminder when dormant email if petition is cancelled" do
         petition.cancelled = true
         PromotePetitionMailer.should_not_receive(:reminder_when_dormant)
-        subject.send_reminder_when_dormant(petition)
+        Jobs::PromotePetitionJob.send_reminder_when_dormant(petition)
       end
       
       it "should not send reminder when dormant email if petition is prohibited" do
         petition.stub(:prohibited?) { true }
         PromotePetitionMailer.should_not_receive(:reminder_when_dormant)
-        subject.send_reminder_when_dormant(petition)
+        Jobs::PromotePetitionJob.send_reminder_when_dormant(petition)
       end
       
       it "should not send reminder when dormant email if petition is suppressed" do
         petition.stub(:suppressed?) { true }
         PromotePetitionMailer.should_not_receive(:reminder_when_dormant)
-        subject.send_reminder_when_dormant(petition)
+        Jobs::PromotePetitionJob.send_reminder_when_dormant(petition)
       end
       
       it "should not send reminder when dormant email if user opted out" do
         petition.user.opt_out_site_email = true
         PromotePetitionMailer.should_not_receive(:reminder_when_dormant)
-        subject.send_reminder_when_dormant(petition)
+        Jobs::PromotePetitionJob.send_reminder_when_dormant(petition)
       end
     end
     
@@ -132,7 +132,7 @@ describe Jobs::PromotePetitionJob do
       
       it "should not send reminder when dormant email" do
         PromotePetitionMailer.should_not_receive(:reminder_when_dormant)
-        subject.send_reminder_when_dormant(petition)
+        Jobs::PromotePetitionJob.send_reminder_when_dormant(petition)
       end
     end
   end
@@ -141,7 +141,7 @@ describe Jobs::PromotePetitionJob do
 
     it "should schedule delay email for next day" do
       delayed_job.should_receive(:send_launch_kicker).with(petition)
-      subject.should_receive(:delay).with(run_at: petition.created_at + 1.day) { delayed_job }
+      subject.class.should_receive(:delay_until).with(petition.created_at + 1.day) { delayed_job }
 
       subject.promote(petition, :send_launch_kicker)
     end
@@ -153,7 +153,7 @@ describe Jobs::PromotePetitionJob do
       mailer.should_receive(:deliver)
       PromotePetitionMailer.should_receive(:send_launch_kicker).with(petition) { mailer }
 
-      subject.send_launch_kicker(petition)
+      Jobs::PromotePetitionJob.send_launch_kicker(petition)
     end
 
     it "should not send reminder if petition is already launched" do
@@ -161,7 +161,7 @@ describe Jobs::PromotePetitionJob do
       petition.stub(:launched?).and_return true
 
       PromotePetitionMailer.should_not_receive(:send_launch_kicker)
-      subject.send_launch_kicker(petition)
+      Jobs::PromotePetitionJob.send_launch_kicker(petition)
     end
 
     it "should not send reminder if the user opted out" do
@@ -170,7 +170,7 @@ describe Jobs::PromotePetitionJob do
       petition.user.opt_out_site_email = true
 
       PromotePetitionMailer.should_not_receive(:send_launch_kicker)
-      subject.send_launch_kicker(petition)
+      Jobs::PromotePetitionJob.send_launch_kicker(petition)
     end
   end
 

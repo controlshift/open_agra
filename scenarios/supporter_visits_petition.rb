@@ -13,6 +13,7 @@ describe "Supporter visits petition", type: :request do
     it "and signs", js: true do
       view_petition_details
       signs_petition
+      comments
       check_thank_you_page
     end
 
@@ -26,6 +27,14 @@ describe "Supporter visits petition", type: :request do
       flag_petition
     end
 
+    it "and likes the comment", js: true do
+      like_comment
+    end
+
+    it "or flags a comment", js: true do
+      flag_comment
+    end
+    
     context "contacting campaigner", js: :true do
       it "and contacts campaigner" do
         contact_campaigner
@@ -36,7 +45,6 @@ describe "Supporter visits petition", type: :request do
       it "and signs" do
         sign_form_already_filled
       end
-
     end
 
     def create_launched_petition
@@ -58,7 +66,7 @@ describe "Supporter visits petition", type: :request do
       page.should have_content("Fred")
       page.should_not have_css ".local-campaign-detail .petition-map"
 
-      page.should have_css('#view_contact_user_form')
+      page.should have_css('#view-contact-user-form')
       page.should_not have_content("email@test.com")
       page.should_not have_content("15147034040")
 
@@ -86,11 +94,39 @@ describe "Supporter visits petition", type: :request do
       should_notify_partner_org
     end
 
+    def comments
+      page.should have_content("Tell others why you signed")
+      page.should have_button "Save"
+      leave_a_comment("Great Job! Well Done")
+      page.should have_content("Thank you for your comment")
+      page.should have_content("Great Job! Well Done")
+    end
+      
+    def like_comment
+      visit petition_path("capybara-test-for-supporters")
+      sign_petition("capybara-test-for-supporters")
+      leave_a_comment("Great Job! Well Done")
+      find(:xpath, "//ul/li[1]/div[3]/a[1]").click
+
+      #should not be able to like the comment again
+      find(:xpath, "//ul/li[1]/div[3]/a[1]").click
+    end
+
+    def flag_comment
+      visit petition_path("capybara-test-for-supporters")
+      sign_petition("capybara-test-for-supporters")
+      leave_a_comment("Great Job! This is a test comment!")
+      find(:xpath, "//ul/li[1]/div[3]/a[2]").click
+
+      find('#flag-captcha-form').should be_visible
+      fill_in 'captcha', with: 'TEST'
+      click_on 'Submit'
+
+      page.should_not have_content("Great Job! This is a test comment!")
+    end
+
     def check_thank_you_page
       page.should have_selector("a.share.email")
-      find("a.share.twitter")["href"].should match(/https\:\/\/twitter.com\/intent\/tweet\?url\=http\:\/\/.+\/petitions\/capybara-test-for-supporters&text\=/)
-      find("a.share.facebook")["data-href"].should include "http://www.facebook.com/sharer.php?u=http"
-      find("a.share.facebook")["data-href"].should include "capybara-test-for-supporters"
       send_an_email_link = find("#view_email_template")
       send_an_email_link["href"].should == "#email_template"
       send_an_email_link.click
@@ -101,7 +137,7 @@ describe "Supporter visits petition", type: :request do
     def contact_campaigner
       visit petition_path("capybara-test-for-supporters")
 
-      find("#view_contact_user_form").click
+      find("#view-contact-user-form").click
 
       find('#contact_user_form').should be_visible
       fill_in 'email_from_name', with: "Charlie"

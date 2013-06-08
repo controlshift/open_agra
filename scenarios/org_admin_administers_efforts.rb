@@ -13,13 +13,9 @@ describe 'Org admin', type: :request do
   context 'create and edit' do
     it 'open ended effort', js: true do
       click_on "#{@current_organisation.name} Admin"
-      click_on "all-efforts"
-      click_on "New Effort"
+      click_on "all-landing-pages"
+      click_on "New Landing Page"
       satisfy_effort_basic_info
-
-      page.find("#effort_who_default").should be_visible
-      page.find("#petition-form-tab").should be_visible
-      page.find("#petition-settings-tab").should be_visible
 
       click_on "Save"
       page.should have_content("Effort name")
@@ -38,29 +34,12 @@ describe 'Org admin', type: :request do
       satisfy_specific_target_effort_info
       attach_file :image, Rails.root.join("scenarios/fixtures/black.jpg")
 
-      page.find("#effort_who_default").should_not be_visible
-      page.find("#petition-form-tab").should_not be_visible
-      page.find("#petition-settings-tab").should be_visible
-      page.find("#effort_title_default").should be_visible
-      page.find("#petition-email-tab").should be_visible
-
-      page.find("#petition-settings-tab a").click()
-
-      page.find(".ask-for-location").should_not be_visible
-      page.find(".leader-duties-text").should be_visible
-      page.find(".how-this-works-text").should be_visible
-      page.find(".training-text").should be_visible
-      page.find(".training-sidebar-text").should be_visible
-      page.find(".feature-effort").should be_visible
-      page.find(".landding-page-welcome-text").should be_visible
 
       click_on "Save Effort"
       page.should have_content("Effort name")
       page.should have_content("Add Target")
 
       click_on "edit-effort"
-
-      page.should have_css("input[type='radio'][disabled]")
 
       visit effort_path("effort-name")
       page.should have_css(".effort-image img[alt='Black']")
@@ -76,6 +55,12 @@ describe 'Org admin', type: :request do
       it 'should list efforts' do
         click_on "#{@current_organisation.name} Admin"
         click_on "all-efforts"
+
+        # this is a landing page, not an effort.
+        page.should_not have_content(@effort.title)
+
+        # now go to the landing page listing.
+        click_on "all-landing-pages"
 
         page.should have_content(@effort.title)
         click_on @effort.title
@@ -188,7 +173,7 @@ describe 'Org admin', type: :request do
 
           visit org_effort_leader_path(@effort, petition)
 
-          page.should have_css(".campaign-admins #users :contains('#{user.full_name}')")
+          page.should have_css(".campaign-admins #users :contains(\"#{user.full_name}\")")
 
           click_on('Manage Campaign Admins')
 
@@ -251,7 +236,6 @@ end
 
 def satisfy_specific_target_effort_info
   satisfy_effort_basic_info
-  choose "Specific targets"
 end
 
 def satisfy_effort_basic_info

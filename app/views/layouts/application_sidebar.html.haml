@@ -7,7 +7,7 @@
     = javascript_include_tag 'petition/manage'
     = stylesheet_link_tag "facebook_share_widget/application"
     = javascript_include_tag "facebook_share_widget/application"
-
+    = javascript_include_tag "petition/sidebar-resize"
   %body{ class: "body-#{controller_name} body-#{controller_name}-#{action_name}" }
     .main
       = render partial: 'layouts/header'
@@ -35,27 +35,3 @@
     = yield :end_of_body
 
     = render partial: 'layouts/vendor_scripts'
-    
-    :javascript
-      function resizeSidebarBackground() {
-        $(".sidebar").width($(document).width() - $(".sidebar-wrapper").position().left - 31);
-        var contentHeight = $(".footer").position().top - $(".main-content-sidebar").position().top;
-        sidebarHeight = $(".sidebar").height();
-        if (sidebarHeight < contentHeight) {
-          $(".sidebar").height(contentHeight);
-        } else {
-          $(".sidebar").height(sidebarHeight);
-        }
-      }
-  
-      $(function() {
-        resizeSidebarBackground();
-      });
-  
-      $(window).resize(function() {
-        resizeSidebarBackground();
-      });
-      
-      $('.content-wrapper').resize(function() {
-        resizeSidebarBackground();
-      });

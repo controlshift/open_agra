@@ -7,8 +7,6 @@ module JobHelper
   end
 
   def should_notify_partner_org
-    should_have_job(Delayed::Job.all, 'notify_sign_up')
-    worker_failures = Delayed::Worker.new.work_off(1000)[1]
-    worker_failures.should == 0
+    
   end
 end

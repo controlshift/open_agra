@@ -1,3 +1,8 @@
+/*
+*= require_self
+*= require bootstrap-modal
+*/
+
 /*!
  * Bootstrap v2.0.3
  *
@@ -1234,11 +1239,15 @@ select:focus:required:invalid:focus {
 }
 
 .help-inline {
-  display: inline-block;
+  display: none !important;
   *display: inline;
   padding-left: 5px;
   vertical-align: middle;
   *zoom: 1;
+}
+
+.help-inline:first-of-type {
+  display: inline-block !important;
 }
 
 .input-prepend,

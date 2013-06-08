@@ -69,7 +69,7 @@ RSpec.configure do |config|
       DatabaseCleaner.strategy = :transaction
       DatabaseCleaner.start
     else
-      DatabaseCleaner.strategy = :truncation
+      DatabaseCleaner.strategy = :truncation, {:except => %w(spatial_ref_sys)} # Leave the postgis table alone
     end
 
     # By default, allow all http connections otherwise we will need to stub other connections (e.g. solr).
@@ -104,7 +104,9 @@ headless = Headless.new(:display => Process.pid, :reuse => false)
 headless.start
 
 def configure_current_organisation
-  @current_organisation = Factory(:organisation, notification_url: "http://any.url.com")
+  @current_organisation = Factory(:organisation, notification_url: "http://any.url.com", slug: "default")
+  # using default slug for doing all the testing.
+  # If you aren't sure what's going on try saving the page by using "save_and_open_page"
   stub_request(:any, @current_organisation.notification_url)
   Organisation.stub(:find_by_host) { @current_organisation }
 end

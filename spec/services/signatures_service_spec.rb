@@ -11,7 +11,7 @@ describe SignaturesService do
 
   context "where there should be callbacks after create" do
     before(:each) do
-      @signature = mock()
+      @signature = mock_model(Signature)
       @organisation = Factory(:organisation, :notification_url => 'foo')
       @petition = Factory(:petition, organisation: @organisation )
       @signature.stub(:new_record?).and_return(true)
@@ -24,16 +24,16 @@ describe SignaturesService do
       subject.should_receive(:notify_partner_org)
       subject.should_receive(:increment_petition_signatures_count)
       subject.should_receive(:increment_effort_signatures_count)
-
+      
       subject.save(@signature)
     end
 
     it "should schedule notification when user signs" do
-      Delayed::Job.count.should == 0
+      Sidekiq::Worker.clear_all
       subject.should_receive(:send_thank_you_and_promotion_emails).and_return(true)
       subject.save(@signature)
-      Delayed::Job.count.should == 1
-      Delayed::Job.last.handler.should match(/notify_sign_up/i)
+      Sidekiq::Worker.jobs.size.should == 1
+      Sidekiq::Worker.jobs.values.first.first["args"].first.should == @organisation.id
     end
   end
 
@@ -46,6 +46,7 @@ describe SignaturesService do
   end
 
   it "should actually send the emails. this is kind of an integration spec." do
+    Sidekiq::Worker.clear_all
     organisation = Factory(:organisation)
     user = Factory(:user, organisation: organisation)
     petition = Factory(:petition, user: user, organisation: organisation)
@@ -54,7 +55,7 @@ describe SignaturesService do
     subject.stub(:current_object).and_return(signature)
     subject.send_thank_you_and_promotion_emails
 
-    Delayed::Worker.new.work_off
+    Sidekiq::Worker.drain_all
     should have_sent_email.with_subject(/Thanks/)
     should have_sent_email.from(petition.organisation.contact_email)
     should have_sent_email.with_body(/Thank/)
@@ -211,8 +212,8 @@ describe SignaturesService do
         @petition = Factory(:petition, organisation: @organisation, group: @group)
       end
 
-      it "should create a group subscription on signature creation" do
-        signature = Factory.build(:signature, petition: @petition, join_organisation: true)
+      it "should create a group subscription on signature creation if join_group is true" do
+        signature = Factory.build(:signature, petition: @petition, join_group: true, join_organisation: true)
         SignaturesService.new.save(signature)
         signature.member.email.should == signature.email
         signature.member.group_subscriptions.collect{| gs | gs.group }.should include(@group)
@@ -220,10 +221,10 @@ describe SignaturesService do
       end
     end
 
-    it "should not subscribe if join_organisation is false" do
+    it "should not subscribe if join_group is false" do
       group = Factory.build(:group)
       petition = Factory.build(:petition, group: group)
-      signature = Factory.build(:signature, join_organisation: false, petition: petition)
+      signature = Factory.build(:signature, join_group: false, petition: petition)
       subject.stub(:current_object).and_return(signature)
       GroupSubscription.should_not_receive(:subscribe!)
       subject.send(:create_group_subscription)

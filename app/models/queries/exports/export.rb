@@ -2,6 +2,7 @@ require 'csv'
 
 module Queries
   module Exports
+    MAX_ROWS = 30000
     class Export < Query
       attr_accessor :organisation
 
@@ -23,6 +24,10 @@ module Queries
 
       def first_row
         @first_row ||= ActiveRecord::Base.connection.execute(sql + " LIMIT 1").to_a.first
+      end
+
+      def total_rows
+        @total_rows ||= ActiveRecord::Base.connection.execute("select count(*) from (#{sql}) tmp").first['count'].to_i
       end
 
       def additional_field_keys
@@ -64,7 +69,7 @@ module Queries
       end
 
       def sql_for_batch(batch_size, primary_key_offset)
-        "#{sql} AND id > #{ActiveRecord::Base.sanitize(primary_key_offset)} LIMIT #{ActiveRecord::Base.sanitize(batch_size)}"
+        "#{sql} AND #{klass.table_name}.id > #{ActiveRecord::Base.sanitize(primary_key_offset)} ORDER BY #{klass.table_name}.id LIMIT #{ActiveRecord::Base.sanitize(batch_size)}"
       end
 
 
@@ -119,7 +124,7 @@ module Queries
       end
 
       def filter_column_names(columns_to_exclude = [])
-        (klass.column_names - columns_to_exclude).join(',')
+        (klass.column_names - columns_to_exclude).collect {|column| "#{klass.table_name}.#{column}"}.join(',')
       end
     end
   end

@@ -10,7 +10,8 @@
         .clear
         .share-buttons
           = render partial: 'petitions/view/social_share'
-
+          - content_for :end_of_body do
+            = render partial: 'petitions/view/email_template'
       %p
         #{ current_organisation.name } is a site that allows anyone to create a campaign for progressive social change.
 

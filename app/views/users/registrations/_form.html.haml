@@ -24,10 +24,13 @@
         .input-why
           %a{ rel:'popover', 'data-original-title'=>'Why?', 'data-content'=>'This is just in case the office team needs to pass on media enquiries or advice about your campaign - your number won’t be publicly visible.' } Why?
         .clearall
-        = f.input :postcode, required: true
+        - if @user.additional_field_configs[:address]
+          = additional_field_input(f, :address, @user.additional_field_configs[:address])
+        = f.input :postcode, required: true, label: cf(:petition_show_postcode_label)
         = f.input :password, required: true
         - @user.additional_field_configs.each do |field_name, field_config|
-          = additional_field_input(f, field_name, field_config)
+          - unless field_name == :address
+            = additional_field_input(f, field_name, field_config)
         .mt10
           = check_box_tag(:remember_me, 1, true, id: 'user_remember_me', name: 'user[remember_me]')
           %label.subtle Remember me
@@ -46,12 +49,14 @@
           = succeed '.' do
             = link_to 'Terms and Conditions', tos_path, target: '_blank'
           = f.error 'agree_toc'
+
         = hidden_field_tag 'token', params[:token] if params.key?(:token)
+        .subtle.mt10
+          %em
+            = current_organisation.new_account_disclaimer
         .submit_button
           = f.button :submit, 'Register', class: 'btn-primary', id: 'user_registration_submit'
         .clearall
-      :javascript
-        email_suggest('#user_registration #user_email');
     - if current_organisation.enable_facebook_login?
       .span1.offset1
         .mt20

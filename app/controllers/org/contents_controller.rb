@@ -5,7 +5,7 @@ class Org::ContentsController < Org::OrgController
       if Content::CATEGORIES.include? params[:category]
         @contents = Content.text.where(organisation_id: nil, category: params[:category])
       else
-        flash[:alert] = 'Unknown category'
+        flash[:alert] = t('controllers.org.content.unknown_category')
         redirect_to org_contents_path
       end
     end
@@ -27,7 +27,7 @@ class Org::ContentsController < Org::OrgController
     if @content.save
       redirect_to org_contents_path
     else
-      flash[:alert] = 'There was a problem saving your content.'
+      flash[:alert] = t('controllers.org.content.error_save')
       render :new
     end
   end
@@ -57,7 +57,7 @@ class Org::ContentsController < Org::OrgController
   def export
     contents = Content.export(current_organisation.id, params[:slug])
     if contents.blank?
-      redirect_to migrate_org_contents_path, alert: "No customised content to download."
+      redirect_to migrate_org_contents_path, alert: t('controllers.org.content.error_export')
     else
       data = contents.to_json
       send_data data, filename: "#{request.host}_content_#{Time.now.strftime("%Y%m%d%H%M")}.json", type: "application/json"
@@ -68,7 +68,7 @@ class Org::ContentsController < Org::OrgController
     upload = params[:upload]
     content_params = JSON.parse(upload.read)
     Content.import(current_organisation.id, content_params)
-    redirect_to migrate_org_contents_path, notice: "Content is imported successfully."
+    redirect_to migrate_org_contents_path, notice: t('controllers.org.content.success_import')
   rescue Exception => e
     redirect_to migrate_org_contents_path, alert: e.message
   end

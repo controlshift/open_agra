@@ -47,7 +47,7 @@ def create_view_sql_for_signatures(view_name, organisation)
    create_view_sql << "SELECT "
    create_view_sql << column_names(Signature, columns_to_exclude)
    create_view_sql << " FROM signatures "
-   create_view_sql << " WHERE id IN (SELECT id FROM petitions WHERE organisation_id = #{organisation.id})"
+   create_view_sql << " WHERE petition_id IN (SELECT id FROM petitions WHERE organisation_id = #{organisation.id})"
    create_view_sql
 end
 

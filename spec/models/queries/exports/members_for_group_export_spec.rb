@@ -8,13 +8,13 @@ describe Queries::Exports::MembersForGroupExport do
 
       petition = Factory(:petition, organisation: @organisation, group: @group)
       petition2 = Factory(:petition, organisation: @organisation, )
-      @sign_no_join = Factory(:signature, email: "sign_no_join@domain.com", join_organisation: false, petition: petition)
-      @sign_join = Factory(:signature, email: "sign_join@domain.com", first_name: 'George', last_name: 'Washington', join_organisation: true, petition: petition)
+      @sign_no_join = Factory(:signature, email: "sign_no_join@domain.com", join_group: false, petition: petition)
+      @sign_join = Factory(:signature, email: "sign_join@domain.com", first_name: 'George', last_name: 'Washington', join_group: true, join_organisation: true, petition: petition)
       @other_group = Factory(:signature, first_name: "othergroup", join_organisation: true, petition: petition2 )
     end
 
     describe ".people_as_csv" do
-      subject { Queries::Exports::MembersForGroupExport.new(group: @group, organisation: @organisation)}
+      subject { Queries::Exports::MembersForGroupExport.new(group_id: @group.id, organisation: @organisation)}
 
       before(:each) do
         @result = ""

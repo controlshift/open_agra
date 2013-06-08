@@ -10,7 +10,7 @@ class Admin::OrganisationsController < Admin::AdminController
   def create
     @organisation = Organisation.new(params[:organisation])
     if @organisation.save
-      redirect_to admin_organisations_path, notice: "Organisation was created successfully"
+      redirect_to admin_organisations_path, notice: t('controllers.organisation.success_create')
     else
       render action: 'new'
     end
@@ -23,7 +23,7 @@ class Admin::OrganisationsController < Admin::AdminController
   def update
     @organisation = Organisation.find params[:id]
     if @organisation.update_attributes(params[:organisation])
-      redirect_to admin_organisations_path, notice: "Organisation was updated successfully"
+      redirect_to admin_organisations_path, notice: t('controllers.organisation.success_update')
     else
       render action: 'edit'
     end

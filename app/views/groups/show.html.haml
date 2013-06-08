@@ -1,13 +1,18 @@
 .row
-  .group-title.span9
+  .span9
     = title @group.title
 
-  - if can?(:manage, @group)
-    .manage-buttons
-      .btn-group
-        = link_to group_manage_path(@group), id: "manage-petition-button", class: "btn btn-manage" do
-          %i.icon-cog
-          Manage
+  .span3
+    - if can?(:manage, @group)
+      .manage-buttons
+        .btn-group
+          = link_to group_manage_path(@group), id: "manage-petition-button", class: "btn btn-manage" do
+            %i.icon-cog
+            Manage
+          - if can?(:manage, current_organisation)
+            = link_to org_group_path(@group), id: "manage-group-button", class: "btn btn-manage" do
+              %i.icon-wrench
+              Admin
 
 .mt20
 .row
@@ -16,10 +21,11 @@
       .group-image
         = image_tag(@group.image.url(:hero))
     .span5
-      = @group.description
+      = @group.description.html_safe
   - else
     .span7
-      = @group.description
+      = @group.description.html_safe
+
 
 .featured-petitions
   - if @petitions.any?

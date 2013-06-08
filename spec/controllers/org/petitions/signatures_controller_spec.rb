@@ -20,12 +20,22 @@ describe Org::Petitions::SignaturesController do
       context "with a signature" do
         before(:each) do
           @sig = Factory(:signature, petition: @petition)
-          get :index, petition_id: @petition
         end
 
-        specify { response.should be_success }
-        specify { assigns(:signatures).should == [@sig]}
+        describe "html" do
+          before(:each) do
+            get :index, petition_id: @petition
+          end
+          specify { response.should be_success }
+          specify { assigns(:signatures).should == [@sig]}
+        end
 
+        describe "csv export" do
+          before(:each) do
+            get :index, petition_id: @petition, format: 'csv'
+          end
+          specify { response.should be_success }
+        end
       end
 
       describe "#email" do
@@ -57,6 +67,18 @@ describe Org::Petitions::SignaturesController do
             put :unsubscribe, petition_id: @petition, id: @sig.id
             response.should be_redirect
             flash[:notice].should == "You have successfully unsubscribed #{@sig.email} from #{@petition.title}."
+          end
+        end
+      end
+      describe "#destroy" do
+        context "with a signature" do
+          before(:each) do
+            @sig = Factory(:signature, petition: @petition)
+          end
+
+          it "should allow unsubscribes" do
+            delete :destroy, petition_id: @petition, id: @sig.id
+            response.should be_redirect
           end
         end
       end

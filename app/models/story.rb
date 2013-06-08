@@ -34,10 +34,16 @@ class Story < ActiveRecord::Base
   
   scope :featured, where(featured: true)
 
+  def self.featured_stories(current_organisation)
+    featured.where(:organisation_id => current_organisation.id)
+      .order("updated_at DESC")
+      .all.rotate(-1)
+  end
+
   private
 
   def cannot_exceed_max_length
-    errors.add(:content, 'Total length of title and content is too long (maximum 200 characters).') if title &&
+    errors.add(:content, I18n.t('errors.messages.story.too_long')) if title &&
                                                                 content && (title.length + content.length > 200 )
   end
 end

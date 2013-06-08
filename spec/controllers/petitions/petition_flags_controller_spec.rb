@@ -37,31 +37,24 @@ describe Petitions::PetitionFlagsController do
 
       context "notification" do
         before :each do
-          Delayed::Job.count.should == 0
+          Sidekiq::Worker.clear_all
         end
-
         it "should notice the organisation if the petition has been flagged once" do
           post_create_flag
-          Delayed::Job.count.should == 1
-          success, failure = Delayed::Worker.new.work_off
-          success.should == 1
-          failure.should == 0
+          lambda {Sidekiq::Worker.drain_all}.should_not raise_exception
         end
 
         it "should notice the organisation if the petition has been flagged threshold th time" do
           pre_threshold = Agra::Application.config.flagged_petitions_threshold - 1
           pre_threshold.times { Factory(:petition_flag, petition: @petition) }
           post_create_flag
-          Delayed::Job.count.should == 1
-          success, failure = Delayed::Worker.new.work_off
-          success.should == 1
-          failure.should == 0
+          lambda {Sidekiq::Worker.drain_all}.should_not raise_exception
         end
 
         it "should not notify the organisation if the petition has been flagged for the 4th time" do
           3.times { Factory(:petition_flag, petition: @petition) }
           post_create_flag
-          Delayed::Job.count.should == 0
+          Sidekiq::Worker.jobs.size.should == 0 
         end
       end
     end

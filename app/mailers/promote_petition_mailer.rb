@@ -1,12 +1,12 @@
 class PromotePetitionMailer < ActionMailer::Base
   def achieved_signature_goal(petition)
     @petition = petition
-    mail_to_campaigner("You did it - your petition just hit 100 signatures.")
+    mail_to_campaigner(t('mailers.promote.achieved_signature_goal.subject'))
   end
 
   def encourage(petition)
     @petition = petition
-    mail_to_campaigner("Only 10 to go")
+    mail_to_campaigner(t('mailers.promote.encourage.subject'))
   end
 
   def reminder_when_dormant(petition)
@@ -16,7 +16,7 @@ class PromotePetitionMailer < ActionMailer::Base
 
   def send_launch_kicker(petition)
     @petition = petition
-    mail_to_campaigner('Get started on your petition')
+    mail_to_campaigner(t('mailers.promote.send_launch_kicker.subject'))
   end
 
   def mail_to_campaigner(subject)

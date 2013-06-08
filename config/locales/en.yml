@@ -4,14 +4,222 @@
 en:
   unauthorized:
     default: You are not authorized to view that page.
-
+  ago: ago
   helpers:
     submit:
       create: Save
       update: Save
+    petition:
+      contact_admin:
+        mailto: "mailto:%{p_contact_email}?subject=Campaigner message RE: %{petition_title}&body=Petition Title: %{petition_title}%0APetition URL: %{petition_url}%0AUser:%{u_email}%0A--- The following message is with regards to the above petition: ---"
+      twitter_share:
+        important: "For more important campaigns"
+      register: Register
+      training: Training
+      edit: Edit
+      start: Start
   devise:
     confirmations:
       confirmed: Your email was successfully confirmed. You can now send email to your supporters.
   errors:
     messages:
-      email_format: "Not an email address"
+      presence: must be present
+      email_format: Not an email address
+      connect_refused: "Failed to search. Please contact technical support."
+      address_not_found: "Address Not Found"
+      search: "Failed to search. Please contact technical support."
+      hacking: 'Someone is trying to hack the site!'
+      email_not_valid: 'is not a valid email'
+      petition:
+        unsubscribe: "You can not unsubscribe from your own campaign."
+        already_flagged: 'You have already flagged this petition'
+      petition_signature:
+        doesnt_match: "The signature and the petition must match"
+      not_same: "does not match."
+      postcode:
+        zip: 'is not a valid zip code'
+        postal: 'is not a valid postal code'
+        blank: 'a postal code is required'
+      user_email:
+        doesnt_match: 'User does not have the same email as the invitation.'
+      image: "must be an image file"
+      max_three_emails_per_week: "can have a maximum of three emails in a week."
+      email_subscription:
+        dont_match: "does not match subscribed address."
+      host:
+        proto_specified: 'only include the hostname, not the protocol'
+      alias:
+        format: "can contains only letters/numbers/hyphens"
+      title:
+        format: "must contain at least 3 letters/numbers"
+      taken: 'has already been taken'
+      petition_blast_email:
+        default_text: "must not include the help text. Please remove it before sending your message."
+      signature:
+        already_signed: 'has already signed'
+      story:
+        too_long: 'Total length of title and content is too long (maximum 200 characters).'
+      target:
+        either_location_or_geo:  "Specify a location or a geography, not both"
+  signature:
+    friend: "Friend"
+  petition_blast_email:
+    default_text: "Not sure what to write? There are templates on the bottom half of the page that you can use"
+  simple_captcha:
+    placeholder: ""
+    message:
+      default: "Secret Code did not match with the Image"
+      user: "The secret Image and code were different"
+  controllers:
+    application:
+      fb_session_expired: "Facebook session has expired, please log in again."
+      csv_generation_in_progress: "Your CSV is being generated. Please check your email after some time to get the download link."
+    confirmation:
+      already_confirmed: "You have already confirmed your email"
+    registration:
+      error_create: 'Did you receive an email with an invitation to use this site? If so, you can only register using that email address. You may have tried to use a different address; please click the back button and try again.'
+    user:
+      success_update: "Your account details have been updated!"
+      success_update_password: "Your Password has been updated!"
+    email:
+      success: "Your email has been sent to your supporters."
+      approval_required: "Your email has been sent to an administrator for approval."
+      test_success: "The test email has been sent."
+    organisation:
+      success_create: "Organisation was created successfully"
+      success_update: "Organisation was updated successfully"
+    efforts:
+      petition:
+        leader_exists: "Sorry, this petition already has a leader. You can support this campaign by signing it."
+    groups:
+      invitation:
+        incorrect_token: "Incorrect or corrupted token for group invitation."
+        incorrect_email: "Invitation was for %{correct_mail} but %{incorrect_mail} is currently signed in. Please login with the correct account for this invite."
+        incorrect_link: 'The invitation link you received is not correct.'
+      unsubscribe:
+        success: "You have successfully unsubscribed from %{group_title}."
+    org:
+      petition:
+        not_found: "No petition found"
+        note_saved: "Petition notes have been saved."
+        success_update: "Moderation status of previous petition is updated successfully."
+      efforts:
+        target:
+          success_create: "Created successfully!"
+          success_update: "Edited %{value} successfully!"
+      groups:
+        invitation:
+          success_email: "Invitation has been sent to %{email}"
+      petitions:
+        facebook_share_variant: 
+          success_delete: "The %{value} share variant has been deleted"
+        note:
+          invalid_input: "Invalid input. Your note cannot be saved."
+          error_save: "An error occurred, petition notes have not been saved."
+        signature:
+          success_destroy: "Member signature has been deleted."
+          error_destroy: "A problem occurred while deleting signature."
+          success_unsubscribe: "You have successfully unsubscribed %{email} from %{petition}."
+          error_unsubscribe: "Unable to unsubscribe %{email}"
+        user:
+          does_not_exist: "%{user_email} does not have a user account"
+      category:
+        success_create: "Category %{name} has been created."
+        success_update: "Category %{name} has been updated."
+        success_delete: 'Category has been deleted.'
+      content:
+        error_save: 'There was a problem saving your content.'
+        unknown_category: 'Unknown category'
+        error_export: "No customised content to download."
+        success_import: "Content is imported successfully."
+      email_white_list:
+        success_create: 'Email added to white list.'
+      email:
+        moderation_reason_blank: "The moderation reason may not be blank for inappropriate messages."
+        error_update: "Unable to update this Blast Email, please contact ControlShift Labs."
+        moderation_not_allowed: 'You may not moderate this email multiple times.'
+    petitions:
+      admin:
+        can_not_invite: 'You cannot invite campaign creator'
+        success_create: "Invitation email has been sent to %{email}"
+        invalid_token: 'Incorrect token or email address for petition admin invitation.'
+        success_delete: "Admin '%{email}' has been removed from the campaign admin list."
+      contact:
+        not_contactable: "The leader of this campaign may not be contacted."
+        captcha_failure: "Text did not match with the image."
+        email_send_failure: "Invalid input. Your email cannot be sent."
+        success_email: "Your email has been sent to the campaigner"
+      manage:
+        success_update: "The petition has been successfully updated!"
+        error_update_alias: "Failed to update petition alias"
+        download_message: "%{email} will receive an email with download instructions as soon as the PDF has been generated."
+        success_activate: "Your petition has been reactivated!"
+        success_submission: "Thank you for contacting us, we will review your petition soon."
+      petition_flag:
+        success_create: "The petition has been flagged."
+        error_create: "You have already flagged this petition."
+      signature:
+        success_delete: 'Your signature has been removed from the petition.'
+        success_unsubscribe: 'You have successfully unsubscribed from the petition.'
+      view:
+        unavailable: "We're sorry, this petition is not available."
+        inappropriate: "This Petition has been disabled because of inappropriate content"
+        unlaunched: 'Petition must be launched before it can be managed.'
+        comments_not_found: "alert('No more comments!!');"
+    saved: "%{value} saved."
+    not_saved: "%{value} cannot be saved."
+  mailers:
+    campaigner:
+      thanks_for_creating:
+        subject: "Thanks for creating the petition: %{petition_title}"
+      notify_petition_being_marked_as_inappropriate:
+        subject: 'Your campaign has been marked as inappropriate'
+      send_share_kicker:
+        subject: 'Share with your friends'
+      notify_petition_letter_ready_for_download:
+        subject: 'Petition is ready to Deliver'
+    export:
+      send_generation_confirmation:
+        subject: "Your export is ready for download"
+    invitation:
+      send_to_campaign_admin:
+        subject: "You're invited to be admin of '%{petition_title}'"
+      send_to_group_admin:
+        subject: "You're Invited to %{group_title}"
+    moderation:
+      notify_admin_of_new_petition:
+        subject: "A new petition needs to be moderated"
+      notify_admin_of_edited_petition:
+        subject: "An edited petition needs to be moderated"
+      notify_campaigner_of_approval:
+        subject: "Your email has been approved"
+      notify_campaigner_of_rejection:
+        subject: "A message from %{org_name} about your email"
+      notify_admin_of_new_blast_email:
+        subject: "An email needs to be moderated"
+    petition_flag:
+      notify_organisation_of_flagged_petition:
+        subject: "A petition has been flagged"
+    promote:
+      achieved_signature_goal:
+        subject: "You did it - your petition just hit 100 signatures."
+      encourage:
+        subject: "Only 10 to go"
+      send_launch_kicker:
+        subject: 'Get started on your petition'
+    signature:
+      thank_signer:
+        subject: "Thanks for signing %{petition_title}"
+    user:
+      contact_campaigner:
+        subject: "Message about your petition: %{subject}"
+      contact_admin:
+        subject: "Reply from an inappropriate petition: %{subject}"
+  services:
+    signature:
+      milestone_post_text: "%{count} signatures reached"
+  views:
+    org:
+      petitions:
+        settings:
+          after_signature_redirect_url: "After signature redirect URL"

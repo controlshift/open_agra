@@ -1,0 +1,13 @@
+- @comments ||= @petition.recent_comments(0).display_columns
+- if @comments.any?
+  .comments
+    %hr
+    %h2.comments-box-title
+      Reasons for signing
+    %ul.comments-box
+      - if @comments.size >= 1
+        = render partial: 'petitions/comments/comment', collection: @comments
+    - if ((@petition.cached_comments_size - @comment_start.to_i - 3) > 0)
+      .right
+        = link_to 'Read more', petition_comments_path(@petition, :comment_start => (@comment_start.to_i + 3)), {remote: true, class: 'more mr10'}
+

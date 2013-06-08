@@ -1,0 +1,18 @@
+{"actions": "/rest/v1/petitionaction/?page=1", "allow_multiple_responses": false, "cms_form": "/rest/v1/petitionform/1/", "created_at": "2009-06-26T18:14:25", "delivery_template": "", "fields": {}, "followup": {
+    "email_body": "<p>Dear {{user.first_name}},</p>\r\n<p>Thank you for signing!</p>\r\n<p>Best,</p>\r\n<p>Food Democracy Now</p>",
+    "email_custom_from": "",
+    "email_from_line": "/rest/v1/fromline/1/",
+    "email_subject": "Thanks for demanding a sustainable USDA",
+    "email_wrapper": "/rest/v1/emailwrapper/1/",
+    "id": 1,
+    "notifications": [],
+    "page": "/rest/v1/petitionpage/1/",
+    "resource_uri": "/rest/v1/pagefollowup/1/",
+    "send_email": true,
+    "send_notifications": false,
+    "send_pushes": false,
+    "send_taf": true,
+    "taf_body": "Sample tellafriend content",
+    "taf_subject": "Sample tellafriend message",
+    "url": "/cms/thanks/usda/"
+}, "goal": 10, "goal_type": "actions", "hidden": false, "hosted_with": "/rest/v1/hostingplatform/1/", "id": 1, "immediate_email_subject": "", "language": "/rest/v1/language/100/", "list": "/rest/v1/list/1/", "multilingual_campaign": null, "name": "usda", "one_click": false, "recognize": "once", "required_fields": [], "resource_uri": "/rest/v1/petitionpage/1/", "send_immediate_email": false, "send_immediate_email_override_limit": false, "send_immediate_fax": false, "status": "active", "tags": [], "title": "Demand a Sustainable USDA", "type": "Petition", "updated_at": "2012-07-19T13:45:39", "url": ""}

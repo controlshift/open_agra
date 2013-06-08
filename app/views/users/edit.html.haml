@@ -20,6 +20,17 @@
       = check_box :user, :opt_out_site_email
       = label_tag :opt_out_site_email, "Opt out site email", for: "user_opt_out_site_email"
 
+      .upload-image-box-horizontal
+        .upload-image.upload-image-switcher{'data-changed-placeholder-url' => asset_path('image-placeholder-form-changed.png') }
+          .preview-image
+            = image_content(entity: @user, style: :form, content_class: 'preview-image')
+          .upload-field
+            = f.input :image,
+              as: :file,
+              label: 'Upload an image', input_html: { accept: 'image/jpeg,image/gif,image/png' }
+          .clear
+
+
       .actions.mt20
         = f.button :submit, "Save"
         

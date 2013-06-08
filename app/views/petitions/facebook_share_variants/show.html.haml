@@ -1,0 +1,5 @@
+%html
+  %head
+    %meta{property: "og:title", content: @variant.title}
+    %meta{property: "og:description", content: @variant.description}
+    %meta{property: "og:image", content: @variant.image.present? ? @variant.image.url : image_url('fb-no-share-image.png')}

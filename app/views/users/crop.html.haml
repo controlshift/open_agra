@@ -1,0 +1,21 @@
+= javascript_include_tag 'jquery.Jcrop'
+= stylesheet_link_tag 'jquery.Jcrop'
+
+:coffeescript
+  $ ->
+    $('#cropbox').Jcrop
+      onChange: update_crop
+      onSelect: update_crop
+      setSelect: [0, 0, 500, 500]
+      aspectRatio: 1
+  update_crop = (coords) ->
+    ratio = #{@user.original_to_large_ratio}
+    $("#crop_whxy").val((coords.w * ratio) + 'x' + (coords.h * ratio) + '+' + (coords.x * ratio) + '+' + (coords.y * ratio))
+
+%h1.mb10 Profile Picture
+= image_tag @user.image.url(:large), :id => "cropbox"
+= simple_form_for @user, url: account_path do |f|
+  = f.hidden_field :crop_whxy, id: :crop_whxy
+  .mt10 Drag the corners of the transparent box above to crop this photo into your profile picture.
+  .actions.mt20
+    = f.button :submit, "Crop"

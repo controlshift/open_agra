@@ -1,9 +1,14 @@
-.breadcrumbs
-  = link_to 'Efforts', org_efforts_path
-  >
-  = link_to "Manage #{@effort.title}", org_effort_path(@effort)
-  >
-  Edit
+%ul.breadcrumb
+  %li
+    = link_to 'Efforts', org_efforts_path
+    %span.divider
+      >
+  %li
+    = link_to "Manage #{@effort.title}", org_effort_path(@effort)
+    %span.divider
+      >
+  %li.active
+    Edit
 
 = title "Edit #{@effort.title}"
 %br

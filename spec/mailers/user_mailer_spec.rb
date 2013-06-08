@@ -24,6 +24,7 @@ describe UserMailer do
       email.from.should == [@contact_email.from_address]
       email.body.should include(@contact_email.content)
       email.body.should include("Below is a message about your petition")
+      email.body.should include(petition_url(@petition, host: @organisation.host))
       email.subject.should == "Message about your petition: " + @contact_email.subject
     end
   end
@@ -52,17 +53,18 @@ describe UserMailer do
     before :each do
       @organisation = Factory(:organisation)
       @user = Factory(:user, organisation: @organisation)
-      ActionMailer::Base.should_receive(:set_default_host).with(@organisation.host)
     end
     
     it "should send confirmation email" do
       mail = @user.devise_mailer.confirmation_instructions(@user).deliver
       mail.header['From'].to_s.should == "#{@organisation.name} <#{@organisation.contact_email}>"
+      mail.body.should include(@organisation.host)
     end
     
     it "should send reset password email" do
       mail = @user.devise_mailer.reset_password_instructions(@user).deliver
       mail.header['From'].to_s.should == "#{@organisation.name} <#{@organisation.contact_email}>"
+      mail.body.should include(@organisation.host)
     end
   end
 end

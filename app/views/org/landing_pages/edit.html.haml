@@ -1,0 +1,17 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Landing Pages', org_landing_pages_path
+    %span.divider
+      >
+  %li
+    = link_to "Manage #{@effort.title}", org_landing_page_path(@effort)
+    %span.divider
+      >
+  %li.active
+    Edit
+.clear
+
+= title "Edit #{@effort.title}"
+%br
+= render partial: 'form'
+

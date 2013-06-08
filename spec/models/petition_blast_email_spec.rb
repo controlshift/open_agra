@@ -2,15 +2,14 @@
 #
 # Table name: blast_emails
 #
-#  id                :integer         not null
+#  id                :integer         not null, primary key
 #  petition_id       :integer
 #  from_name         :string(255)     not null
 #  from_address      :string(255)     not null
 #  subject           :string(255)     not null
 #  body              :text            not null
-#  delayed_job_id    :integer
-#  created_at        :datetime
-#  updated_at        :datetime
+#  created_at        :datetime        not null
+#  updated_at        :datetime        not null
 #  recipient_count   :integer
 #  moderation_status :string(255)     default("pending")
 #  delivery_status   :string(255)     default("pending")
@@ -19,6 +18,7 @@
 #  type              :string(255)
 #  group_id          :integer
 #  organisation_id   :integer
+#  target_recipients :string(255)
 #
 
 require 'spec_helper'
@@ -74,12 +74,10 @@ describe PetitionBlastEmail do
 
     it "should schedule blast email job" do
       @blast = Factory(:petition_blast_email, petition: petition)
-      
-      job_handle = mock
-      job_handle.should_receive(:id).and_return(12345)
-      Delayed::Job.should_receive(:enqueue).with(kind_of(Jobs::BlastEmailJob)).and_return(job_handle)
+      Factory :signature, petition: petition, unsubscribe_at: nil, join_organisation: true
+      Sidekiq::Worker.clear_all
       @blast.send_to_all
-      @blast.delayed_job_id.should == 12345
+      Sidekiq::Worker.jobs.size.should == 1
     end
 
     context 'threshold of 3 emails per week' do

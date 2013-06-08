@@ -1,0 +1,45 @@
+## Moonshine Sidekiq
+
+### Installation
+
+    # Rails 2
+    script/plugin install git://github.com/railsmachine/moonshine_god.git --force
+    script/plugin install git://github.com/railsmachine/moonshine_sidekiq.git --force
+    # Rails 3
+    script/rails plugin install git://github.com/railsmachine/moonshine_god.git --force
+    script/rails plugin install git://github.com/railsmachine/moonshine_sidekiq.git --force
+
+Configure as necessary in your moonshine.yml (or stage-specific moonshine yml):
+
+    :sidekiq:
+      :workers: 2
+      
+
+Next, add the recipe to the manifests in question:
+
+    # app/manifests/application_manifest.rb
+    recipe :god
+    recipe :sidekiq
+
+Add the `:sidekiq` role to any servers that run DJ:
+
+    # config/deploy/production.rb
+    server 'myapp.com', :web, :sidekiq, :god, :db, :primary => true
+
+### Managing DJ with God
+
+This plugin also provides the following Capistrano tasks:
+
+    cap god:sidekiq:stop
+    cap god:sidekiq:start
+    cap god:sidekiq:restart
+    cap god:sidekiq:status
+
+We recommend having DJ restart on deploy to reload code changes:
+
+    # config/deploy.rb
+    after 'god:restart', 'god:sidekiq:restart'
+
+### Deploying
+
+That's it. Deploy and done!

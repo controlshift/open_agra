@@ -1,9 +1,9 @@
 %p Hi,
 
-%p You've been invited to help administer the petition "#{@invitation.petition.title}" on #{@organisation.name}.
+%p You've been invited to help administer the petition "#{@invitation.petition.title}" on #{@organisation.combined_name}.
 
 %p
-  = link_to 'Accept the Invitation to Get Started', petition_admin_url(@invitation.petition, @invitation, campaign_admin: {invitation_token: @invitation.invitation_token} )
+  = link_to 'Accept the Invitation to Get Started', petition_admin_url(@invitation.petition, @invitation, host: @organisation.host, campaign_admin: {invitation_token: @invitation.invitation_token} )
 
 %p Sincerely,
 

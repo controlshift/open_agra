@@ -1,0 +1,26 @@
+ProxyPreserveHost On
+UseCanonicalName off
+HostNameLookups off
+ProxyTimeout 1800
+Timeout 1800
+ProxyBadHeader Ignore
+<VirtualHost _default_:443>
+SSLProxyEngine On
+SSLEngine on
+RequestHeader set X_FORWARDED_PROTO "https"
+SSLCertificateFile <%= ssl_configuration[:certificate_file] || '/etc/ssl/certs/ssl-cert-snakeoil.pem' %>
+SSLCertificateKeyFile <%= ssl_configuration[:certificate_key_file] || '/etc/ssl/private/ssl-cert-snakeoil.key' %>
+<% if ssl_configuration[:certificate_chain_file] %>
+SSLCertificateChainFile <%= ssl_configuration[:certificate_chain_file] %>
+<% else %>
+<% end %>
+ServerName https-proxy
+  <Location />
+    Allow from all
+    ProxyPass http://localhost:80/
+    SetEnv proxy-nokeepalive 1
+  </Location>
+  ErrorLog /var/log/apache2/error.log
+  LogLevel warn
+  CustomLog /var/log/apache2/access.log combined
+</VirtualHost>

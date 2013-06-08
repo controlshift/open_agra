@@ -1,13 +1,13 @@
 class InvitationMailer < Devise::Mailer
   def send_to_campaign_admin(invitation)
     @organisation = invitation.petition.organisation
-    send_invitation(invitation, "You're invited to be admin of '#{invitation.petition.title}'")
+    send_invitation(invitation, t('mailers.invitation.send_to_campaign_admin.subject', petition_title: invitation.petition.title))
 
   end
 
   def send_to_group_admin(invitation)
     @organisation = invitation.group.organisation
-    send_invitation(invitation, "You're Invited to #{invitation.group.title}")
+    send_invitation(invitation, t('mailers.invitation.send_to_group_admin.subject', group_title: invitation.group.title))
   end
 
   private

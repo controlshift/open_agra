@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+limit = (ARGV.first || 500).to_i
+
+time = Time.now.strftime('%m/%d/%Y - %I:%M%p')
+
+puts "#{time} Checking passenger-status for stale processes"
+
+lines = `passenger-status 2>&1 | grep 'PID:' | grep -v 'grep'`
+
+good_pids = []
+
+lines.each_line do |line|
+  if line =~ /PID: (\d+)/
+    good_pids << $1
+  end
+end
+
+puts "#{time} Checking passenger-memory-stats for processes > #{limit} MB"
+
+lines=`ps ax -o 'pid,rss,cmd' | grep -e '<%= options[:pattern] %>' | grep -v grep`
+
+lines.each_line do |line|
+
+  process = line.strip.split(/\s+/)
+  pid, memory_in_mb, cmd = process[0], (process[1].to_i/1024).to_i, process[2..-1].join(' ')
+
+  time = Time.now.strftime('%m/%d/%Y - %I:%M%p')
+  if (memory_in_mb) > limit
+
+    puts  "#{time} - Passenger #{pid} exceeded the #{limit}MB limit with #{memory_in_mb}MB."
+
+    command = "kill -9 #{pid}"
+    puts "#{command} # for: #{cmd}"
+    system(command)
+  elsif ! good_pids.include?(pid)
+    puts  "#{time} - Passenger #{pid} abandoned by passenger-status"
+
+    command = "kill -9 #{pid}"
+    puts "#{command} # for: #{cmd}"
+    system(command)
+  end
+end

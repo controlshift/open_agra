@@ -1,2 +1,5 @@
-- if Category.active(current_organisation.id).count > 0
-  = f.association :categories, as: :check_boxes, collection: Category.active(current_organisation.id), label: local_assigns.has_key?(:label) ? label : "Categories"
+- if current_organisation.categories.any?
+  = f.association :categories, as: (current_organisation.show_categories_as_dropdown? ? :select : :check_boxes),
+                  :input_html => {:size => 1, :multiple => false},
+                  collection: current_organisation.categories,
+                  label: local_assigns.has_key?(:label) ? label : "Categories"

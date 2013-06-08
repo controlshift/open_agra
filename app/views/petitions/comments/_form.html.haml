@@ -1,0 +1,6 @@
+= simple_form_for @comment, url: create_petition_comment_path(@petition, @signature), wrapper: :compact, remote: true do |f|
+  .controls#comment
+    = f.input :text, label: 'Tell others why you signed', input_html: {class: 'input-xlarge input-ysmall '}
+    .actions
+      = f.button :submit, 'Save', id: "post-button", class: "btn-secondary"
+    = image_tag  "ajax-loader-16.gif", id: "comment-spinner", class: "mt5 padding5", style: "display:none"

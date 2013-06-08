@@ -1,10 +1,16 @@
-.breadcrumbs
-  = link_to 'Manage Content', org_contents_path
-  >
-  = link_to @content.category, org_contents_path(category: @content.category)
-  >
-  Edit
-  = @content.name
+%ul.breadcrumb
+  %li
+    = link_to 'Manage Content', org_contents_path
+    %span.divider
+      >
+  %li
+    = link_to @content.category, org_contents_path(category: @content.category)
+    %span.divider
+      >
+  %li.active
+    Edit
+    = @content.name
+.clear
 
 = title "Edit #{@content.name}"
 

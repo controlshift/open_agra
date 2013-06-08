@@ -19,15 +19,13 @@ class Petitions::SignaturesController < ApplicationController
 
     respond_to do | format|
       if SignaturesService.new.save(@signature)
-        track! :opt_to_join_org if @signature.join_organisation?
-        track! :sign_petition
-        format.any(:html, :mobile) { redirect_to thanks_petition_path(@petition) }
-        format.js   { render :create, layout: false }
+        @comment = Comment.new
+        finished :opt_to_join_org if @signature.join_organisation?
+        finished :sign_petition
+        successful_create_response(format)
       elsif @signature.errors[:email] && @signature.errors[:email].include?('has already signed') && @signature.errors.size == 1
-        format.any(:html, :mobile) { redirect_to thanks_petition_path(@petition) }
-        format.js   { render :create, layout: false }
+        successful_create_response(format)
       else
-        @email = Email.new
         format.any(:html, :mobile) { render 'petitions/view/show', layout: 'application_sidebar' }
         format.js   { render :error, layout: false }
       end
@@ -35,7 +33,7 @@ class Petitions::SignaturesController < ApplicationController
   end
 
   def index
-    streaming_csv( Queries::Exports::PetitionSignaturesExport.new(petition: @petition, organisation: current_organisation) )
+    streaming_csv( Queries::Exports::PetitionSignaturesExport.new(petition_id: @petition.id, organisation: current_organisation) )
   end
 
   def manual_input
@@ -66,8 +64,8 @@ class Petitions::SignaturesController < ApplicationController
       end
     end
     
-    @success_text = @saved_signatures > 0 ? "#{pluralize(@saved_signatures, 'signature')} saved." : ""
-    @error_text = @error_rows.empty? ? "" : "#{pluralize(@error_rows.count, 'signature')} cannot be saved."
+    @success_text = @saved_signatures > 0 ? t('controllers.saved', value: pluralize(@saved_signatures, Signature.model_name.human.downcase)) : ""
+    @error_text = @error_rows.empty? ? "" : t('controllers.not_saved', value: pluralize(@error_rows.count, Signature.model_name.human.downcase))
 
     respond_to do |format|
       format.html do
@@ -91,7 +89,7 @@ class Petitions::SignaturesController < ApplicationController
 
   def destroy
     if @signature.petition == @petition && SignaturesService.new.delete(@signature)
-      flash[:notice] = 'Your signature has been removed from the petition.'
+      flash[:notice] = t('controllers.petitions.signature.success_delete')
       redirect_to petition_path(@petition)
     else
       raise ActiveRecord::RecordNotFound
@@ -106,7 +104,7 @@ class Petitions::SignaturesController < ApplicationController
     @unsubscribe = Unsubscribe.new(:signature => @signature, :petition => @petition, :email => params[:unsubscribe][:email].strip)
 
     if @unsubscribe.unsubscribe
-      flash[:notice] = 'You have successfully unsubscribed from the petition.'
+      flash[:notice] = t('controllers.petitions.signature.success_unsubscribe')
       redirect_to petition_path(@petition)
     else
       render :unsubscribing
@@ -114,6 +112,24 @@ class Petitions::SignaturesController < ApplicationController
   end
 
   private
+
+  def successful_create_response(format)
+    format.any(:html, :mobile) do
+      if @petition.after_signature_redirect_url.blank?
+        redirect_to thanks_petition_path(@petition)
+      else
+        redirect_to @petition.after_signature_redirect_url
+      end
+    end
+
+    format.js do
+      if @petition.after_signature_redirect_url.blank?
+        render :create, layout: false
+      else
+        render :redirect, layout: false
+      end
+    end
+  end
   
   def load_petition
     # TEMPORARY FIX FOR BUG!!! Revert sometime in 2013.

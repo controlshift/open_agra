@@ -1,0 +1,36 @@
+= Moonshine Sysctl
+
+=== A plugin for Moonshine[http://github.com/railsmachine/moonshine]
+
+Tune kernel parameters with Moonshine.
+
+=== Instructions
+
+* <tt>script/plugin install git://github.com/railsmachine/moonshine_sysctl.git</tt>
+* Include the plugin and recipe(s) in your Moonshine manifest
+    plugin :sysctl
+    recipe :sysctl
+* Drop some configuration into the <tt>:sysctl</tt> key on your Moonshine config.
+
+For example, to tune the TCP stack like so:
+
+    net.ipv4.tcp_tw_reuse = 1
+    net.ipv4.ip_local_port_range = 10000 65023
+    net.ipv4.tcp_max_syn_backlog = 10240
+    net.ipv4.tcp_max_tw_buckets = 400000
+    net.ipv4.tcp_max_orphans = 60000
+    net.ipv4.tcp_synack_retries = 3
+    net.ipv4.tcp_syncookies = 1
+    net.core.somaxconn = 10000
+
+You'd add the following to your <tt>config/moonshine.yml</tt>:
+
+  :sysctl:
+    net.ipv4.tcp_tw_reuse: 1
+    net.ipv4.ip_local_port_range: 10000 65023
+    net.ipv4.tcp_max_syn_backlog: 10240
+    net.ipv4.tcp_max_tw_buckets: 400000
+    net.ipv4.tcp_max_orphans: 60000
+    net.ipv4.tcp_synack_retries: 3
+    net.ipv4.tcp_syncookies: 1
+    net.core.somaxconn: 10000

@@ -2,15 +2,14 @@
 #
 # Table name: blast_emails
 #
-#  id                :integer         not null
+#  id                :integer         not null, primary key
 #  petition_id       :integer
 #  from_name         :string(255)     not null
 #  from_address      :string(255)     not null
 #  subject           :string(255)     not null
 #  body              :text            not null
-#  delayed_job_id    :integer
-#  created_at        :datetime
-#  updated_at        :datetime
+#  created_at        :datetime        not null
+#  updated_at        :datetime        not null
 #  recipient_count   :integer
 #  moderation_status :string(255)     default("pending")
 #  delivery_status   :string(255)     default("pending")
@@ -19,6 +18,7 @@
 #  type              :string(255)
 #  group_id          :integer
 #  organisation_id   :integer
+#  target_recipients :string(255)
 #
 
 require 'spec_helper'

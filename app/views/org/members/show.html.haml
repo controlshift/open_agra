@@ -1,7 +1,11 @@
-.breadcrumbs
-  = link_to 'Members', org_members_path
-  >
-  #{@member.email}
+%ul.breadcrumb
+  %li
+    = link_to 'Members', org_members_path
+    %span.divider
+      >
+  %li.active
+    = @member.email
+.clear
 
 .leader-info-box.clearfix.mt30.mb30
   .leader-icon.pull-left.mr20.ml20
@@ -61,11 +65,11 @@
     This user has no campaigns.
 
   %h3
-    Groups
+    Partnerships
   - if @member.user.groups.any?
 
     %ul
       - @member.user.groups.each do |group|
         %li= link_to(group.title, group)
   - else
-    This member is not the administrator of any groups.
+    This member is not the administrator of any partnership.

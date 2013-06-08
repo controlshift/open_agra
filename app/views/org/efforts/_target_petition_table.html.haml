@@ -2,7 +2,7 @@
   = table_for(@petitions) do |t|
     = t.data do
       - t.cell(:name) {|p| p.target.name}
-      - t.cell(:location) {|p| p.location.query}
+      - t.cell(:location) {|p| p.location ? p.target.location.query : p.target.geography.name}
       - t.cell(:petition) {|p| p.title && link_to(p.title, petition_path(p))}
       - t.cell(:leader) {|p| link_to_leaders(@effort, p)}
       - t.cell(:actions)  do |p|

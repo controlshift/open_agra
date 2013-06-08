@@ -9,7 +9,7 @@ class Admin::PetitionsController < Admin::AdminController
       end
 
     rescue Errno::ECONNREFUSED
-      flash.now.alert = "Failed to search. Please contact technical support."
+      flash.now.alert = t('errors.messages.connect_refused')
     end
   end
 

@@ -7,7 +7,7 @@
           %span.icon-bar
           %span.icon-bar
     
-        %a.brand{ href: root_path }= '&nbsp;'.html_safe
+        %a.brand{ href: current_organisation.home_link_override.blank? ? root_path : current_organisation.home_link_override  }= '&nbsp;'.html_safe
   
         .nav-collapse
           %ul.nav.pull-right

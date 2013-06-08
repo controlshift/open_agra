@@ -13,9 +13,9 @@
 %p When I shared the campaign on Facebook, my friends started sharing it too and soon people who I didn't know were supporting it on Twitter. I know it can be a bit scary, but the minute you the minute you start talking to people about your campaign you'll build momentum.
 
 %p
-  #{link_to "Share your campaign on Facebook", "http://www.facebook.com/sharer.php?u=#{CGI::escape(petition_url(@petition, time: @petition.updated_at.to_i))}", target: "_blank"}
+  #{link_to "Share your campaign on Facebook", "http://www.facebook.com/sharer.php?u=#{CGI::escape(petition_url(@petition, time: @petition.updated_at.to_i,  host: @organisation.host))}", target: "_blank"}
 %p
-  #{link_to "Share your campaign on Twitter", "https://twitter.com/share?url=#{petition_url(@petition)}&text=This cause is close to my heart - please sign:"}
+  #{link_to "Share your campaign on Twitter", "https://twitter.com/share?url=#{petition_url(@petition,  host: @organisation.host)}&text=This cause is close to my heart - please sign:"}
 
 %p #{link_to "I don't have either of those, but I'd like to share my campaign", 'https://getup.wufoo.com/forms/z7p9p1/'}
 

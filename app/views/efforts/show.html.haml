@@ -7,7 +7,7 @@
     = title @effort.title
     - if can?(:manage, @effort)
       %i.icon-pencil
-      = link_to "Manage this effort", org_effort_path(@effort), class: "admin-link"
+      = link_to "Manage this effort", @effort.open_ended? ? org_landing_page_path(@effort) : org_effort_path(@effort), class: "admin-link"
 
 .mt20
 .row
@@ -16,7 +16,7 @@
       .effort-image
         =image_tag(@effort.image.url(:hero))
     .span5
-      = simple_format(@effort.description)
+      = simple_format(@effort.description, {}, :sanitize => false)
     .span4
       = link_to 'Start A Campaign', new_effort_petition_path(@effort),  class: 'btn btn-primary btn-create-effort-petition'
   - else
@@ -35,7 +35,7 @@
           .right
             %form.filter.effort-location-search.pull-left{ action: effort_path{@effort}, method: 'GET' }
               #efforts-near-container.effort-search
-                = render :partial => 'efforts/search_container'
+                = render :partial => 'efforts/near/search_container'
           .clear
     %hr
     %ul.thumbnails

@@ -1,6 +1,6 @@
 = Content.content_for('signature_thank_you_email', @organisation, @context).html_safe
 
 %p{:style=>'font-size: 0.8em'}
-  = link_to "Not sure what we're talking about? Remove your signature.", confirm_destroy_petition_signature_url(@petition, @signature)
+  = link_to "Not sure what we're talking about? Remove your signature.", confirm_destroy_petition_signature_url(@petition, @signature, host: @organisation.host)
 %hr
 = Content.content_for('signature_thank_you_email_forward', @organisation, @context).html_safe

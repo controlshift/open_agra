@@ -151,17 +151,16 @@ describe Petitions::ManageController do
     describe "lots of signatures" do
       before(:each) do
         Petition.any_instance.stub(:cached_signatures_size).and_return(1000)
+        Sidekiq::Worker.clear_all
       end
 
       it "should generate petition letter in background and notice user" do
         filename = "#{@petition.slug}_form.pdf"
 
-        job = mock
-        Jobs::GeneratePetitionLetterJob.stub(:new).with(@petition, filename, user) { job }
-        Delayed::Job.should_receive(:enqueue).with(job)
+        Jobs::GeneratePetitionLetterJob.should_receive(:perform_async).with(@petition.id, filename, user.id)
 
         get :download_letter, petition_id: @petition
-
+        Sidekiq::Worker.drain_all
         response.should redirect_to deliver_petition_manage_path(@petition)
         flash[:notice].should == "#{user.email} will receive an email with download instructions as soon as the PDF has been generated."
       end

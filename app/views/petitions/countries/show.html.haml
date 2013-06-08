@@ -1,0 +1,28 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Petitions', categories_path
+    %span.divider
+      >
+
+  %li
+    = link_to 'Near', new_petitions_near_path
+    %span.divider
+      >
+
+  %li.active
+    = @country[:printable_name]
+
+
+= title "#{@country[:printable_name]} Petitions"
+
+.row
+  .span8
+    .inner-shadow
+      = render :partial => 'location_map'
+    .right
+      = link_to embed_petitions_country_path do
+        %i.icon-external-link
+        Embed
+
+- content_for :sidebar do
+  = render partial: "/petitions/shared/near_sidebar"

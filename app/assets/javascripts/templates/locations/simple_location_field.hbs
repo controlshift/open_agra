@@ -3,7 +3,7 @@
     <label class="string required control-label" for="location-query-field">
       Where?
       <abbr title="required">*</abbr>
-      {{#unless query}}
+      {{#unless query_present}}
         <span class='help-inline'>can't be blank</span>
       {{/unless}}
       {{#unless geocoder_success}}
@@ -11,8 +11,7 @@
       {{/unless}}
     </label>
   </div>
-
-  <input id="location-query-field" name="location[query]" placeholder="Search by location" autocomplete="off" value="{{query}}">
+  <input id="location-query-field" name="location[query]" placeholder="Search by location" autocomplete="off" value="{{query}}" type="text">
   <input name="location[latitude]"  type="hidden" value="{{latitude}}" />
   <input name="location[longitude]" type="hidden" value="{{longitude}}" />
   <input name="location[street]"    type="hidden" value="{{street}}" />

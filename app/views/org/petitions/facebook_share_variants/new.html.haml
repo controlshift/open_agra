@@ -1,0 +1,20 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Petitions', org_petitions_path
+    %span.divider
+      >
+  %li
+    = link_to "#{@petition.title} Admin", org_petition_path(@petition)
+    %span.divider
+      >
+  %li
+    = link_to 'Facebook Share Experiment', org_petition_facebook_share_variants_path(@petition)
+    %span.divider
+      >
+  %li.active
+    Add Faecbook Variant
+.clear
+
+= title "Add Facebook Variant"
+
+= render partial: 'form'

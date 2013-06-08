@@ -1,5 +1,5 @@
 - if params[:token]
-  = render partial: "#{session[:header_content]}", locals: {petition: load_petition(session[:petition_id])}
+  = render partial: "#{session[:header_content]}", locals: {petition: load_petition(session[:petition_id])} if session[:header_content]
   - if session[:header_content] == "lead_petition_breadcrumb_steps"
     = render partial: 'lead_petition_registration', locals: {petition: load_petition(session[:petition_id])}
   - else

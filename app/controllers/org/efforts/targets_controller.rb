@@ -6,16 +6,16 @@ class Org::Efforts::TargetsController < Org::OrgController
 
   def new
     inherited_name = params[:target][:name] rescue ''
-    @target = Target.new(name: inherited_name)
+    @target = Target.new(name: inherited_name){|t| t.location = Location.new}
   end
 
   def create
     @target = Target.new(params[:target])
     @target.organisation = current_organisation
-    @target.location = Location.find_by_query(params[:location][:query]) || Location.create(params[:location]) if params[:location]
+    @target.location = (params[:location][:query].present? && Location.find_by_query(params[:location][:query])) || Location.create(params[:location]) if params[:location]
     if @target.save
       create_petition_with_target(@target)
-      redirect_to org_effort_path(params[:effort_id]), notice: "Created successfully!"
+      redirect_to org_effort_path(params[:effort_id]), notice: t('controllers.org.efforts.target.success_create', :value => @target.name)
     else
       render :new
     end
@@ -37,6 +37,18 @@ class Org::Efforts::TargetsController < Org::OrgController
     end
   end
 
+  def add_collection
+    target_collection =  current_organisation.target_collections.find(params[:effort][:target_collection])
+    @effort.target_collection = target_collection
+    @effort.save!
+
+    target_collection.targets.each do |target|
+      create_petition_with_target(target)
+    end
+
+    redirect_to org_effort_path(@effort)
+  end
+
   def index
     result = Target.autocomplete(params[:term], current_organisation)
     render json: result
@@ -50,7 +62,7 @@ class Org::Efforts::TargetsController < Org::OrgController
 
     if update_location(params[:location], target_attributes) && @target.update_attributes(target_attributes)
       update_related_petitions(location: @target.location)
-      redirect_to org_effort_path(params[:effort_id]), notice: "Edited #{@target.name} successfully!"
+      redirect_to org_effort_path(params[:effort_id]), notice: t('controllers.org.efforts.target.success_update', :value => @target.name)
     else
       render 'edit'
     end

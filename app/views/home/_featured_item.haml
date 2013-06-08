@@ -1,0 +1,32 @@
+.featured-petition
+  .row
+    .span1
+      = "&nbsp;".html_safe
+    .span4
+      %a{ href: url_for(featured_item) }
+        .petition-image-wrapper
+          - unless featured_item.image_file_name.blank?
+            .petition-image
+              = image_tag featured_item.image.url(:hero)
+          - else
+            .petition-image
+              = image_tag "image-placeholder-home.png"
+        .petition-progress
+          = render :partial => "petitions/view/petition_progress",
+                   :locals => { petition: featured_item, no_text: true }
+  .row
+    .span1
+      .petition-signatures
+        %span.number= number_with_delimiter(featured_item.cached_signatures_size)
+        %br
+        of
+        %span.strong= number_with_delimiter(featured_item.goal)
+        %br
+        signatures
+    .span4
+      %a{ href: url_for(featured_item) }
+        .petition-title
+          %h3=featured_item.title
+        - if featured_item.respond_to?(:why)
+          .petition-why
+            =featured_item.why

@@ -20,8 +20,8 @@
 #  why_help                        :text
 #  why_label                       :string(255)
 #  why_default                     :text
-#  created_at                      :datetime
-#  updated_at                      :datetime
+#  created_at                      :datetime        not null
+#  updated_at                      :datetime        not null
 #  image_file_name                 :string(255)
 #  image_content_type              :string(255)
 #  image_file_size                 :integer
@@ -48,6 +48,8 @@ class Effort < ActiveRecord::Base
   include Progress
 
   belongs_to :organisation
+  belongs_to :target_collection
+
   has_many :petitions
   has_many :categorized_efforts
   has_many :categories, through: :categorized_efforts
@@ -65,16 +67,16 @@ class Effort < ActiveRecord::Base
   has_paperclip_image styles: {hero: '330x330>', form: '200x122>'}
 
   has_attached_file :image_default, Rails.configuration.paperclip_options.merge(styles: {hero: '330x330>', form: '200x122>'})
-  validates_attachment_content_type(:image_default, content_type: /image\/.+/, message: "must be an image file")
+  validates_attachment_content_type(:image_default, content_type: /image\/.+/, message: I18n.t('errors.messages.image'))
 
   EFFORT_TYPES = %w(open_ended specific_targets)
   validates_inclusion_of :effort_type, in: EFFORT_TYPES
 
   scope :featured, where(featured: true).order("updated_at DESC")
 
-  scope :most_recently_featured, lambda { |organisation_id|
-    featured.where(organisation_id: organisation_id).limit(1)
-  }
+  def self.most_recently_featured(organisation)
+    featured.where(organisation_id: organisation.id).limit(1).first
+  end
 
   searchable do
     text(:categories) do
@@ -122,10 +124,24 @@ class Effort < ActiveRecord::Base
   end
 
   def petition_locations
-    petitions.appropriate.where("petitions.location_id is not null").collect { |petition| petition.location }
+    petitions.appropriate.where("petitions.location_id is not null").includes(:location).collect { |petition| petition.location }
   end
 
-  def order_petitions_by_location(location)
+
+  def order_petitions_by_location_postgis location, radius = nil
+    radius = (radius || distance_limit || 25000) * 1609 # miles to meters
+    if location.present?
+      if self.target_collection.blank?
+        self.petitions.appropriate_unordered.ordered_by_location(location[:longitude].to_f, location[:latitude].to_f, radius)
+      else
+        self.petitions.appropriate.for_location(location[:longitude].to_f, location[:latitude].to_f)
+      end
+    else
+      self.petitions.appropriate
+    end
+  end
+
+  def order_petitions_by_location_solr(location)
     return self.petitions.appropriate unless location
     latitude = location[:latitude].to_f
     longitude = location[:longitude].to_f
@@ -135,6 +151,8 @@ class Effort < ActiveRecord::Base
     query.execute!
     query.petitions
   end
+
+  alias order_petitions_by_location order_petitions_by_location_postgis
 
   def signatures_size
     petitions.inject(0) { |result, petition| result + petition.cached_signatures_size }

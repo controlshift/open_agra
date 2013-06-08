@@ -5,6 +5,7 @@ module Salesforce
     client.sobject_module = Salesforce
     client.materialize("Contact")
     client.materialize("Campaign")
+    client.materialize("CampaignMember")
     client
   end
 end

@@ -16,10 +16,11 @@ class Org::UsersController < Org::OrgController
   end
 
   def update
+    @user.additional_fields = {}
     @user.attributes = params[:user].slice( *@user.accessible_attribute_names )
     @user.org_admin = params[:user][:org_admin]
     if @user.save
-      redirect_to org_members_path, notice: "#{@user.email} saved."
+      redirect_to org_members_path, notice: t('controllers.saved', value: @user.email)
     else
       render 'admin/users/edit'
     end
@@ -30,7 +31,7 @@ class Org::UsersController < Org::OrgController
     if @user
       redirect_to edit_org_user_path(@user)
     else
-      redirect_to org_users_path, alert: "Address Not Found"
+      redirect_to org_users_path, alert: t('errors.messages.address_not_found')
     end
 
   end

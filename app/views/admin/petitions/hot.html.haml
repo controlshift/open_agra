@@ -1,7 +1,7 @@
-= title 'Hot Petitions'
+= title 'Hot Petitions', class: 'left'
 
 = render partial: 'admin/petitions/search_form', locals: { form_action: org_admin? ? search_org_petitions_path : search_admin_petitions_path, search_input_name: "query" }
 
+.clear
+
 = render partial: 'admin/petitions/petition_hot_table'
-
-

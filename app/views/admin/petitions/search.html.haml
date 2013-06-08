@@ -9,7 +9,7 @@
     = t.data do
       - t.cell(:title) { |p| link_to(p.title, petition_path(p), class: petition_class(p)) }
       - t.cell(:signatures, cell_html: { class: "center" }) { |p| p.cached_signatures_size }
-      - t.cell(:flags, cell_html: { class: "center" }) { |p| p.flags.size }
+      - t.cell(:comments, cell_html: { class: "center" }) { |p| p.flags.size }
       - t.cell(:cancelled, cell_html: { class: "center" }) { |p| p.cancelled? ? "&#10003".html_safe : "" }
       - t.cell(:created_by) { |p| link_to_edit_user(p.user) }
       - t.cell(:email) { |p| printable_attribute(p.user, :email)}

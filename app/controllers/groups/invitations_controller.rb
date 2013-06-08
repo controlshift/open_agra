@@ -40,11 +40,11 @@ class Groups::InvitationsController < ApplicationController
 
   def invalid_params
     message = if params[:group_member].present? && (@invitation.invitation_token != params[:group_member][:invitation_token])
-      'Incorrect or corrupted token for group invitation.'
+      t('controllers.groups.invitation.incorrect_token')
     elsif @invitation.invitation_email.strip.downcase != current_user.email.strip.downcase
-      "Invitation was for #{@invitation.invitation_email} but #{current_user.email} is currently signed in. Please login with the correct account for this invite."
+      t('controllers.groups.invitation.incorrect_email', {:correct_mail => @invitation.invitation_email, :incorrect_mail => current_user.email})
     else
-      'The invitation link you received is not correct.'
+      t('controllers.groups.invitation.incorrect_link')
     end
 
     redirect_to root_path, alert: message

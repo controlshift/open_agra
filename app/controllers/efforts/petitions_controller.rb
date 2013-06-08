@@ -8,6 +8,7 @@ class Efforts::PetitionsController < ApplicationController
   def new
     @petition = Petition.new
     @petition.effort = @effort
+    @petition.categories = @effort.categories
 
     if @effort.ask_for_location?
       @petition.location = Location.new
@@ -33,7 +34,6 @@ class Efforts::PetitionsController < ApplicationController
 
   def train
     @petition.achieve_training_progress!
-    @petition.save
     redirect_to next_step_for_training_page(with_prompt_edit: @effort.prompt_edit_individual_petition, petition: @petition)
   end
 
@@ -72,7 +72,7 @@ class Efforts::PetitionsController < ApplicationController
     if can?(action, subject, extra_args)
       return true
     else
-      redirect_to petition_path(subject), :alert => 'Sorry, this petition already has a leader. You can support this campaign by signing it.'
+      redirect_to petition_path(subject), :alert => t('controllers.efforts.petition.leader_exists')
       return false
     end
   end

@@ -1,8 +1,11 @@
-.breadcrumbs
-  = link_to 'Manage Category', org_categories_path
-  >
-  New Category
-  
+%ul.breadcrumb
+  %li
+    = link_to 'Manage Categories', org_categories_path
+    %span.divider
+      >
+  %li.active
+    New Category
+
 = title "New Category"
 %br
 = render partial: 'form'

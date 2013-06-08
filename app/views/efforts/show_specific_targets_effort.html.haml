@@ -25,13 +25,14 @@
       Your Location
     %form.filter.effort-location-search.pull-left{ action: effort_path{@effort}, method: 'GET' }
       #efforts-near-container.local-campaign-search
-        = render :partial => 'efforts/search_container'
+        = render :partial => 'efforts/near/search_container'
 
 .featured-petitions
   - if @petitions
     .separator.mt30
     .title.mt20.mb20.petition-count
-      campaigns (#{@petitions.size})
+      campaigns (#{@petitions.total_entries})
+    = will_paginate @petitions
     %ul.thumbnails
       = render partial: "/efforts/featured_petition", collection: @petitions
 

@@ -2,15 +2,14 @@
 #
 # Table name: blast_emails
 #
-#  id                :integer         not null
+#  id                :integer         not null, primary key
 #  petition_id       :integer
 #  from_name         :string(255)     not null
 #  from_address      :string(255)     not null
 #  subject           :string(255)     not null
 #  body              :text            not null
-#  delayed_job_id    :integer
-#  created_at        :datetime
-#  updated_at        :datetime
+#  created_at        :datetime        not null
+#  updated_at        :datetime        not null
 #  recipient_count   :integer
 #  moderation_status :string(255)     default("pending")
 #  delivery_status   :string(255)     default("pending")
@@ -19,6 +18,7 @@
 #  type              :string(255)
 #  group_id          :integer
 #  organisation_id   :integer
+#  target_recipients :string(255)
 #
 
 class GroupBlastEmail < BlastEmail
@@ -61,7 +61,7 @@ class GroupBlastEmail < BlastEmail
 
   def max_three_emails_per_week
     if GroupBlastEmail.where(group_id: group_id).where("created_at >= ? AND  moderation_status != ?", 7.days.ago, 'inappropriate').count >= 3
-      errors.add(:group_id, "can have a maximum of three emails in a week.")
+      errors.add(:group_id, I18n.t('errors.messages.max_three_emails_per_week'))
     end
   end
 end

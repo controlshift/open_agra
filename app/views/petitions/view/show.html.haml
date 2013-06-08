@@ -1,3 +1,4 @@
+= javascript_include_tag 'petition/show'
 - if @petition.effort.present?
   = render partial: "petitions/view/petition_upper_link", locals: {obj: @petition.effort, obj_class: "effort-link", path: effort_url(@petition.effort)}
 - elsif @petition.group.present?
@@ -6,18 +7,18 @@
 
 / facebook meta tags
 - content_for :head do
-  %meta{property: "og:title", content: "#{@petition.title}"}
-  %meta{property: "og:url", content: "#{petition_url(@petition)}"}
-  %meta{property: "og:description", content: "#{@petition.title}. #{@petition.why}"}
-  %meta{property: "og:image", content:"#{petition_image_for_share(@petition)}"}
-  :css
-    body { overflow-x: hidden; }
-  .cached-url.hidden
-    = "http://#{request.host_with_port}/cached_url/"
-  :coffeescript
-    $ ->
-      $('.petition-text a').embedly({maxWidth: 460, url: $.trim($('.cached-url').text())})
+  - cache ["fb_header_snippet", @petition, @petition.facebook_share] do
+    %meta{property: "og:title", content: "#{@petition.facebook_share.title}"}
+    %meta{property: "og:url", content: "#{petition_url(@petition)}"}
+    %meta{property: "og:description", content: "#{@petition.facebook_share.description}"}
+    %meta{property: "og:image", content:"#{petition_image_for_share(@petition.facebook_share)}"}
+    :css
+      body { overflow-x: hidden; }
 
+  - cache ["fb_js_snippet", current_organisation] do
+    :coffeescript
+      $ ->
+        window.Cs.appId = '#{current_organisation.settings[:fb_app_id]}'
 
 - content_for :specific_alerts do
   = render partial: "petitions/view/alert_if_petition_cancelled"
@@ -32,53 +33,64 @@
       = link_to petition_manage_path(@petition), id: "manage-petition-button", class: "btn btn-manage" do
         %i.icon-cog
         Manage
-        
+      - if can?(:manage, current_organisation)
+        = link_to org_petition_path(@petition), id: "manage-petition-button", class: "btn btn-manage" do
+          %i.icon-wrench
+          Admin
+
 .petition-box
   .row
-    .span6
-      %h1.title= @petition.title
-  
-  %h2.who To: #{@petition.who}
+    - if can?(:manage, @petition)
+      .petition-title-span
+        %h1.title= @petition.title
+    - else
+      .span9
+        %h1.title= @petition.title
+
+  %h2.who
+    %span{id:'petition-who-to'}
+      To:
+    #{@petition.who}
   .row
     .span3.mb20
-      - cache("v2_petition_show_part_one_#{@petition.cache_key}") do
+      - cache(["image", @petition]) do
         - unless @petition.image_file_name.blank?
           .mb10= image_content(entity: @petition)
 
-      - cache("v1_petition_show_#{current_organisation.id}_progress_bar_#{@petition.cache_key}", expires_in: 30.seconds) do
-        = render "petitions/view/show_progress_bar_or_not"
+      = render "petitions/view/show_progress_bar_or_not"
 
-      - if @petition.location.present?
-        .petition-map
-          .map
-            = google_static_map(location: @petition.location, size: "220x200")
+      - cache(["part_two", @petition, @petition.user]) do
+        - if @petition.location.present?
+          .petition-map
+            .map
+              = google_static_map(location: @petition.location, size: "220x200")
+        - if @petition.user.present?
+          .profile
+            Campaign created by
+            %span.name #{@petition.user.full_name}
+            - if @petition.campaigner_contactable
+              %a{ href: "#",  id: "view-contact-user-form", 'data-url' => new_petition_contact_path(@petition)}
+                = image_tag "icon-email.png"
 
-      - if @petition.user.present?
-        .profile
-          Campaign created by
-          %span.name #{@petition.user.full_name}
-          - if @petition.campaigner_contactable && cannot?(:manage, @petition.organisation)
-            - content_for :end_of_body do
-              / render div at the end of body for fixing IE7 z-index problem
-              = render partial: "shared/contact_user_form", locals: { user: @petition.user, url: petition_contacts_path(@petition) }
-            %a{ href: "#contact_user_form", id: "view_contact_user_form", "data-toggle" => "modal", "data-backdrop" => 'true', "data-keyboard" => "true" }
-              = image_tag "icon-email.png"
-
-          - if can?(:manage, @petition.organisation)
-            %br
-            %b.icon-envelope
-            = @petition.user.email
-            %br
-            %b.icon-phone
-            = @petition.user.phone_number
-
-    - cache("v2_petition_show_main_content_#{@petition.cache_key}") do
+        %hr
+        - if @petition.external_facebook_page.present? || @petition.external_site.present?
+          - if @petition.external_facebook_page.present?
+            .external-facebook-page
+              = link_to 'Campaign Facebook Page', @petition.external_facebook_page
+          - if @petition.external_site.present?
+            .external-site
+              = link_to 'Campaign Website', @petition.external_site
+          %hr
+      .share
+        .social_share.left-side
+          = render partial: '/petitions/view/social_share'
+    - cache(@petition) do
       .span6
         .petition-text
           %pre.what= auto_link(h(@petition.what), :html => { :target => '_blank' })
           %h3.subtitle Why is this important?
           %pre.why= auto_link(h(@petition.why), :html => { :target => '_blank' })
-          - if @petition.delivery_details && !@petition.delivery_details.blank?
+          - if @petition.delivery_details.present?
             %h3.subtitle How it will be delivered
             %pre.delivery= auto_link(h(@petition.delivery_details), :html => { :target => '_blank' })
           - if @petition.categories.count > 0
@@ -89,44 +101,51 @@
         .clear
   = link_to "#", id: "flag-petition", href: "#flag-modal", rel: 'popover', data: { toggle: 'modal' }, class: "btn-flag" do
     Flag this petition for review
-  - cache("v2_petition_show_#{current_organisation.id}_signatures_#{@petition.cache_key}", expires_in: 30.seconds) do
-    = render partial: "petitions/view/show_signatures_or_not"
-
+  - cache("comments_#{@petition.cache_key}_#{@petition.comments_cache_key}") do
+    .comments-container
+      = render partial: "petitions/comments/index"
+  = render partial: "petitions/view/custom_petition_footer"
 - content_for :sidebar do
   .sidebar
-    .container
-      %div{ style: "height: 45px" }
-      .sidebar-box.sign
-        .sign-the-petition
-          .titlebar
-            %h2 Sign
-          .sign-the-petition-form
-            - if @signature.errors.any? || user_signed_in?
-              = render partial: "petitions/view/sign"
-            - else
-              = render partial: "petitions/view/sign"
+    #content
+      .container#sign_petition
+        %div#height-fixer
+        - if @previous_signature.blank?
+          .sidebar-box.sign
+            .sign-the-petition
+              .titlebar
+                %h2 Sign
+              .sign-the-petition-form
+                - if @signature.errors.any? || user_signed_in?
+                  = render partial: "petitions/view/sign"
+                - else
+                  - cache(sign_partial_cache_key(current_organisation, @petition, params[:source], params[:akid]), expires_in: 30.minutes) do
+                    = render partial: "petitions/view/sign"
 
-      .sidebar-box.share
-        - if current_organisation.show_share_buttons_on_petition_page?
-          .social_share
-            .titlebar
-              %h2 Share
-            = render partial: '/petitions/view/social_share'
-
+        .sidebar-box.share
+          - if @previous_signature.present?
+            = render partial: "petitions/signatures/create"
+        .sidebar-box.comment
+          - if @previous_signature.present? && @previous_signature.id.present?
+            - @signature = @previous_signature
+            = render partial: "petitions/signatures/update"
+      %hr.sign
+        - cache("v1_petition_show_#{current_organisation.id}_signatures_#{@petition.cache_key}", expires_in: 1.minute) do
+          = render partial: "petitions/view/show_signatures_or_not"
 
 
 - content_for :end_of_body do
-  .modal.hide.fade.petition-selector-modal#flag-modal{'data-flag-url' => petition_flags_path(@petition) }
+  = render :partial => 'petitions/view/employer_modal'
+
+  = render :partial => 'petitions/view/flag_modal'
+
+  / render div at the end of body for fixing IE7 z-index problem
+  = render partial: "petitions/view/email_template"
+
+  %div{id: 'contact-user-modal', class:"modal hide fade", tabindex:"-1"}
+
+  .modal.hide.fade#flag-comment-modal
     .modal-header
       %button.close{ "data-dismiss" => "modal" } x
-      %h3 Flag this Petition for Review
-    .modal-body.petition-form
-      %b Reason
-      %p Please tell us why this campaign is inappropriate.
-      .mt10
-        .inline-block
-          .control-group
-            .controls
-              %textarea.input-xlarge#flag-reason{"rows" => 5}
-    .modal-footer
-      %a.btn.btn-primary.disabled#btn-flag{ href: '#'} Flag Petition
+      %h3 Flag this Comment for Review
+    .modal-body

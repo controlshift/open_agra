@@ -13,18 +13,16 @@ describe "Org admin administers targets", :type => :request, :js => true do
     log_in(@org_admin.email, "onlyusknowit")
   end
 
-  it 'generate new petition when you create a new target' do
+  def new_target
     visit org_effort_path(@effort.slug)
     click_on "Add Target"
     fill_in "Name", with: target_name
     click_on "Add Target"
 
     page.should have_css("#target_name[value='#{target_name}']")
+  end
 
-    fill_in "Phone Number", with: "12345678912"
-    fill_in "Email", with: "abc@123.com"
-    fill_in "location-query-field", with: "Sydney"
-    click_on "Save"
+  def created_target
     page.should have_content("Created successfully!")
     page.should have_css("#petitions :contains('#{target_name}')")
 
@@ -34,6 +32,17 @@ describe "Org admin administers targets", :type => :request, :js => true do
     page.should have_css(".who:contains('#{target_name}')")
     page.should have_css(".why:contains('#{why_field_content_of_effort}')")
     page.should have_css(".what:contains('#{what_field_content_of_effort}')")
+  end
+  
+  it 'generate new petition when you create a new target' do
+    new_target
+
+    fill_in "Phone Number", with: "12345678912"
+    fill_in "Email", with: "abc@123.com"
+    fill_in "location-query-field", with: "Sydney"
+    click_on "Save"
+    
+    created_target
   end
 
 

@@ -66,6 +66,11 @@ form.petition {
         padding-bottom: 8px;
       }
 
+      ul.email-tips {
+        margin-top: 15px;
+        color:  #7d7d7d;
+      }
+
 
       li > a {
         color: black;
@@ -155,6 +160,9 @@ form.petition {
     }
 
   .sidebar {
+    #content {
+      top: 30px;
+    }
     background: {
       color: #f5f5f5;
       image: image-url("bg-header-shadow.png"), image-url("bg-footer-shadow.png");
@@ -187,23 +195,23 @@ form.petition {
       margin-bottom: 15px;
     }
 
-  	.titlebar {
-  	  position: relative;
+    .titlebar {
+      position: relative;
 
-  		.number {
-  		  position: absolute;
-  		  top: 5px;
-  		  left: -40px;
-  		  width:20px;
-  		  height:40px;
-  		  color: $title-color;
-        font: $title-font;
-  		  font-size: 14pt;
-  		  line-height: 40px;
-  		  background-image: image-url("bg-step-number.png");
-  		  vertical-align: middle;
-  		}
-  	}
+        .number {
+          position: absolute;
+          top: 5px;
+          left: -40px;
+          width:20px;
+          height:40px;
+          color: $title-color;
+          font: $title-font;
+          font-size: 14pt;
+          line-height: 40px;
+          background-image: image-url("bg-step-number.png");
+          vertical-align: middle;
+        }
+    }
   }
 
   .petition-progress {
@@ -232,14 +240,32 @@ form.petition {
   }
 
 }
-
+.petition-title-span {
+  width: 520px;
+}
 // =============================================
 //	Petition Public Page
 // =============================================
 
-.body-view-show, .body-signatures-create {
+.body-view-show, .body-signatures-create, .body-comments-show {
   #contact_user_form .ajax-loader { margin:0px 10px 0px 0px; }
   #contact_user_form .error { color: red; font-size:$text-font-size }
+
+  .external-site {
+    background-repeat: no-repeat;
+    padding-left: 40px;
+    padding-top: 5px;
+    height:  30px;
+    background-image: image-url("external-site.png");
+  }
+
+  .external-facebook-page {
+    background-repeat: no-repeat;
+    padding-left: 40px;
+    padding-top: 5px;
+    height:  30px;
+    background-image: image-url("facebook-group-icon.png");
+  }
 
   .spread-word{
     color: #252525;
@@ -257,16 +283,10 @@ form.petition {
     width: 100%; // required for multi column list on IE7
 
     li {
-      float: left; // required for multi column list
       font-size: 10pt;
       border: 0px;
-      line-height: 15px;
-      width: 190px;
-      height: 46px;
       color: $text-color;
       font-family: $description-font-family;
-      margin-bottom: 20px;
-      margin-right: 10px;
 
       .name {
         word-wrap: break-word;
@@ -282,8 +302,164 @@ form.petition {
       }
     }
 
+    margin: 10px 0 0 0;
+    list-style: none;
+  }
+  .last_signed {
+    font-size: 11pt;
+  }
+
+  .comments {
+    a.more {
+      color: $accent-color;
+      text-decoration: underline;
+    }
+  }
+  .comments-box {
+    li.hovered {
+      background-color: #f7f7f7;
+      .actions {
+        i.icon-heart {
+          color: #AD7979;
+        }
+        i.icon-flag {
+          color: #C7B68D;
+        }
+        a.details {
+          color: #959595;
+          background: image-url('permalink-dark.png') no-repeat right;
+        }
+      }
+    }
+    li {
+      @include border-radius(3px);
+
+      background-color: #FFFFFF;
+      font-size: 0.95em;
+      border: 1px solid #DDD;
+      color: #636363;
+      padding: 15px 20px;
+      font-family: $description-font-family;
+      margin-bottom: 20px;
+      margin-right: 10px;
+
+      .actions {
+        font-size:  1.2em;
+        a {
+          text-decoration: none;
+        }
+        i {
+          color: #C7C7C7;
+        }
+        i.icon-heart:hover, i.selected {
+          color: #CC3B3B !important;
+        }
+        i.icon-flag:hover {
+          color: #FFCA48;
+        }
+
+        a.details {
+          padding: 3px 20px 0 15px;
+          font-weight: normal;
+          color: #C7C7C7;
+          font-style: italic;
+          font-size: 0.8em;
+          background: image-url('permalink-light.png') no-repeat right;
+        }
+        a.details:hover {
+          color: #6b6b6b;
+          background: image-url('permalink-darkest.png') no-repeat right;
+        }
+      }
+
+      .comment-header {
+        margin-bottom: 15px;
+        span {
+          display: inline-block;
+          vertical-align: middle;
+        }
+        .name {
+          word-wrap: break-word;
+          font-size: 12pt;
+          color: $text-color;
+
+        }
+        .label {
+          margin-left: 30px;
+          padding: 1px 5px 1px 4px;
+        }
+      }
+      
+      .comment {
+        font-weight: normal;
+        line-height: 1.2em;
+        background: image-url('quote-icon-small.png') no-repeat;
+        padding: 4px 0 15px 19px;
+      }
+      
+      abbr {
+        color: #FFFFFF;
+        font-family: $text-font-family;
+        font-style: italic;
+        text-shadow: none;
+        text-transform: none;
+        font-size: 10px;
+      }
+    }
+
     margin: 20px 0 0 0;
     list-style: none;
+  }
+
+  .timeline-container {
+    .input, .post {
+      margin:20px 0 0 145px;
+    }
+    .post {
+      border-left: 2px solid #252525;
+      margin: 0 0 0 130px;
+      padding: 15px;
+      img {
+        border: 0 none transparent;
+        position: absolute;
+      }
+      img.user {
+        height: 12px;
+        left: 120px;
+        width: 20px;
+      }
+      img.system {
+        height: 8px;
+        left: 125px;
+        width: 11px;
+      }
+      .right .links a{
+        padding: 10px;
+      }
+      .actions {
+        margin-right: 76px;
+      }
+      abbr {
+        color: $subtle-color;
+        font-size:0.8em;
+        font-style: italic;
+        font-weight: normal;
+        font-family: $subtitle-font-family;
+        text-transform: none;
+        position: absolute;
+        right: 590px;
+      }
+    }
+
+    h4 {
+      font-size: 11pt;
+    }
+    .edit-form {
+      display: none;
+      .actions {
+        margin-right: 76px;
+      }
+    }
   }
 
   .sign-the-petition {
@@ -295,120 +471,160 @@ form.petition {
       a { color: #252525; }
     }
     form {
-  	  label.string, label.tel, label.email {
-  	    color: #252525;
-  	    font-size: 8pt;
-  	    font-weight: bold;
-  	    font-family: $description-font-family;
-  	  }
-  	  label.subtle {
-  	    font-size: 9pt;
-  	    font-weight: normal;
-  	  }
-  	  .label-wrapper { height: 20px; }
-  		input.string {
-  		  @include border-radius(0);
-  		  width: 180px;
-  		  margin: 0;
-  		}
-  		input.signature-narrow {
-  	    width: 160px;
-  	  }
-  	  .checkbox {
-  	    width: 140px;
-  	    margin-top: 10px;
-  	  }
-  	  .control-group.error input, .control-group.error select, .control-group.error textarea {
-  	    border-color: $accent-color;
-  	  }
-  	}
+      label.string, label.tel, label.email {
+        color: #252525;
+        font-size: 8pt;
+        font-weight: bold;
+        font-family: $description-font-family;
+      }
+      label.subtle {
+        font-size: 9pt;
+        font-weight: normal;
+      }
+      .label-wrapper { height: 20px; }
+        input.string {
+          @include border-radius(0);
+          width: 180px;
+          margin: 0;
+        }
+        input.signature-narrow {
+        width: 160px;
+      }
+      .checkbox {
+        width: 140px;
+        margin-top: 10px;
+      }
+      .control-group.error input, .control-group.error select, .control-group.error textarea {
+        border-color: $accent-color;
+      }
+    }
 
-  	.input-why {
-  	  margin-top: -30px;
-  	}
+    .input-why {
+      margin-top: -30px;
+    }
 
-  	.checkbox-why {
-  	  margin-top: -20px;
-  	}
+    .checkbox-why {
+      margin-top: -20px;
+    }
 
-  	.input-why, .checkbox-why {
-  	  float: left;
-  	  margin-left: 180px;
+    .input-why, .checkbox-why {
+      float: left;
+      margin-left: 180px;
     }
 
     .input-why, .checkbox-why, .help-block {
 
-  	  a {
+      a {
         color: #252525;
         font-size: 8pt;
         font-style: italic;
         font-family: $subtitle-font-family;
       }
-  	}
+    }
 
-  	.btn-primary { float: left; width: 190px }
+    .btn-primary { float: left; width: 190px }
 
-  	.return-to-petition { display: none; }
+    .return-to-petition { display: none; }
 
     .signature-disclaimer {
       font-style: italic;
-      font-weight: 0.8em;
     }
   }
+
+  #comment {
+    .help-inline {
+      color: $accent-color !important;
+    }
+    .control-group.error input:focus,
+    .control-group.error select:focus,
+    .control-group.error textarea:focus {
+      border-color: $accent-color !important;
+    }  
+    .control-group.error input, 
+    .control-group.error select, 
+    .control-group.error textarea  {
+      border-color: $accent-color !important;
+    }       
+  }
+
 
   .social_share {
     line-height: 0;
 
-  	a.share {
-  	  background-color: #e4e4e4;
-  	  background-image: none;
-  	  @include border-radius(4px);
-  	  height: 40px;
-  	  line-height: 18px;
+    a.share {
+      background-color: #e4e4e4;
+      background-image: none;
+      @include border-radius(4px);
+      height: 40px;
+      line-height: 18px;
 
-  	  &:hover {
-  	    background-color: #e4e4e4;
-    	  background-image: none;
-    	  text-decoration: none;
-  	  }
-  	  .text {
-  	    display: inline-block;
-  	    font-family: $serif-font-family;
-  	    text-transform: uppercase;
-    	  color: #252525;
-    	  float: left;
-    	  margin: 10px 0 0 10px;
-  	  }
-  	  i {
-  	    display: inline-block;
-  	    float: right;
-  	    color: $accent-color;
-  	  }
-  	}
-  	a.share.facebook {
-  	  width: 190px;
-  	  margin-bottom: 5px;
-	    i {
-	      font-size: 30px;
-	      line-height: 1em;
-  	    margin: 5px 10px 0 0;
-	    }
-  	}
-  	a.share.twitter {
-  	  width: 95px;
-	    i {
-	      font-size: 16px;
-  	    margin: 10px 10px 0 0;
-	    }
-  	}
-  	a.share.email {
-  	  width: 90px;
-	    i {
-	      font-size: 16px;
-  	    margin: 10px 10px 0 0;
-	    }
-  	}
-  	.petition_url { display: none; }
+      &:hover {
+        background-color: #e4e4e4;
+          background-image: none;
+          text-decoration: none;
+      }
+      .text {
+        display: inline-block;
+        font-family: $serif-font-family;
+        text-transform: uppercase;
+          color: #252525;
+          float: left;
+          margin: 10px 0 0 10px;
+      }
+      i {
+        display: inline-block;
+        float: right;
+        color: $accent-color;
+      }
+    }
+    a.share.facebook {
+      width: 190px;
+      margin-bottom: 5px;
+        i {
+          font-size: 30px;
+          line-height: 1em;
+        margin: 5px 10px 0 0;
+        }
+    }
+    a.share.twitter {
+      width: 95px;
+        i {
+          font-size: 16px;
+        margin: 10px 10px 0 0;
+        }
+    }
+    a.share.email {
+      width: 90px;
+        i {
+          font-size: 16px;
+        margin: 10px 10px 0 0;
+        }
+    }
+    .petition_url { display: none; }
+  }
+
+  .left-side {
+    a.share.facebook {
+      width: 220px;
+      font-size: 12pt;
+      i {
+        padding-top: 1px;
+      }
+    }
+    a.share.twitter {
+      width: 114px;
+      font-size: 12pt;
+      i {
+        padding-top: 1px;
+      }
+    }
+    a.share.email {
+      width: 102px;
+      font-size: 12pt;
+      i {
+        padding-top: 1px;
+      }
+    }
   }
 }
 
@@ -960,27 +1176,27 @@ ul#selected-categories {
 // =============================================
 .body-petitions-index {
   ul.petition_list {
-  	list-style-type: none;
-  	padding: 0px;
-  	margin: 20px 0;
+    list-style-type: none;
+    padding: 0px;
+    margin: 20px 0;
 
-  	li {
-  	  position: relative;
-    	padding: 10px 20px 10px 0;
-    	margin-bottom: 20px;
+    li {
+      position: relative;
+        padding: 10px 20px 10px 0;
+        margin-bottom: 20px;
       cursor: pointer;
       border-bottom: $separator-line;
 
-    	h2 {
-    	  display: inline;
-    	  font-size: 14pt;
-    	  font-family: $description-font-family;
+        h2 {
+          display: inline;
+          font-size: 14pt;
+          font-family: $description-font-family;
 
-    	  a { color: $title-color; }
+          a { color: $title-color; }
         a.list-item-not-launched { color: #999 }
         a.list-item-cancelled { color: #A30013 }
-    	}
-  	}
+        }
+    }
   }
 
   .list-item-title {
@@ -1030,7 +1246,7 @@ ul#selected-categories {
   }
 }
 
-.body-view-show, .body-petitions-launching, .body-signatures-create {
+.body-view-show, .body-petitions-launching, .body-signatures-create, .body-comments-show {
   .petition-box {
     .upload-field div.input { margin: 10px; }
     input, select { margin: 0; }
@@ -1180,4 +1396,54 @@ ul#selected-categories {
     display: none;
   }
 
+}
+// =============================================
+//  Comments show page
+// =============================================
+.body-comments-show {
+  .link-container {
+    margin-bottom: 25px;
+  }
+  .detailed {
+    li {
+      padding: 20px 25px;
+      .actions {
+        i.icon-heart {
+          color: #AD7979;
+        }
+      }
+      .comment-header {
+        .name {
+          font-size: 14pt;
+        }
+        .label {
+          padding: 3px 6px 3px 5px;
+        }
+      }
+      .comment {
+        line-height: 23px;
+        background: image-url('quote-icon-big.png') no-repeat;
+        font-size: 12pt;
+        padding-left: 28px;
+      }
+      abbr {
+        font-size: 12px;
+      }
+    }
+    margin: 10px 0 0 0;
+  }
+  .back-label {
+    background-color: black;
+    width: 125px;
+    padding: 5px 4px 4px 10px;
+    font-size: 9pt;
+    font-weight: normal;
+    a {
+      i {
+        padding-right: 4px;
+        vertical-align: middle;
+      }
+      text-decoration: none; 
+    }     
+  }
 }

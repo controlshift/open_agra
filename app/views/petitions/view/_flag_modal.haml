@@ -1,0 +1,14 @@
+.modal.hide.fade.petition-selector-modal#flag-modal{'data-flag-url' => petition_flags_path(@petition) }
+  .modal-header
+    %button.close{ "data-dismiss" => "modal" } x
+    %h3 Flag this Petition for Review
+  .modal-body.petition-form
+    %b Reason
+    %p Please tell us why this campaign is inappropriate.
+    .mt10
+      .inline-block
+        .control-group
+          .controls
+            %textarea.input-xlarge#flag-reason{"rows" => 5}
+  .modal-footer
+    %a.btn.btn-primary.disabled#btn-flag{ href: '#'} Flag Petition

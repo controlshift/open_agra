@@ -1,7 +1,11 @@
-.breadcrumbs
-  = link_to 'Manage Stories', org_contents_stories_path, {:class => 'use-pjax'}
-  >
-  = @story.title
+%ul.breadcrumb
+  %li
+    = link_to 'Manage Stories', org_contents_stories_path, {:class => 'use-pjax'}
+    %span.divider
+      >
+  %li.active
+    = @story.title
+.clear
 
 .word-wrap
   = title "\"#{@story.title}\" Story #{@story.featured? ? '(Featured)' : ''}"

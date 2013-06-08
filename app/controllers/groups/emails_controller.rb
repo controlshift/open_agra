@@ -15,9 +15,9 @@ class Groups::EmailsController < ApplicationController
 
     if BlastEmailsService.new.save(@email)
       if @email.in_delivery?
-        notice = 'Your email has been sent to your supporters.'
+        notice = t('controllers.email.success')
       else
-        notice = 'Your email has been sent to an administrator for approval.'
+        notice = t('controllers.email.approval_required')
       end
 
       redirect_to group_manage_path(@group), notice: notice
@@ -35,7 +35,7 @@ class Groups::EmailsController < ApplicationController
       if @email.valid?
         begin
           send_test_email_to_myself
-          format.json { render json: {message: 'The test email has been sent.'}, status: :ok }
+          format.json { render json: {message: t('controllers.email.test_success')}, status: :ok }
         rescue Exception => e
           format.json { render json: {message: e.message}, status: :not_acceptable }
         end

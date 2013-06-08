@@ -1,0 +1,5 @@
+= link_to(edit_org_petition_facebook_share_variant_path(@petition, s), { title:"Edit Share Variant"}) do
+  %i.icon-edit.ml10
+
+= link_to(org_petition_facebook_share_variant_path(@petition, s), { title:"Edit Share Variant", method: :delete, confirm: 'Are you sure?'}) do
+  %i.icon-trash.ml10

@@ -2,10 +2,21 @@ require 'spec_helper'
 
 describe Org::PetitionsController do
   include_context "setup_default_organisation"
-  
+
   before(:each) do
     @user = FactoryGirl.create(:org_admin, organisation: @organisation)
     sign_in @user
+  end
+
+  describe "#show" do
+    before(:each) do
+      @petition = FactoryGirl.create(:petition, organisation: @organisation)
+    end
+    it "should render" do
+      get :show, id: @petition
+      assigns(:admins).should == []
+      should render_template :show
+    end
   end
 
   describe "#index" do
@@ -175,4 +186,5 @@ describe Org::PetitionsController do
       end
     end
   end
+
 end

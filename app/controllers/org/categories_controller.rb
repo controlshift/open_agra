@@ -14,7 +14,7 @@ class Org::CategoriesController < Org::OrgController
     @category = Category.new(params[:category])
     @category.organisation = current_organisation
     if CategoriesService.new.save(@category)
-      redirect_to org_categories_path, notice: "Category #{@category.name} has been created."
+      redirect_to org_categories_path, notice: t('controllers.org.category.success_create', name: @category.name)
     else
       render :new
     end
@@ -25,7 +25,7 @@ class Org::CategoriesController < Org::OrgController
 
   def update
     if CategoriesService.new.update_attributes(@category, params[:category])
-      redirect_to org_categories_path, notice: "Category #{@category.name} has been updated."
+      redirect_to org_categories_path, notice: t('controllers.org.category.success_update', name: @category.name)
     else
       render :edit
     end
@@ -33,7 +33,7 @@ class Org::CategoriesController < Org::OrgController
   
   def destroy
     @category.destroy
-    redirect_to org_categories_path, notice: 'Category has been deleted.'
+    redirect_to org_categories_path, notice: t('controllers.org.category.success_delete')
   end
   
   private

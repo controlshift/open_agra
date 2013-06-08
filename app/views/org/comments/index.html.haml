@@ -1,0 +1,8 @@
+= title  "Flagged Petition Comments"
+
+- if @comments.any?
+	.flagged
+		= render :partial => 'org/petitions/comments/comments_table', locals: {show_petition: true}
+
+- else
+	%h4.mt10 No flagged comments found.

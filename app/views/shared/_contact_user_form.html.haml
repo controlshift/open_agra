@@ -1,6 +1,7 @@
-#contact_user_form.modal.hide{'data-contact-url' => url }
+#contact_user_form{'data-contact-url' => url }
   .modal-header
-    %a.close{ href: "#", "data-dismiss" => "modal" } ×
+    %button{'type' => "button", 'class' => "close", 'data-dismiss' => "modal", 'aria-hidden' =>"true"} ×
+
     %h3 Contact #{user.full_name}
   .modal-body
     = simple_form_for @email, :url => url, :validate => true, :wrapper => :compact, :authenticity_token => false do |f|
@@ -16,5 +17,3 @@
     %a.btn{ id: "btn-send" } Send
     .right
       %img.ajax-loader.hide{ id: "img-send-loader", src: asset_path("ajax-loader-24.gif") }
-
-= javascript_include_tag 'petition/contact_user'

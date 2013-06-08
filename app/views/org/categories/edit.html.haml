@@ -1,6 +1,11 @@
-.breadcrumbs
-  = link_to 'Manage Categories', org_categories_path
-  > Edit
+%ul.breadcrumb
+  %li
+    = link_to 'Manage Categories', org_categories_path
+    %span.divider
+      >
+  %li.active
+    Edit
+
 .word-wrap
   = title "Edit #{@category.name}"
 %br

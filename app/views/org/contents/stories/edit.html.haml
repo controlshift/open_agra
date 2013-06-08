@@ -1,8 +1,16 @@
-.breadcrumbs
-  = link_to 'Manage Stories', org_contents_stories_path
-  >
-  = link_to @story.title, org_contents_story_path(@story)
-  > Edit
+%ul.breadcrumb
+  %li
+    = link_to 'Manage Stories', org_contents_stories_path
+    %span.divider
+      >
+  %li
+    = link_to @story.title, org_contents_story_path(@story)
+    %span.divider
+      >
+  %li.active
+    Edit
+.clear
+
 .word-wrap
   = title "Edit #{@story.title}"
 %br

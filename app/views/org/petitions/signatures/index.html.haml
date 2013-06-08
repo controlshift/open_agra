@@ -1,28 +1,36 @@
-.clear
-.table-container{style: 'position: relative'}
-  .breadcrumbs
+%ul.breadcrumb
+  %li
     = link_to 'Petitions', org_petitions_path, {:class => 'use-pjax'}
-    >
-    = @petition.title
-    > Signatures
-  = title "#{@petition.title} Signatures"
+    %span.divider
+      >
+  %li
+    = link_to @petition.title, org_petition_path(@petition)
+    %span.divider
+      >
+  %li.active
+    Signatures
+.clear
 
-  = form_tag  email_org_petition_signatures_path(@petition), :method => :get, class: 'admin-search' do
-    %input.search-query{ name: "email", placeholder: "email" }
-    %a.search-button#search-btn{ href: "javascript:$('form.admin-search').submit();" }
-      %i.icon-search
-
+= form_tag  email_org_petition_signatures_path(@petition), :method => :get, class: 'admin-search' do
+  %input.search-query{ name: "email", placeholder: "email" }
+  %a.search-button#search-btn{ href: "javascript:$('form.admin-search').submit();" }
+    %i.icon-search
+.clear
+.mt30
+  = title "#{@petition.title} Signatures", class: 'left'
+  .clear
 
   - if @signatures.any?
     = table_for(@signatures) do |t|
       = t.data do
-        - t.cell(:email)
+        - t.cell(:email) {|s| link_to(s.email, org_member_path(s.member))}
         - t.cell(:first_name)
         - t.cell(:last_name)
         - t.cell(:phone_number)
         - t.cell(:join_organisation)
         - t.cell(:postcode)
         - t.cell(:unsubscribed_at) {|s| s.unsubscribe_at ? pretty_date_format(s.unsubscribe_at) : button_to("unsubscribe", unsubscribe_org_petition_signature_path(@petition, s.id), method: :put) }
+        - t.cell(:delete) {|s| button_to("delete", org_petition_signature_path(@petition, s.id), method: :delete)}
         - t.cell(:created_at) {|s| pretty_date_format(s.created_at)}
     - if @signatures.size > 1
       = will_paginate @signatures

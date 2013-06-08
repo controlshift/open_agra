@@ -9,4 +9,4 @@
   =link_to petition_url(@petition), petition_url(@petition)
 %p Thanks
 %p
-  =@petition.user.full_name
+  = current_user.full_name

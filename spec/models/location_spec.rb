@@ -20,12 +20,22 @@
 require 'spec_helper'
 
 describe Location do
-  it { should validate_presence_of(:query) }
+  it { should validate_presence_of(:query) } # Not anymore
   it { should validate_presence_of(:latitude) }
   it { should validate_presence_of(:longitude) }
 
   context "with a location" do
     subject { Factory(:location) }
     it { should validate_uniqueness_of(:query) }
+  end
+
+  describe "point" do
+    subject { Factory.build(:location)}
+
+    it "should set the point" do
+      subject.point.should be_nil
+      subject.save
+      subject.point.should_not be_nil
+    end
   end
 end

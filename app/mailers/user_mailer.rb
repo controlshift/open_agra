@@ -1,11 +1,11 @@
 class UserMailer < Devise::Mailer
   def contact_campaigner(petition, email)
-    subject = "Message about your petition: #{email.subject}"
+    subject = t('mailers.user.contact_campaigner.subject', subject: email.subject)
     send_message(petition, email, subject)
   end
   
   def contact_admin(petition, email)
-    subject = "Reply from an inappropriate petition: #{email.subject}"
+    subject = t('mailers.user.contact_admin.subject', subject: email.subject)
     send_message(petition, email, subject)
   end
   

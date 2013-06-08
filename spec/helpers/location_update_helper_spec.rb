@@ -5,8 +5,8 @@ describe LocationUpdateHelper do
   it "should return true and assign location id if location is valid" do
     attributes = {}
     location = Factory(:location)
-    Location.should_receive(:find_or_create_by_query).with(location.attributes[:query], location.attributes).and_return(location)
-
+    Location.should_receive(:find_by_query).with(location.attributes['query']).and_return(location)
+  
     helper.update_location(location.attributes, attributes).should == true
     attributes[:location_id].should == location.id
   end
@@ -14,7 +14,7 @@ describe LocationUpdateHelper do
   it "should return false and assign location id if location is invalid" do
     attributes = {}
     location = Factory(:location)
-    Location.should_receive(:find_or_create_by_query).with(location.attributes[:query], location.attributes).and_return(location)
+    Location.should_receive(:find_by_query).with(location.attributes['query']).and_return(location)
     location.stub(:valid?).and_return(false)
 
     helper.update_location(location.attributes, attributes).should == false

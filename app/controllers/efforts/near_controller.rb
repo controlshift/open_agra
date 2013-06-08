@@ -4,7 +4,6 @@ class Efforts::NearController < ApplicationController
   before_filter :load_effort
 
   def new
-    render "new"
   end
 
   def index

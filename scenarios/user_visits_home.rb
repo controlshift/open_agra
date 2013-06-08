@@ -18,7 +18,7 @@ describe "User visits home page", type: :request do
 
     visit root_path
 
-    page.should have_css(".featured-effort:contains('featured effort name')")
+    page.should have_css(".featured-petition:contains('featured effort name')")
   end
 
   def sees_featured_story

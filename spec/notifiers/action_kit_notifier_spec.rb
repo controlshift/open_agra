@@ -1,75 +1,113 @@
 require 'spec_helper'
 
 describe ActionKitNotifier do
-  let(:user) { Factory.stub(:user) }
-  let(:petition) { Factory.stub(:petition) }
-  let(:role) { 'creator' }
-  
-  before :each do
-    @host = 'localhost'
-    @username= 'username'
-    @password = '12345'
-    @notifier = ActionKitNotifier.new(@host, @username, @password)
-  end
-  
-  describe "#notify_sign_up" do
-    it "should not notify if host is blank" do
-      RestClient.should_not_receive(:post)
-      ActionKitNotifier.new(nil, 'username', 'password').notify_sign_up(user_details: user, role: role).should be_false
-    end
-    
-    it "should not notify if username is blank" do
-      RestClient.should_not_receive(:post)
-      ActionKitNotifier.new('host', nil, 'password').notify_sign_up(user_details: user, role: role).should be_false
-    end
-    
-    it "should not notify if password is blank" do
-      RestClient.should_not_receive(:post)
-      ActionKitNotifier.new('host', 'username', nil).notify_sign_up(user_details: user, role: role).should be_false
-    end
-    
-    it 'should connect action kit api and save the user model' do
-      petition.stub(:categories) { [OpenStruct.new(slug: 'cat1')] }
-      resource_uri = "https://username:12345@localhost/rest/v1/action/"
-      data = {
-        page: 'page_petition',
-        first_name: user.first_name,
-        last_name: user.last_name, 
-        email: user.email, 
-        zip: user.postcode,
-        created_at: user.created_at,
-        country: 'Australia',
-        action_categories: ['cat1']
-      }
-      
-      RestClient.should_receive(:post).with(resource_uri, data.to_json, content_type: :json, accept: :json)
+  subject { ActionKitNotifier.new('localhost', 'username', 'password') }
 
-      @notifier.notify_sign_up(user_details: user, role: role, petition: petition, organisation: Factory.build(:organisation, action_kit_country: 'Australia', action_kit_signature_page: 'page_signature', action_kit_petition_page: 'page_petition'))
+  describe "initialisation" do
+    specify { subject.ak.should be_an_instance_of(ActionKitRest::Client) }
+    specify { subject.ak.username.should == 'username' }
+    specify { subject.ak.password.should == 'password'}
+    specify { subject.ak.host.should ==  'localhost'}
+    it "should use the railtie to setup the logger" do
+      ActionKitRest.logger.should == Rails.logger
+    end
+  end
+
+  describe "#ensure_category_pages_present" do
+    let(:petition) { Factory(:petition, organisation: organisation) }
+    let(:organisation) { Factory(:organisation) }
+    let(:category) { Factory(:category)}
+
+    before(:each) do
+      CategorizedPetition.create!(petition: petition, category: category)
+      subject.petition = petition
+      subject.organisation = organisation
+    end
+
+    it "should create a tag for the category" do
+      petition.categories.should include(category)
+
+      subject.ak.stub(:tag).and_return(tag = mock())
+      tag.stub(:find_or_create).and_return(tag_obj = mock())
+      tag_obj.stub(:name).and_return "category name"
+      tag_obj.stub(:resource_uri).and_return '/rest/v1/tag/46/'
+
+
+      subject.send(:ensure_category_pages_present).should == true
+      category.reload.external_id.should == '46'
+    end
+  end
+
+  describe "#notify_sign_up" do
+    let(:organisation) { Factory(:organisation, action_kit_country: 'AU')}
+    let(:petition) { Factory(:petition, organisation: organisation, external_id: 'page_petition') }
+    before(:each) do
+      petition.stub(:categories) { [OpenStruct.new(slug: 'cat1')] }
+    end
+
+
+    describe "success" do
+      let(:data) {
+        {
+            page: 'page_petition',
+            first_name: user_details.first_name,
+            last_name: user_details.last_name,
+            email: user_details.email,
+            zip: '87105 3787',
+            created_at: user_details.created_at,
+            home_phone: user_details.phone_number,
+            country: 'AU',
+            list: '1',
+            source: 'controlshift',
+            action_categories: ['cat1']
+        }
+      }
+
+      before(:each) do
+        subject.should_receive(:ensure_external_petition_present).and_return true
+        subject.should_receive(:ensure_creators_page_present).and_return true
+        subject.should_receive(:ensure_category_pages_present).and_return true
+
+        subject.stub(:ak).and_return(ak = mock)
+        ak.stub(:action).and_return(action = mock())
+        action.should_receive(:create).at_least(1).times.with(data).and_return(obj = mock())
+        obj.stub(:user).and_return('/rest/v1/user/39520/')
+        obj.stub(:id).and_return "123"
+        obj.stub(:created_user).and_return true
+      end
+
+      context "with a user" do
+        let(:user_details) { Factory(:user, postcode: '87105 3787', organisation: organisation) }
+
+        it 'should create an action' do
+          subject.notify_sign_up(user_details: user_details, petition: petition, organisation: organisation)
+
+          user_details.reload
+          user_details.external_constituent_id.should == '39520'
+        end
+      end
+
+      context "with a signature" do
+        let(:user_details) { Factory(:signature, postcode: '87105 3787', petition: petition) }
+
+        it 'should create an action' do
+          subject.notify_sign_up(user_details: user_details, petition: petition, organisation: organisation)
+
+          user_details.reload
+          user_details.external_constituent_id.should == '39520'
+          user_details.external_id = '123'
+          user_details.member.external_id = '39520'
+        end
+      end
     end
 
     it "should propagate raised exceptions" do
-      petition.stub(:categories) { [OpenStruct.new(slug: 'cat1')] }
-      resource_uri = "https://username:12345@localhost/rest/v1/action/"
-      data = {
-        page: 'page_petition',
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        zip: user.postcode,
-        created_at: user.created_at,
-        country: 'Australia',
-        action_categories: ['cat1']
-      }
+      subject.stub(:ensure_external_petition_present).and_return true
+      subject.stub(:ensure_creators_page_present).and_return true
+      subject.stub(:ensure_category_pages_present).and_return true
 
-      RestClient.should_receive(:post).with(resource_uri, data.to_json, content_type: :json, accept: :json).and_raise(RestClient::Exception)
-      lambda { @notifier.notify_sign_up(user_details: user, role: role, petition: petition, organisation: Factory.build(:organisation, action_kit_country: 'Australia', action_kit_signature_page: 'page_signature', action_kit_petition_page: 'page_petition')) }.should raise_error
-    end
-
-    context '#page_for' do
-      let(:organisation) { Factory.build(:organisation, action_kit_signature_page: 'page_signature', action_kit_petition_page: 'page_petition')}
-      specify { @notifier.send(:page_for, 'creator', organisation).should == 'page_petition' }
-      specify { @notifier.send(:page_for, 'signer', organisation).should == 'page_signature' }
-      specify { -> { @notifier.send(:page_for, 'non-existing role') }.should raise_error }
+      ActionKitRest::Client.stub(:new).and_raise(Exception)
+      lambda { subject.notify_sign_up(user_details: user, petition: petition, organisation: organisation) }.should raise_error
     end
   end
 end

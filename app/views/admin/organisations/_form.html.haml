@@ -1,5 +1,5 @@
 .mt20
-= simple_form_for [:admin, @organisation], wrapper: :compact do |form|  
+= simple_form_for [:admin, @organisation], wrapper: :compact do |form|
   %h3 General
   %hr
     .row
@@ -31,7 +31,7 @@
   %hr
     .row
       .span3
-        = form.input :use_white_list, as: :boolean  
+        = form.input :use_white_list, as: :boolean
       .span3
         = form.input :show_petition_category_on_creation, as: :boolean
       .span3
@@ -41,11 +41,13 @@
     .row
       .span3
         = form.input :always_join_parent_org_when_sign_up, as: :boolean
-  %br
-  %h3 Visual Appearance
-  %hr
-    .row
-      .span3= form.input :show_share_buttons_on_petition_page, as: :boolean, label: 'Show share buttons (Petition page)'
+      .span3
+        = form.input :hide_phone_number_on_signature_form, as: :boolean
+      .span3
+        = form.input :show_categories_as_dropdown, as: :boolean
+      .span3
+        = form.input :home_link_override, as: :string
+
   %br
   %h3 External Accounts
   %hr
@@ -123,6 +125,6 @@
       .span3= form.input :action_kit_signature_page, label: 'Signature Page'
       .span3= form.input :action_kit_petition_page, label: 'Petition Page'
   %br
-  
+
   .actions
     = form.button :submit

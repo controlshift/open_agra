@@ -1,0 +1,8 @@
+.sidebar
+  .row
+    .span3.mt50
+      - if @countries.any?
+        %h5 Country
+        - @countries.each do |code|
+          .country
+            = link_to Country.find_by(:iso, code)[:printable_name], petitions_country_path(code)

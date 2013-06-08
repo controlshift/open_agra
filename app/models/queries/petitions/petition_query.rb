@@ -7,7 +7,7 @@ module Queries
       validates :page, numericality: true, allow_nil: true
 
       def petitions
-        if @result
+        if @result && @result.results
           @result.results
         else
           []

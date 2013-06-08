@@ -5,9 +5,10 @@ class Petitions::ContactsController < ApplicationController
   skip_before_filter :authenticate_user!
   before_filter :verify_petition_is_launched, only: [:contact]
 
-  NOT_CONTACTABLE = {message: "The leader of this campaign may not be contacted.", error_type: "not_contactable"}
-  CAPTCHA_NOT_MATCH = {message: "Text did not match with the image.", error_type: "captcha_failure"}
-  EMAIL_SEND_FAILURE = {message: "Invalid input. Your email cannot be sent.", error_type: "email_send_failure"}
+  def new
+    @email = Email.new
+    render partial: "shared/contact_user_form", locals: { user: @petition.user, url: petition_contacts_path(@petition) }
+  end
 
   def create
     return fail_response_with_error_message(error_message) if error_message.present?
@@ -15,10 +16,11 @@ class Petitions::ContactsController < ApplicationController
     if contact_campaign_admins
       success_response
     else
-      fail_response_with_error_message(EMAIL_SEND_FAILURE)
+      fail_response_with_error_message({message: t('controllers.petitions.contact.email_send_failure'), error_type: "email_send_failure"})
     end
   end
 
+  private
   # TODO: This should be refactored into a contact model.
 
   def fail_response_with_error_message(error_message)
@@ -30,7 +32,7 @@ class Petitions::ContactsController < ApplicationController
 
   def success_response
     respond_to do |format|
-      format.html { redirect_to petition_path(@petition), notice: "Your email has been sent to the campaigner" }
+      format.html { redirect_to petition_path(@petition), notice: t('controllers.petitions.contact.success_email') }
       format.json { render json: {}, status: :ok }
     end
   end
@@ -40,8 +42,8 @@ class Petitions::ContactsController < ApplicationController
   end
 
   def error_message
-    return NOT_CONTACTABLE unless contactable?
-    return CAPTCHA_NOT_MATCH unless simple_captcha_valid?
+    return {message: t('controllers.petitions.contact.not_contactable'), error_type: "not_contactable"} unless contactable?
+    return {message: t('controllers.petitions.contact.captcha_failure'), error_type: "captcha_failure"} unless simple_captcha_valid?
   end
 
 

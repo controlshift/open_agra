@@ -2,17 +2,11 @@ class Org::EffortsController < Org::OrgController
   before_filter :load_and_authorize_effort, only: [:edit, :update, :show]
 
   def index
-    @efforts = Effort.paginate(page: params[:page]).order('created_at DESC').where(organisation_id: current_organisation.id)
+    @efforts = Effort.paginate(page: params[:page]).order('created_at DESC').where(organisation_id: current_organisation.id, effort_type: 'specific_targets')
   end
 
   def show
     @petitions = Petition.where(effort_id: @effort).page(params[:page]).order('created_at DESC')
-    if @effort.open_ended?
-      render :show
-    else
-      render :show_targets
-    end
-
   end
 
   def new

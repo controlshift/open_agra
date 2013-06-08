@@ -28,19 +28,16 @@ module PetitionsHelper
     input_field_with_popover @petition, form, field, label, help, default, html_options
   end
 
-  def petition_image_for_share(petition)
-    unless petition.image_file_name.blank?
-      @petition.image.url(:form)
+  def petition_image_for_share(share)
+    if share.image_file_name.blank?
+      image_url('fb-no-share-image.png')
     else
-      "#{request.protocol}#{request.host_with_port}/assets/organisations/#{current_organisation.slug}/logo_share.png"
+      share.image.url(:form)
     end
   end
 
   def contact_admin(petition)
-    mailto = "mailto:#{petition.organisation.contact_email}"
-    mailto << "?subject=Campaigner message RE: #{petition.title}"
-    mailto << "&body=Petition Title: #{petition.title}%0APetition URL: #{petition_url(petition)}%0AUser:#{current_user.email}%0A"
-    mailto << "--- The following message is with regards to the above petition: ---"
+    mailto = t('helpers.petition.contact_admin.mailto', {p_contact_email: petition.organisation.contact_email, petition_title: petition.title, u_email: current_user.email, petition_url: petition_url(petition)})
     mailto
   end
 
@@ -66,17 +63,42 @@ module PetitionsHelper
 
   def twitter_share_href(petition)
     href = "https://twitter.com/intent/tweet?"
-    href << "url=#{petition_url(petition)}"
+    href << "url=#{petition_url(petition, source: 'twitter-share-button')}"
     if petition.organisation.twitter_account_name.present?
       href << "&via=#{petition.organisation.twitter_account_name}"
-      href << "&related=#{petition.organisation.twitter_account_name}:#{CGI::escape('For more important campaigns')}"
+      href << "&related=#{petition.organisation.twitter_account_name}:#{CGI::escape(t('helpers.petition.twitter_share.important'))}"
     end
     href << "&text=#{CGI::escape_html(cf('twitter_share_text'))}"
     href
   end
 
   def facebook_share_href(petition)
-    "http://www.facebook.com/sharer.php?u=#{CGI::escape(petition_url(petition, time: petition.updated_at.to_i))}"
+    share = petition.facebook_share
+    # undocumented link format: http://www.wealsodocookies.com/posts/generate-a-share-with-facebook-link-that-embed-summary-title-images-but-without-og-data
+    href = 'http://www.facebook.com/sharer/sharer.php'
+    share_url = CGI::escape(facebook_petition_url(share))
+    if respond_to?(:is_mobile_device?) && is_mobile_device?
+      href << '?u=' # facebook doesn't read anything else on mobile devices
+      href << share_url
+    else
+      href << '?s=100&p[url]='
+      href << CGI::escape(facebook_petition_url(share))
+      href << '&p[title]='
+      href << CGI::escape(share.title)
+      href << '&p[summary]='
+      href << CGI::escape(share.description)
+      href << '&p[images][0]='
+      href << CGI::escape(petition_image_for_share(share))
+    end
+    href
+  end
+
+  def facebook_petition_url(share)
+    if share.variant
+      petition_facebook_share_variant_url(share.petition, share.variant, {time: share.petition.updated_at.to_i, source: 'facebook-share-button'})
+    else
+      petition_url(share.petition, time: share.petition.updated_at.to_i, source: 'facebook-share-button')
+    end
   end
 
   def achievements_accordion(title, id, &block)
@@ -98,7 +120,7 @@ module PetitionsHelper
   end
 
   def pretty_date_format(date, format="%d/%b/%Y")
-    date > 1.week.ago ? distance_of_time_in_words(Time.now, date) + " ago" : date.strftime(format)
+    date > 1.week.ago ? distance_of_time_in_words(Time.now, date) + " #{t('ago')}" : date.strftime(format)
   end
 
   def link_to_leaders(effort, petition)
@@ -124,23 +146,32 @@ module PetitionsHelper
     default_options = {location: Location.new(:latitude => 0, :longitude => 0)}
     options = default_options.merge(options)
 
-    address = "#{options[:location].latitude},#{options[:location].longitude}"
-    image_tag("http://maps.googleapis.com/maps/api/staticmap?size=#{options[:size]}&zoom=#{options[:location].zoom}
-               &markers=icon:http://static-targets-showcase.controlshiftlabs.com/assets/marker.png%7Cshadow:false%7C#{address}&sensor=false")
+    location = options[:location]
+    geography = options[:geography]
+
+    if geography
+      # Static maps won't take thousands of points, so skip some. Hopefully not the important ones.
+      path = geography.summarize_points(75).map(&:shape).map {|p| [p.lat, p.lon].join(',')}.join('|')
+      image_tag "http://maps.googleapis.com/maps/api/staticmap?size=#{options[:size]}&path=color:0xF63935|fillcolor:0xF6393533|#{path}&sensor=false".gsub(/\|/, '%7C')
+    elsif location
+      address = "#{options[:location].latitude},#{options[:location].longitude}"
+      image_tag("http://maps.googleapis.com/maps/api/staticmap?size=#{options[:size]}&zoom=#{options[:location].zoom}
+               &markers=icon:http://static.controlshiftlabs.com/assets/marker-centered.png%7Cshadow:false%7C#{address}&sensor=false")
+    end
   end
 
   def petition_chevron_for_edit_prompt_effort
-    prompt_edit_step_hash = { 1 => ['lead-petition', 'Register'],
-                              2 => ['training', 'Training'],
-                              3 => ['edit', 'Edit'],
-                              4 => ['start', 'Start'] }
+    prompt_edit_step_hash = { 1 => ['lead-petition', t('helpers.petition.register')],
+                              2 => ['training', t('helpers.petition.training')],
+                              3 => ['edit', t('helpers.petition.edit')],
+                              4 => ['start', t('helpers.petition.start')] }
     petition_chevron(prompt_edit_step_hash)
   end
 
   def petition_chevron_for_normal_effort
-    step_hash = { 1 => ['lead-petition', 'Register'],
-                  2 => ['training', 'Training'],
-                  3 => ['start', 'Start'] }
+    step_hash = { 1 => ['lead-petition', t('helpers.petition.register')],
+                  2 => ['training', t('helpers.petition.training')],
+                  3 => ['start', t('helpers.petition.start')] }
     petition_chevron(step_hash)
   end
 
@@ -183,6 +214,23 @@ module PetitionsHelper
       haml_tag "span.#{status}.#{progress}-status.status" do
         haml_concat progress
       end
+    end
+  end
+
+  def sign_partial_cache_key(organisation, petition, source = "", akid="")
+    key = "sign_#{organisation.cache_key}_#{petition.cache_key}_#{source}#{akid}"
+    if petition.group_id.present?
+      "#{key}_#{petition.group.cache_key}"
+    else
+      key
+    end
+  end
+
+  def signature_disclaimer(petition)
+    if petition.group && petition.group.signature_disclaimer
+      petition.group.signature_disclaimer
+    else
+      current_organisation.signature_disclaimer
     end
   end
 

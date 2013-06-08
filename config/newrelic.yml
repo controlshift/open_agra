@@ -1,5 +1,5 @@
 ---
-production:
+production: &default_settings
   error_collector:
     capture_source: true
     enabled: true
@@ -17,3 +17,7 @@ production:
     transaction_threshold: apdex_f
   capture_params: false
   log_level: info
+staging:
+  <<: *default_settings
+  app_name: <%= ENV["NEW_RELIC_APP_NAME"] %>
+

@@ -18,6 +18,17 @@ describe Extensions::Signature::Rspec do
       end
     end
 
+    describe "validation" do
+      it "should validate presence of magician_kind" do
+        signature.valid?
+        signature.should have(0).error_on(:magician)
+        signature.should have(1).error_on(:magician_kind)
+        signature.magician_kind = 'Sorcerer'
+        signature.valid?
+        signature.should_not have(1).error_on(:magician_kind)
+      end
+    end
+
     describe "#assign_attributes" do
       it "should be accessible after assignments" do
         signature.assign_attributes(magician: true)
@@ -27,7 +38,7 @@ describe Extensions::Signature::Rspec do
 
     describe "cached_organisation_slug" do
       it "should, when saved, remember the organisation slug" do
-        signature.assign_attributes(attributes_for(:signature).merge(magician: 'true'))
+        signature.assign_attributes(attributes_for(:signature).merge(magician: 'true', magician_kind: 'sorcerer'))
         signature.petition = Factory(:petition)
         signature.save!
         signature.reload
@@ -47,7 +58,7 @@ describe Extensions::Signature::Rspec do
 
     describe "persistance" do
       it "should allow additional fields to be persisted" do
-        signature.assign_attributes(attributes_for(:signature).merge(magician: 'true'))
+        signature.assign_attributes(attributes_for(:signature).merge(magician: 'true', magician_kind: 'sorcerer'))
         signature.petition = Factory(:petition)
         signature.save!
         signature.reload
@@ -64,7 +75,7 @@ describe Extensions::Signature::Rspec do
     end
 
     describe "#accessible_attribute_names" do
-      specify{ signature.accessible_attribute_names.should == %w(default_organisation_slug email postcode first_name last_name phone_number join_organisation magician) }
+      specify{ signature.accessible_attribute_names.should == %w(default_organisation_slug email postcode first_name last_name phone_number join_organisation join_group source akid magician magician_kind) }
     end
   end
 
@@ -76,7 +87,7 @@ describe Extensions::Signature::Rspec do
     # test that the behavior is transmitted into the intended organisation
     signature1.should respond_to(:magician)
     signature1.should respond_to(:magician?)
-    signature1.additional_field_configs.should == {:magician => { as: :boolean, label: 'Are you a magician?' }}
+    signature1.additional_field_configs.should == {:magician => { as: :boolean, label: 'Are you a magician?' }, :magician_kind => {:as=>:string, :label=>"Kind of magician", :validation_options=>{:presence=>true}}}
     #signature1.should respond_to(:_additional_field_configs)
 
 

@@ -6,6 +6,7 @@ module Extensions
 
       included do
         additional_field :magician, { as: :boolean, label: 'Are you a magician?' }
+        additional_field :magician_kind, {as: :string, label: 'Kind of magician', validation_options: { presence: true} }
       end
     end
   end

@@ -36,6 +36,34 @@ CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
 COMMENT ON EXTENSION hstore IS 'data type for storing sets of (key, value) pairs';
 
 
+--
+-- Name: kmeans; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS kmeans WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION kmeans; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION kmeans IS 'k-means classification by window function';
+
+
+--
+-- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
+
+
 SET search_path = public, pg_catalog;
 
 --
@@ -67,7 +95,6 @@ CREATE TABLE blast_emails (
     from_address character varying(255) NOT NULL,
     subject character varying(255) NOT NULL,
     body text NOT NULL,
-    delayed_job_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     recipient_count integer,
@@ -77,7 +104,8 @@ CREATE TABLE blast_emails (
     moderation_reason text,
     type character varying(255),
     group_id integer,
-    organisation_id integer
+    organisation_id integer,
+    target_recipients character varying(255)
 );
 
 
@@ -231,6 +259,43 @@ ALTER SEQUENCE categorized_petitions_id_seq OWNED BY categorized_petitions.id;
 
 
 --
+-- Name: comments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE comments (
+    id integer NOT NULL,
+    text text,
+    up_count integer DEFAULT 0,
+    approved boolean,
+    flagged_at timestamp without time zone,
+    flagged_by_id integer,
+    signature_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    featured boolean DEFAULT false
+);
+
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE comments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
+
+
+--
 -- Name: contents; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -265,6 +330,43 @@ CREATE SEQUENCE contents_id_seq
 --
 
 ALTER SEQUENCE contents_id_seq OWNED BY contents.id;
+
+
+--
+-- Name: csv_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE csv_reports (
+    id integer NOT NULL,
+    name character varying(255),
+    exported_by_id integer,
+    report_file_name character varying(255),
+    report_content_type character varying(255),
+    report_file_size integer,
+    report_updated_at timestamp without time zone,
+    query_options hstore,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: csv_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE csv_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: csv_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE csv_reports_id_seq OWNED BY csv_reports.id;
 
 
 --
@@ -349,7 +451,8 @@ CREATE TABLE efforts (
     image_default_content_type character varying(255),
     image_default_file_size integer,
     image_default_updated_at timestamp without time zone,
-    landing_page_welcome_text text
+    landing_page_welcome_text text,
+    target_collection_id integer
 );
 
 
@@ -439,6 +542,44 @@ ALTER SEQUENCE emails_id_seq OWNED BY emails.id;
 
 
 --
+-- Name: facebook_share_variants; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE facebook_share_variants (
+    id integer NOT NULL,
+    title character varying(255),
+    description text,
+    type character varying(255),
+    image_file_name character varying(255),
+    image_content_type character varying(255),
+    image_file_size integer,
+    image_updated_at timestamp without time zone,
+    petition_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: facebook_share_variants_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE facebook_share_variants_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: facebook_share_variants_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE facebook_share_variants_id_seq OWNED BY facebook_share_variants.id;
+
+
+--
 -- Name: facebook_share_widget_shares; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -473,6 +614,67 @@ ALTER SEQUENCE facebook_share_widget_shares_id_seq OWNED BY facebook_share_widge
 
 
 --
+-- Name: geographic_collections; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE geographic_collections (
+    id integer NOT NULL,
+    name character varying(255)
+);
+
+
+--
+-- Name: geographic_collections_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE geographic_collections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: geographic_collections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE geographic_collections_id_seq OWNED BY geographic_collections.id;
+
+
+--
+-- Name: geographies; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE geographies (
+    id integer NOT NULL,
+    geographic_collection_id integer,
+    name character varying(255),
+    shape geography(GeometryZ,4326),
+    metadata hstore
+);
+
+
+--
+-- Name: geographies_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE geographies_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: geographies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE geographies_id_seq OWNED BY geographies.id;
+
+
+--
 -- Name: group_blast_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -483,7 +685,6 @@ CREATE TABLE group_blast_emails (
     from_address character varying(255) NOT NULL,
     subject character varying(255) NOT NULL,
     body text NOT NULL,
-    delayed_job_id integer,
     recipient_count integer,
     moderation_status character varying(255) DEFAULT 'pending'::character varying,
     delivery_status character varying(255) DEFAULT 'pending'::character varying,
@@ -594,7 +795,8 @@ CREATE TABLE groups (
     image_file_size integer,
     image_updated_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    settings text
 );
 
 
@@ -634,7 +836,9 @@ CREATE TABLE locations (
     warning character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    extras text
+    extras text,
+    geography_id integer,
+    point geometry(Point,4326)
 );
 
 
@@ -666,7 +870,8 @@ CREATE TABLE members (
     email character varying(255),
     organisation_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    external_id character varying(255)
 );
 
 
@@ -715,7 +920,11 @@ CREATE TABLE organisations (
     facebook_url character varying(255),
     twitter_account_name character varying(255),
     settings text,
-    uservoice_widget_link character varying(255)
+    uservoice_widget_link character varying(255),
+    placeholder_file_name character varying(255),
+    placeholder_content_type character varying(255),
+    placeholder_file_size integer,
+    placeholder_updated_at timestamp without time zone
 );
 
 
@@ -773,6 +982,39 @@ ALTER SEQUENCE petition_flags_id_seq OWNED BY petition_flags.id;
 
 
 --
+-- Name: petition_member_activities; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE petition_member_activities (
+    id integer NOT NULL,
+    petition_id integer,
+    member_id integer,
+    captured_details hstore,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: petition_member_activities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE petition_member_activities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: petition_member_activities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE petition_member_activities_id_seq OWNED BY petition_member_activities.id;
+
+
+--
 -- Name: petitions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -811,7 +1053,16 @@ CREATE TABLE petitions (
     alias character varying(255),
     achievements text,
     bsd_constituent_group_id character varying(255),
-    target_id integer
+    target_id integer,
+    external_id character varying(255),
+    redirect_to text,
+    external_facebook_page character varying(255),
+    external_site character varying(255),
+    show_progress_bar boolean DEFAULT true,
+    comments_updated_at timestamp without time zone,
+    successful boolean DEFAULT false,
+    success_story text,
+    after_signature_redirect_url text
 );
 
 
@@ -863,7 +1114,12 @@ CREATE TABLE signatures (
     external_constituent_id character varying(255),
     member_id integer,
     additional_fields hstore,
-    cached_organisation_slug character varying(255)
+    cached_organisation_slug character varying(255),
+    source character varying(255) DEFAULT ''::character varying,
+    join_group boolean,
+    external_id character varying(255),
+    new_member boolean,
+    akid character varying(255)
 );
 
 
@@ -958,6 +1214,38 @@ ALTER SEQUENCE stories_id_seq OWNED BY stories.id;
 
 
 --
+-- Name: target_collections; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE target_collections (
+    id integer NOT NULL,
+    name character varying(255),
+    organisation_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: target_collections_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE target_collections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: target_collections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE target_collections_id_seq OWNED BY target_collections.id;
+
+
+--
 -- Name: targets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -970,7 +1258,9 @@ CREATE TABLE targets (
     organisation_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
+    slug character varying(255),
+    target_collection_id integer,
+    geography_id integer
 );
 
 
@@ -991,6 +1281,39 @@ CREATE SEQUENCE targets_id_seq
 --
 
 ALTER SEQUENCE targets_id_seq OWNED BY targets.id;
+
+
+--
+-- Name: timeline_posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE timeline_posts (
+    id integer NOT NULL,
+    text character varying(255),
+    user_id integer,
+    petition_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: timeline_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE timeline_posts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: timeline_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE timeline_posts_id_seq OWNED BY timeline_posts.id;
 
 
 --
@@ -1027,7 +1350,11 @@ CREATE TABLE users (
     external_constituent_id character varying(255),
     member_id integer,
     additional_fields hstore,
-    cached_organisation_slug character varying(255)
+    cached_organisation_slug character varying(255),
+    image_file_name character varying(255),
+    image_content_type character varying(255),
+    image_file_size integer,
+    image_updated_at timestamp without time zone
 );
 
 
@@ -1247,7 +1574,21 @@ ALTER TABLE ONLY categorized_petitions ALTER COLUMN id SET DEFAULT nextval('cate
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY contents ALTER COLUMN id SET DEFAULT nextval('contents_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY csv_reports ALTER COLUMN id SET DEFAULT nextval('csv_reports_id_seq'::regclass);
 
 
 --
@@ -1282,7 +1623,28 @@ ALTER TABLE ONLY emails ALTER COLUMN id SET DEFAULT nextval('emails_id_seq'::reg
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY facebook_share_variants ALTER COLUMN id SET DEFAULT nextval('facebook_share_variants_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY facebook_share_widget_shares ALTER COLUMN id SET DEFAULT nextval('facebook_share_widget_shares_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY geographic_collections ALTER COLUMN id SET DEFAULT nextval('geographic_collections_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY geographies ALTER COLUMN id SET DEFAULT nextval('geographies_id_seq'::regclass);
 
 
 --
@@ -1345,6 +1707,13 @@ ALTER TABLE ONLY petition_flags ALTER COLUMN id SET DEFAULT nextval('petition_fl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY petition_member_activities ALTER COLUMN id SET DEFAULT nextval('petition_member_activities_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY petitions ALTER COLUMN id SET DEFAULT nextval('petitions_id_seq'::regclass);
 
 
@@ -1373,7 +1742,21 @@ ALTER TABLE ONLY stories ALTER COLUMN id SET DEFAULT nextval('stories_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY target_collections ALTER COLUMN id SET DEFAULT nextval('target_collections_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY targets ALTER COLUMN id SET DEFAULT nextval('targets_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY timeline_posts ALTER COLUMN id SET DEFAULT nextval('timeline_posts_id_seq'::regclass);
 
 
 --
@@ -1451,11 +1834,27 @@ ALTER TABLE ONLY categorized_petitions
 
 
 --
+-- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY comments
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY contents
     ADD CONSTRAINT contents_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: csv_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY csv_reports
+    ADD CONSTRAINT csv_reports_pkey PRIMARY KEY (id);
 
 
 --
@@ -1491,11 +1890,35 @@ ALTER TABLE ONLY emails
 
 
 --
+-- Name: facebook_share_variants_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY facebook_share_variants
+    ADD CONSTRAINT facebook_share_variants_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: facebook_share_widget_shares_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY facebook_share_widget_shares
     ADD CONSTRAINT facebook_share_widget_shares_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: geographic_collections_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY geographic_collections
+    ADD CONSTRAINT geographic_collections_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: geographies_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY geographies
+    ADD CONSTRAINT geographies_pkey PRIMARY KEY (id);
 
 
 --
@@ -1571,6 +1994,14 @@ ALTER TABLE ONLY petition_flags
 
 
 --
+-- Name: petition_member_activities_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY petition_member_activities
+    ADD CONSTRAINT petition_member_activities_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: petitions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1603,11 +2034,27 @@ ALTER TABLE ONLY stories
 
 
 --
+-- Name: target_collections_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY target_collections
+    ADD CONSTRAINT target_collections_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: targets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY targets
     ADD CONSTRAINT targets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: timeline_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY timeline_posts
+    ADD CONSTRAINT timeline_posts_pkey PRIMARY KEY (id);
 
 
 --
@@ -1715,6 +2162,13 @@ CREATE INDEX existing_signatures ON signatures USING btree (petition_id) WHERE (
 
 
 --
+-- Name: good_comments; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX good_comments ON comments USING btree (signature_id, flagged_at, approved, up_count);
+
+
+--
 -- Name: homepage_optimization; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1764,6 +2218,13 @@ CREATE INDEX index_categorized_petitions_on_category_id ON categorized_petitions
 
 
 --
+-- Name: index_comments_on_flagged_by_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_comments_on_flagged_by_id ON comments USING btree (flagged_by_id);
+
+
+--
 -- Name: index_contents_on_category; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1775,6 +2236,13 @@ CREATE INDEX index_contents_on_category ON contents USING btree (category);
 --
 
 CREATE UNIQUE INDEX index_contents_on_slug_and_organisation_id ON contents USING btree (slug, organisation_id);
+
+
+--
+-- Name: index_csv_reports_on_exported_by_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_csv_reports_on_exported_by_id ON csv_reports USING btree (exported_by_id);
 
 
 --
@@ -1796,6 +2264,27 @@ CREATE INDEX index_efforts_on_slug ON efforts USING btree (slug);
 --
 
 CREATE INDEX index_email_white_lists_on_email ON email_white_lists USING btree (email);
+
+
+--
+-- Name: index_facebook_share_variants_on_petition_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_facebook_share_variants_on_petition_id ON facebook_share_variants USING btree (petition_id);
+
+
+--
+-- Name: index_geographic_collections_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_geographic_collections_on_name ON geographic_collections USING btree (name);
+
+
+--
+-- Name: index_geographies_on_shape; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_geographies_on_shape ON geographies USING gist (shape);
 
 
 --
@@ -1844,7 +2333,14 @@ CREATE INDEX index_groups_on_organisation_id ON groups USING btree (organisation
 -- Name: index_groups_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_groups_on_slug ON groups USING btree (slug);
+CREATE UNIQUE INDEX index_groups_on_slug ON groups USING btree (slug);
+
+
+--
+-- Name: index_locations_on_geography_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_locations_on_geography_id ON locations USING btree (geography_id);
 
 
 --
@@ -1852,6 +2348,13 @@ CREATE INDEX index_groups_on_slug ON groups USING btree (slug);
 --
 
 CREATE INDEX index_locations_on_latitude_and_longitude ON locations USING btree (latitude, longitude);
+
+
+--
+-- Name: index_locations_on_point; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_locations_on_point ON locations USING gist (point);
 
 
 --
@@ -1953,6 +2456,13 @@ CREATE INDEX index_signatures_on_member_id ON signatures USING btree (member_id)
 
 
 --
+-- Name: index_signatures_on_source; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_signatures_on_source ON signatures USING btree (source);
+
+
+--
 -- Name: index_signatures_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1978,6 +2488,27 @@ CREATE INDEX index_targets_on_location_id ON targets USING btree (location_id);
 --
 
 CREATE INDEX index_targets_on_organisation_id ON targets USING btree (organisation_id);
+
+
+--
+-- Name: index_targets_on_target_collection_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_targets_on_target_collection_id ON targets USING btree (target_collection_id);
+
+
+--
+-- Name: index_timeline_posts_on_petition_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_timeline_posts_on_petition_id ON timeline_posts USING btree (petition_id);
+
+
+--
+-- Name: index_timeline_posts_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_timeline_posts_on_user_id ON timeline_posts USING btree (user_id);
 
 
 --
@@ -2104,6 +2635,27 @@ CREATE UNIQUE INDEX unique_share ON facebook_share_widget_shares USING btree (us
 --
 
 CREATE INDEX visible_petitions ON signatures USING btree (petition_id, deleted_at, unsubscribe_at);
+
+
+--
+-- Name: geometry_columns_delete; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE RULE geometry_columns_delete AS ON DELETE TO geometry_columns DO INSTEAD NOTHING;
+
+
+--
+-- Name: geometry_columns_insert; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE RULE geometry_columns_insert AS ON INSERT TO geometry_columns DO INSTEAD NOTHING;
+
+
+--
+-- Name: geometry_columns_update; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE RULE geometry_columns_update AS ON UPDATE TO geometry_columns DO INSTEAD NOTHING;
 
 
 --
@@ -2390,8 +2942,6 @@ INSERT INTO schema_migrations (version) VALUES ('20121030022346');
 
 INSERT INTO schema_migrations (version) VALUES ('20121031192945');
 
-INSERT INTO schema_migrations (version) VALUES ('20121107161738');
-
 INSERT INTO schema_migrations (version) VALUES ('20121107162433');
 
 INSERT INTO schema_migrations (version) VALUES ('20121107163738');
@@ -2399,3 +2949,71 @@ INSERT INTO schema_migrations (version) VALUES ('20121107163738');
 INSERT INTO schema_migrations (version) VALUES ('20121109162621');
 
 INSERT INTO schema_migrations (version) VALUES ('20121114000419');
+
+INSERT INTO schema_migrations (version) VALUES ('20121128225807');
+
+INSERT INTO schema_migrations (version) VALUES ('20121129062804');
+
+INSERT INTO schema_migrations (version) VALUES ('20121129063225');
+
+INSERT INTO schema_migrations (version) VALUES ('20121207233804');
+
+INSERT INTO schema_migrations (version) VALUES ('20121220030544');
+
+INSERT INTO schema_migrations (version) VALUES ('20121222182615');
+
+INSERT INTO schema_migrations (version) VALUES ('20121231160228');
+
+INSERT INTO schema_migrations (version) VALUES ('20130114160417');
+
+INSERT INTO schema_migrations (version) VALUES ('20130117051918');
+
+INSERT INTO schema_migrations (version) VALUES ('20130121053550');
+
+INSERT INTO schema_migrations (version) VALUES ('20130130060750');
+
+INSERT INTO schema_migrations (version) VALUES ('20130201162434');
+
+INSERT INTO schema_migrations (version) VALUES ('20130204063353');
+
+INSERT INTO schema_migrations (version) VALUES ('20130207053206');
+
+INSERT INTO schema_migrations (version) VALUES ('20130207062357');
+
+INSERT INTO schema_migrations (version) VALUES ('20130208055611');
+
+INSERT INTO schema_migrations (version) VALUES ('20130211105440');
+
+INSERT INTO schema_migrations (version) VALUES ('20130301084552');
+
+INSERT INTO schema_migrations (version) VALUES ('20130308020428');
+
+INSERT INTO schema_migrations (version) VALUES ('20130316145432');
+
+INSERT INTO schema_migrations (version) VALUES ('20130317232340');
+
+INSERT INTO schema_migrations (version) VALUES ('20130318101245');
+
+INSERT INTO schema_migrations (version) VALUES ('20130319085037');
+
+INSERT INTO schema_migrations (version) VALUES ('20130321051211');
+
+INSERT INTO schema_migrations (version) VALUES ('20130402191118');
+
+INSERT INTO schema_migrations (version) VALUES ('20130408053631');
+
+INSERT INTO schema_migrations (version) VALUES ('20130408152727');
+
+INSERT INTO schema_migrations (version) VALUES ('20130425145314');
+
+INSERT INTO schema_migrations (version) VALUES ('20130426145017');
+
+INSERT INTO schema_migrations (version) VALUES ('20130515235146');
+
+INSERT INTO schema_migrations (version) VALUES ('20130517205322');
+
+INSERT INTO schema_migrations (version) VALUES ('20130527163533');
+
+INSERT INTO schema_migrations (version) VALUES ('20130531133812');
+
+INSERT INTO schema_migrations (version) VALUES ('20130603133524');

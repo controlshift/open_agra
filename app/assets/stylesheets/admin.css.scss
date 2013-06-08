@@ -91,11 +91,17 @@
   select { width: 150px; }
 }
 
+.main-content-with-sidebar {
+  .breadcrumbs {
+    float: left;
+    width: 450px;
+    position: relative;
+  }
+}
+
 .admin-search {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin: 8px -20px 0 0;
+  position: relative;
+  float: right;
 }
 
 .loader {

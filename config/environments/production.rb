@@ -1,6 +1,7 @@
 Agra::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
+
   # Code is not reloaded between requests
   config.cache_classes = true
 
@@ -43,7 +44,13 @@ Agra::Application.configure do
   # config.logger = SyslogLogger.new
 
   # Use a different cache store in production
-  config.cache_store = :dalli_store
+  config.cache_store = :dalli_store, ENV['MEMCACHED_URL']
+
+  config.action_dispatch.rack_cache = {
+      :metastore    => Dalli::Client.new(ENV['MEMCACHED_URL']),
+      :entitystore  => 'file:tmp/cache/rack/body',
+      :allow_reload => false
+  }
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -64,17 +71,8 @@ Agra::Application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 
-  # configuration needed by Sendgrid on Heroku
-  config.action_mailer.smtp_settings = {
-      address: 'smtp.sendgrid.net',
-      port: '587',
-      authentication: :plain,
-      domain: 'heroku.com'
-  }
-  config.action_mailer.delivery_method = :smtp
-
   config.middleware.use ExceptionNotifier,
-    :email_prefix => "[#{ENV['app-name']} ]",
+    :email_prefix => "[agra-production]",
     :sender_address => %{"info" <info@controlshiftlabs.com>},
     :exception_recipients => %w{controlshift-dev@googlegroups.com woodhull@gmail.com}
 end

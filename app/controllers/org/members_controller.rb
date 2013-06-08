@@ -13,7 +13,7 @@ class Org::MembersController < Org::OrgController
     if @member
       redirect_to org_member_path(@member)
     else
-      redirect_to org_members_path, alert: "Address Not Found"
+      redirect_to org_members_path, alert: t('errors.messages.address_not_found')
     end
   end
 

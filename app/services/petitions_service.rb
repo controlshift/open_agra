@@ -5,6 +5,17 @@ class PetitionsService < ApplicationService
   set_callback :update, :before, :notify_petition_being_marked_as_inappropriate, :if => "!halted"
   set_callback :update, :after, :notify_petition_being_edited_by_campaigner, :if => "!halted"
 
+
+  def save_with_not_unique_retry(obj)
+    begin
+      save_without_not_unique_retry(obj)
+    rescue ActiveRecord::RecordNotUnique
+      save_without_not_unique_retry(obj)
+    end
+  end
+
+  alias_method_chain :save, :not_unique_retry
+
   def send_creation_thank_you_and_schedule_launch_reminder
     if current_object.user
       actions_after_petition_is_created_and_has_user
@@ -46,7 +57,6 @@ class PetitionsService < ApplicationService
   def lead(petition, current_user)
     petition.user = current_user
     petition.achieve_leading_progress!
-    petition.save!
     launch(petition, current_user)
   end
   
@@ -64,7 +74,8 @@ class PetitionsService < ApplicationService
     CampaignerMailer.delay.thanks_for_creating(current_object)
     ModerationMailer.delay.notify_admin_of_new_petition(current_object)
     Jobs::PromotePetitionJob.new.promote(current_object, :send_launch_kicker)
-    OrgNotifier.new.delay.notify_sign_up(organisation: current_object.organisation, petition: current_object, 
-                                         user_details: current_object.user, role: 'creator')
+    NotifySignupWorker.perform_async(current_object.organisation.id, current_object.id, current_object.user.id, 'creator')
+
+    true
   end
 end

@@ -1,21 +1,46 @@
+postgis: &postgis
+  adapter: postgis
+  postgis_extension: true
 
 development:
-  adapter: postgresql
+  <<: *postgis
+  username: postgres
   database: agra_development
   pool: 5
   timeout: 5000
 
+profile:
+  <<: *postgis
+  pool: 5
+  timeout: 5000
+
+
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
-test: &test
-  adapter: postgresql
+test:
+  <<: *postgis
+  username: postgres
   database: <%= ENV['TEST_DB_NAME'] || 'agra_test' %>
   pool: 5
   timeout: 5000
 
+
+environment_variables: &environment_variables
+  <<: *postgis
+  database: <%= ENV['POSTGRESQL_DATABASE'] %>
+  host: <%= ENV['POSTGRESQL_HOST'] %>
+  username: <%= ENV['POSTGRESQL_USERNAME'] %>
+  password: <%= ENV['POSTGRESQL_PASSWORD'] %>
+  pool: <%= ENV['POSTGRESQL_POOL'] || 10 %>
+  timeout: <%= ENV['POSTGRESQL_TIMEOUT'] || 5000 %>
+
+staging:
+  <<: *environment_variables
+
+controlshiftqa:
+  <<: *environment_variables
+
 production:
-  adapter: postgresql
-  database: agra_production
-  pool: 5
-  timeout: 5000
+  <<: *environment_variables
+

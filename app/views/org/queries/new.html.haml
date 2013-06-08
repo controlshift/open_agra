@@ -16,7 +16,7 @@
 
 %br
 = simple_form_for @org_query, url: org_query_path, validate: true, wrapper: 'compact' do |form|
-  = form.input :query, input_html: { class:  'span9'}
+  = form.input :query, input_html: { class:  'span9', rows: '4'}, as: :text
   .clear
   .actions
     = form.button :submit, 'Execute'

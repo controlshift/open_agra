@@ -9,8 +9,8 @@
 #  category        :string(255)
 #  body            :text
 #  filter          :string(255)     default("none")
-#  created_at      :datetime
-#  updated_at      :datetime
+#  created_at      :datetime        not null
+#  updated_at      :datetime        not null
 #  kind            :string(255)     default("text")
 #
 

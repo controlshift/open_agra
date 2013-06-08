@@ -1,0 +1,24 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Settings', settings_org_path
+    %span.divider
+      >
+  %li.active
+    Placeholder Image
+
+
+= title "Placeholder Image"
+
+= simple_form_for current_organisation, url: org_placeholder_path, method: :put,  validate: true, :wrapper => 'compact' do |form|
+  .upload-image-box-horizontal
+    .upload-image.upload-image-switcher{"data-changed-placeholder-url" => asset_path("image-placeholder-form-changed.png") }
+      = image_content(entity: current_organisation, style: :form, content_class: "preview-image", image_field: :placeholder )
+      .arrow
+      .upload-field
+        = form.input :placeholder,
+          as: :file,
+          label: "Upload an image", input_html: { accept: "image/jpeg,image/gif,image/png" }
+      .clear
+
+  .actions
+    = form.button :submit

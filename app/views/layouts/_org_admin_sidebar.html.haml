@@ -1,4 +1,4 @@
-- cache("v7_org_admin_sidebar_#{current_organisation.cache_key}") do
+- cache("v9_org_admin_sidebar_#{current_organisation.cache_key}") do
   .org-admin-sidebar.well{ style: "padding: 8px 0" }
     %ul.nav.nav-list
       %li
@@ -22,12 +22,20 @@
         = link_to org_categories_path, {:id => 'all-categories', :class => 'use-pjax'} do
           %i.icon-tags
           Categories
+      %li
+        = link_to org_comments_path, {:id => 'all-flagged-comments', :class => 'use-pjax'} do
+          %i.icon-comment
+          Comments
 
       %li.nav-header Manage
       %li
         = link_to org_groups_path, {:id => 'manage-groups', :class => 'use-pjax'} do
           %i.icon-map-marker
-          Groups
+          Partnerships
+      %li
+        = link_to org_landing_pages_path, {:id => 'all-landing-pages', :class => 'use-pjax'} do
+          %i.icon-list
+          Pages
       %li
         = link_to org_efforts_path, {:id => 'all-efforts', :class => 'use-pjax'} do
           %i.icon-road

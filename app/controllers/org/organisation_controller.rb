@@ -7,7 +7,7 @@ class Org::OrganisationController < Org::OrgController
 
   def update
     if current_organisation.update_attributes(params[:organisation])
-      redirect_to settings_org_path, notice: "Organisation was updated successfully"
+      redirect_to settings_org_path, notice: t('controllers.organisation.success_update')
     else
       render action: 'settings'
     end

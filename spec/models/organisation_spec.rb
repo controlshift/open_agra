@@ -4,8 +4,8 @@
 #
 #  id                           :integer         not null, primary key
 #  name                         :string(255)
-#  created_at                   :datetime
-#  updated_at                   :datetime
+#  created_at                   :datetime        not null
+#  updated_at                   :datetime        not null
 #  slug                         :string(255)
 #  host                         :string(255)
 #  contact_email                :string(255)
@@ -24,6 +24,10 @@
 #  twitter_account_name         :string(255)
 #  settings                     :text
 #  uservoice_widget_link        :string(255)
+#  placeholder_file_name        :string(255)
+#  placeholder_content_type     :string(255)
+#  placeholder_file_size        :integer
+#  placeholder_updated_at       :datetime
 #
 
 require 'spec_helper'
@@ -64,7 +68,6 @@ describe Organisation do
   it { should respond_to(:requires_location_for_campaign) }
   it { should respond_to(:always_join_parent_org_when_sign_up) }
   it { should allow_mass_assignment_of(:uservoice_widget_link) }
-  it { should allow_mass_assignment_of(:show_share_buttons_on_petition_page) }
   it { should allow_mass_assignment_of(:use_white_list) }
   it { should allow_mass_assignment_of(:show_petition_category_on_creation) }
 
@@ -74,7 +77,7 @@ describe Organisation do
     before :each do
       @organisation = Factory(:organisation, host: "www.example.com")
     end
-    
+
     specify { Organisation.find_by_host("www.example.com").should == @organisation }
     specify { Organisation.find_by_host("www.EXAMPLE.com").should == @organisation }
   end
@@ -104,34 +107,34 @@ describe Organisation do
     organisation = Factory(:organisation, contact_email: "info@communityrun.org", name: "CommunityRun")
     organisation.contact_email_with_name.should == "\"CommunityRun\" <info@communityrun.org>"
   end
-  
+
   describe "sendgrid credential" do
     it "should return org sendgrid username if exists" do
       subject.sendgrid_username = "my_username"
       subject.sendgrid_username.should == "my_username"
     end
-    
+
     it "should return default sendgrid username if not exists" do
       ENV['SENDGRID_USERNAME'] = "default_username"
       subject.sendgrid_username.should == "default_username"
     end
-    
+
     it "should return default sendgrid username if empty string" do
       ENV['SENDGRID_USERNAME'] = "default_username"
       subject.sendgrid_username = ""
       subject.sendgrid_username.should == "default_username"
     end
-    
+
     it "should return org sendgrid password if exists" do
       subject.sendgrid_password = "my_password"
       subject.sendgrid_password.should == "my_password"
     end
-    
+
     it "should return default sendgrid password if not exists" do
       ENV['SENDGRID_PASSWORD'] = "default_password"
       subject.sendgrid_password.should == "default_password"
     end
-    
+
     it "should return default sendgrid password if empty string" do
       ENV['SENDGRID_PASSWORD'] = "default_password"
       subject.sendgrid_password = ""
@@ -140,16 +143,20 @@ describe Organisation do
   end
 
   describe "#combined_name" do
+    before(:each) { subject.name = 'foo' }
     it "should render a combination" do
-      subject.name = 'foo'
       subject.parent_name = 'bar'
       subject.combined_name.should == 'foo and bar'
     end
 
     it "should render a non existing parent" do
-      subject.name = 'foo'
       subject.parent_name = nil
       subject.combined_name.should == 'foo'
+    end
+
+    it "should render the long_name if present" do
+      subject.name = 'Foo by Bar'
+      subject.combined_name.should == 'Foo by Bar'
     end
   end
 
@@ -188,4 +195,34 @@ describe Organisation do
     end
   end
 
+  describe "attaching a placeholder image" do
+    it { should_not validate_attachment_presence(:placeholder) }
+    it { should validate_attachment_content_type(:placeholder).allowing('image/jpeg', 'image/png').rejecting('text/plain', 'text/xml') }
+
+    it "copies specific paperclip errors to #image for SimpleForm integration" do
+      organisation = FactoryGirl.build_stubbed(:organisation)
+      organisation.errors.add(:placeholder_content_type, "must be an image file")
+      organisation.run_callbacks(:validation)
+      organisation.errors[:placeholder].should == ["must be an image file"]
+    end
+
+    it "removes unreadable paperclip errors from #image" do
+      organisation = FactoryGirl.build_stubbed(:organisation)
+      organisation.errors.add(:placeholder, "/var/12sdfsdf.tmp no decode delegate found")
+      organisation.run_callbacks(:validation)
+      organisation.errors[:placeholder].should == []
+    end
+  end
+
+  describe "restrict auth scope to only fields required" do
+    it "should not ask for fields that this organisation does not use" do
+      subject.stub(:slug).and_return('foo')
+      subject.facebook_auth_scope.should == 'email, publish_stream'
+    end
+
+    it "should include employer for coworker" do
+      subject.stub(:slug).and_return('coworker')
+      subject.facebook_auth_scope.should == 'email, publish_stream, friends_work_history, user_work_history'
+    end
+  end
 end

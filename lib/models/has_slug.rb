@@ -4,11 +4,11 @@ module HasSlug
   extend ActiveSupport::Concern
 
   included do
-    before_save :create_slug!
+    before_validation :create_slug!
+    validates :slug, uniqueness: true
   end
 
   module ClassMethods
-    
   end
 
   module InstanceMethods

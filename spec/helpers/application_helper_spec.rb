@@ -85,5 +85,30 @@ describe ApplicationHelper do
     end
 
   end
-
+  describe "#image_helpers" do
+    it "should return image tag with title and alt text as specified in the entity" do
+      entity = mock(title: 'My Title', errors: [], image_file_name: 'image.png')
+      entity.should_receive(:image).and_return(mock(url: '/assets/image.png'))
+      helper.image_content({entity: entity, style: :icon}).should == '<div class="petition-image"><img alt="My Title" src="/assets/image.png" title="My Title" /></div>'
+    end  
+    it "should return image tag with default title and alt text" do
+      entity = mock(errors: [], image_file_name: 'image.png')
+      entity.should_receive(:image).and_return(mock(url: '/assets/image.png'))
+      helper.image_content({entity: entity, style: :icon, content_class: 'preview-image'}).should == '<div class="preview-image"><img alt="Picture" src="/assets/image.png" title="Picture" /></div>'
+    end
+    it "should return image tag with user profile image when user is not logged in through facebook" do
+      entity = mock(errors: [], image_file_name: 'image.png', facebook_id: nil)
+      entity.should_receive(:image).and_return(mock(url: '/assets/image.png'))
+      helper.display_profile_image({entity: entity, style: :icon, content_class: 'profile-image'}).should == '<img alt="Picture" class="profile-image" src="/assets/image.png" />'
+    end
+    it "should return image tag with user profile image when it is present and user is logged in through facebook" do
+      entity = mock(errors: [], image_file_name: 'image.png', facebook_id: '1234')
+      entity.should_receive(:image).and_return(mock(url: '/assets/image.png'))
+      helper.display_profile_image({entity: entity, style: :icon, content_class: 'profile-image'}).should == '<img alt="Picture" class="profile-image" src="/assets/image.png" />'
+    end
+    it "should return image tag with facebook profile image when user has no user profile image" do
+      entity = mock(errors: [], image_file_name: nil, facebook_id: '1234')
+      helper.display_profile_image({entity: entity, style: :icon, content_class: 'profile-image'}).should == '<img alt="Picture" class="profile-image" src="http://graph.facebook.com/1234/picture" />'
+    end
+  end
 end

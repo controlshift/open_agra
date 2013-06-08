@@ -3,7 +3,7 @@
 %br
 - if @can_be_unsubscribed
   If you don't want to receive emails from the '#{@source.title}' campaign in the future, please
-  #{link_to "unsubscribe", blast_email_unsubscribe_url(@email)}.
+  #{link_to "unsubscribe", blast_email_unsubscribe_url(@email, host: @organisation.host)}.
 
 - else
   You are an administrator for the '#{@source.title}' campaign and may not unsubscribe from it.

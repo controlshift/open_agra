@@ -2,7 +2,7 @@ module Queries
   module Exports
     class MembersExport < Export
       def klass
-        Signature
+        Member
       end
 
       def sql

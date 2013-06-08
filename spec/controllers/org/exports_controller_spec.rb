@@ -16,11 +16,20 @@ describe Org::ExportsController do
     end
 
     describe "signatures" do
-      before(:each) do
+      it "should render success response" do
         get :signatures
+        response.should be_success
       end
 
-      specify  { response.should be_success }
+      it "should render being uploaded page when number of rows are more than 30k" do
+        Sidekiq::Worker.clear_all
+        Queries::Exports::SignaturesExport.any_instance.stub(:total_rows).and_return(30001)
+        request.env["HTTP_REFERER"] = '/'
+        get :signatures
+        response.should be_redirect
+        flash[:notice].should == 'Your CSV is being generated. Please check your email after some time to get the download link.'
+        Sidekiq::Worker.jobs.count.should == 1
+      end
     end
 
     describe "petitions" do

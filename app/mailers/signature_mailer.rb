@@ -11,8 +11,8 @@ class SignatureMailer < ActionMailer::Base
     }
 
     mail(to: signature.email,
-         from: signature.petition.organisation.contact_email_with_name,
-         subject: "Thanks for signing #{@petition.title}",
+         subject: t('mailers.signature.thank_signer.subject', petition_title: @petition.title),
+         from: signature.petition.email_from_address,
          content_type: 'text/html',
          organisation: @organisation)
   end

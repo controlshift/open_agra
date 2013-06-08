@@ -1,0 +1,1 @@
+class OrganisationNotFoundException < Exception ; end

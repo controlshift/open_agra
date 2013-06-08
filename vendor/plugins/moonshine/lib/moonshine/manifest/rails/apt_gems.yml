@@ -1,0 +1,71 @@
+curb:
+- libcurl4-openssl-dev
+
+mysql:
+- libmysqlclient15-dev
+
+'sqlite3-ruby':
+- sqlite3
+- libsqlite3-dev
+
+# nokogiri and things that depend on it
+nokogiri:
+- libxml2-dev
+- libxslt1-dev
+fog:
+- libxml2-dev
+- libxslt1-dev
+sunspot_rails:
+- libxml2-dev
+- libxslt1-dev
+blue_state_digital:
+- libxml2-dev
+- libxslt1-dev
+aws-sdk:
+- libxml2-dev
+- libxslt1-dev
+capybara:
+- libxml2-dev
+- libxslt1-dev
+xpath:
+- libxml2-dev
+- libxslt1-dev
+
+
+<% imagemagick_dev_package = Facter.lsbdistid == 'Ubuntu' &&  Facter.lsbdistrelease.to_f == 8.10 ? 'libmagick9-dev' : 'libmagickwand-dev' %>
+rmagick:
+- imagemagick
+- <%= imagemagick_dev_package %>
+paperclip:
+- imagemagick
+- <%= imagemagick_dev_package %>
+'thoughtbot-paperclip':
+- imagemagick
+- <%= imagemagick_dev_package %>
+mini_magick:
+- imagemagick
+- <%= imagemagick_dev_package %>
+dragonfly:
+- imagemagick
+- <%= imagemagick_dev_package %>
+
+postgres:
+- postgresql-client
+- postgresql-contrib
+- libpq-dev
+
+libxml-ruby:
+- libxml2
+- libxml2-dev
+
+image_science:
+- libfreeimage3
+- libfreeimage-dev
+
+geoip_city:
+- libgeoip-dev
+
+memcached:
+- libsasl2-2
+- libsasl2-dev
+- libsasl2-modules

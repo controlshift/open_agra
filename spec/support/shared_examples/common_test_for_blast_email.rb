@@ -7,7 +7,7 @@ shared_examples_for BlastEmail do
   it { should validate_presence_of(:subject) }
   it { should validate_presence_of(:body) }
 
-  it { should ensure_length_of(:from_name).is_at_most(100) }
+  it { should ensure_length_of(:from_name).is_at_most(200) }
   it { should ensure_length_of(:subject).is_at_most(255) }
 
   it { should allow_mass_assignment_of(:from_name) }
@@ -15,9 +15,6 @@ shared_examples_for BlastEmail do
   it { should allow_mass_assignment_of(:subject) }
   it { should allow_mass_assignment_of(:body) }
 
-  it { should allow_value('ABCDEFGHIJKLMNOPQRSTUVWXYZ').for(:from_name) }
-  it { should allow_value("abcdefghijklmnopqrstuvwxyz1234567890- '").for(:from_name) }
-  it { should_not allow_value(',<.>/?;:"[{}]"~!@#$%^&*()_=+ ').for(:from_name) }
   it { should allow_value('foo bar').for(:body)}
 
   it "should combine email with name" do

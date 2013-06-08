@@ -1,8 +1,11 @@
-
 - if params[:category]
-  = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
-  >
-  = params[:category]
+  %ul.breadcrumb
+    %li
+      = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
+      %span.divider
+        >
+    %li.active
+      = params[:category]
 
 - if params[:category]
   = title params[:category]

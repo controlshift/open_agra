@@ -4,7 +4,7 @@
 # Class Content contains categories in case you want to add a new category.
 
 def load_content(slug)
-  IO.read(File.join(Rails.root, 'db', 'fixtures', 'content', "#{slug}.txt")) 
+  IO.read(File.join(Rails.root, 'db', 'fixtures', 'content', "#{slug}.txt"))
 end
 Content.seed(:slug, :organisation_id,
 
@@ -56,6 +56,8 @@ Content.seed(:slug, :organisation_id,
   { slug: 'leader_duties_text',    body: load_content('leader_duties_text'),   category: 'Efforts', name: 'Leader duty',          filter: 'liquid'  },
   { slug: 'how_this_works_text',   body: load_content('how_this_works_text'),  category: 'Efforts', name: 'Specific target help', filter: 'liquid'  },
   { slug: 'training_text',         body: load_content('training_text'),        category: 'Efforts', name: 'Training text',        filter: 'liquid'  },
-  { slug: 'training_sidebar_text', body: load_content('training_sidebar_text'),category: 'Efforts', name: 'Training sidebar text',filter: 'liquid'  }
+  { slug: 'training_sidebar_text', body: load_content('training_sidebar_text'),category: 'Efforts', name: 'Training sidebar text',filter: 'liquid'  },
+
+  { slug: 'new_petition_lede', body: '', category: 'Petitions', name: 'New Petition Lede'  }
 )
 

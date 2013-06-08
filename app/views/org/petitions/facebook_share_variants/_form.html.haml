@@ -1,0 +1,7 @@
+= simple_form_for [:org, @petition, @share_variant], :wrapper => 'compact' do |form|
+  = form.input :title, label: "Facebook Share Title", input_html: { class:  'span9'}
+  = form.input :description, label: "Facebook Share Description", input_html: { class: 'span9', rows: 4}
+  = image_tag @share_variant.image.url(:form) if @share_variant.image.present?
+  = form.input :image, label: "Facebook Share Image", input_html:  { class:  'span9'}
+  .actions
+    = form.button :submit

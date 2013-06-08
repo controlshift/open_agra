@@ -182,45 +182,55 @@ describe Petitions::SignaturesController do
     context "a petition" do
       before(:each) do
         @user = Factory(:user, organisation: @organisation)
-        @petition = Factory(:petition, user: @user, organisation: @organisation)
       end
 
+      let(:petition) {  @petition = Factory(:petition, user: @user, organisation: @organisation) }
+
       it "should sign the petition" do
-        @petition.signatures.should be_empty
+        petition.signatures.should be_empty
         @signature = Factory.attributes_for(:signature)
-        post :create, {signature: @signature, petition_id: @petition}
-        @petition.signatures.count.should == 1
-        response.should redirect_to thanks_petition_path(@petition)
+        post :create, {signature: @signature, petition_id: petition}
+        petition.signatures.count.should == 1
+        response.should redirect_to thanks_petition_path(petition)
+      end
+
+      context "petition with after_signature_redirect" do
+        let(:petition) {  @petition = Factory(:petition, user: @user, organisation: @organisation, after_signature_redirect_url: 'http://www.google.com/') }
+
+        it "should redirect to an alternate url" do
+          post :create, {signature: Factory.attributes_for(:signature), petition_id: petition}
+          response.should redirect_to 'http://www.google.com/'
+        end
       end
 
       it "should sign the petition with mobile" do
-        @petition.signatures.should be_empty
+        petition.signatures.should be_empty
         @signature = Factory.attributes_for(:signature)
-        post :create, {signature: @signature, petition_id: @petition, format: "mobile"}
-        @petition.signatures.count.should == 1
-        response.should redirect_to thanks_petition_path(@petition)
+        post :create, {signature: @signature, petition_id: petition, format: "mobile"}
+        petition.signatures.count.should == 1
+        response.should redirect_to thanks_petition_path(petition)
       end
 
       it "should not sign with insufficient info" do
         attributes = Factory.attributes_for(:signature)
         attributes.delete(:postcode)
-        post :create, {signature: attributes, petition_id: @petition}
-        @petition.signatures.count.should == 0
+        post :create, {signature: attributes, petition_id: petition}
+        petition.signatures.count.should == 0
         response.should render_template('petitions/view/show')
       end
 
       it "should ignore signature whose email already exists" do
-        signature = Factory.create(:signature, petition: @petition)
-        post :create, {signature: Factory.attributes_for(:signature, email: signature.email), petition_id: @petition}
-        @petition.signatures.count.should == 1
-        response.should redirect_to thanks_petition_path(@petition)
+        signature = Factory.create(:signature, petition: petition)
+        post :create, {signature: Factory.attributes_for(:signature, email: signature.email), petition_id: petition}
+        petition.signatures.count.should == 1
+        response.should redirect_to thanks_petition_path(petition)
       end
 
       it "should ignore signature whose email already exists with mobile" do
-        signature = Factory.create(:signature, petition: @petition)
-        post :create, {signature: Factory.attributes_for(:signature, email: signature.email), petition_id: @petition, format: "mobile"}
-        @petition.signatures.count.should == 1
-        response.should redirect_to thanks_petition_path(@petition)
+        signature = Factory.create(:signature, petition: petition)
+        post :create, {signature: Factory.attributes_for(:signature, email: signature.email), petition_id: petition, format: "mobile"}
+        petition.signatures.count.should == 1
+        response.should redirect_to thanks_petition_path(petition)
       end
     end
   end

@@ -1,7 +1,7 @@
 %p
   %i
     &ndash;&ndash;&nbsp;&nbsp;Below is a message about your petition. View your petition at
-    = link_to "#{petition_url(@petition)}", petition_url(@petition)
+    = link_to "#{petition_url(@petition, host: @organisation.host)}", petition_url(@petition, host: @organisation.host)
     &nbsp;&nbsp;&ndash;&ndash;
 %p
   %pre{style: "font-family:arial;"}

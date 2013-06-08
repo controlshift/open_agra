@@ -14,13 +14,13 @@ class Petitions::PetitionFlagsController < ApplicationController
       threshold = Agra::Application.config.flagged_petitions_threshold
       PetitionFlagMailer.delay.notify_organisation_of_flagged_petition(@petition) if @petition.flags.count == 1 || @petition.flags.count == threshold
       respond_to do |format|
-        format.html { redirect_to petition_path(@petition), notice: "The petition has been flagged." }
-        format.json { render json: {notice: "The petition has been flagged."}, status: :ok }
+        format.html { redirect_to petition_path(@petition), notice: t('controllers.petitions.petition_flag.success_create') }
+        format.json { render json: {notice: t('controllers.petitions.petition_flag.success_create')}, status: :ok }
       end
     else
       respond_to do |format|
-        format.html { redirect_to petition_path(@petition), alert: "You have already flagged this petition." }
-        format.json { render json: {notice: "You have already flagged this petition."}, status: :not_acceptable }
+        format.html { redirect_to petition_path(@petition), alert: t('controllers.petitions.petition_flag.error_create') }
+        format.json { render json: {notice: t('controllers.petitions.petition_flag.error_create')}, status: :not_acceptable }
       end
     end
   end

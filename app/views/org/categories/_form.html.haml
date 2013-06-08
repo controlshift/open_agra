@@ -1,5 +1,7 @@
 = simple_form_for [:org, @category], validate: true, :wrapper => 'compact' do |form|
   = form.input :name, input_html: { class:  'span3' }
+  - if @category.persisted? && @category.external_id.present?
+    = form.input :external_id, label: "#{current_organisation.notifiers} External ID", hint: "Consult with support before changing External ID."
   .clear
   .actions
     = form.button :submit

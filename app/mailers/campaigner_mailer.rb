@@ -35,7 +35,7 @@ class CampaignerMailer < ActionMailer::Base
     end
     
     mail(to: recipient.email,
-         subject: "Thanks for creating the petition: #{petition.title}",
+         subject: t('mailers.campaigner.thanks_for_creating.subject', petition_title: petition.title),
          from: organisation.contact_email_with_name,
          content_type: 'text/html',
          organisation: organisation) do | format|
@@ -48,7 +48,7 @@ class CampaignerMailer < ActionMailer::Base
     organisation = @petition.organisation
     if @petition.user
       mail(to: @petition.email,
-           subject: 'Your campaign has been marked as inappropriate',
+           subject: t('mailers.campaigner.notify_petition_being_marked_as_inappropriate.subject'),
            from: organisation.contact_email_with_name,
            organisation: organisation)
     else
@@ -57,14 +57,15 @@ class CampaignerMailer < ActionMailer::Base
   end
 
   def send_share_kicker(petition)
-    send_kicker_email(petition, 'Share with your friends')
+    send_kicker_email(petition, t('mailers.campaigner.send_share_kicker.subject'))
   end
   
   def notify_petition_letter_ready_for_download(petition, user)
     @petition = petition
+    @user = user
     organisation = @petition.organisation
     mail(to: user.email,
-         subject: 'Petition is ready to Deliver',
+         subject: t('mailers.campaigner.notify_petition_letter_ready_for_download.subject'),
          from: organisation.contact_email_with_name,
          organisation: organisation)
   end

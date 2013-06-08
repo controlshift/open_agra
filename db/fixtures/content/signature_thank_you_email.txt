@@ -15,11 +15,19 @@ Can you help spread the word about the campaign by sharing it with your friends 
 </p>
 
 <p>
-<a href="{% facebook_share_url %}">Share on facebook.</a>
+<a href="{% facebook_share_url %}" style="text-decoration:none; margin-right:10px;">
+<span style="background-color:#3b5998;border:solid 1px #660000;text-decoration:none;color:#ffffff;padding:10px;font-weight:bold">
+SHARE ON FACEBOOK
+</span>
+</a>
 </p>
-
+<br/>
 <p>
-<a href="{% twitter_share_url %}">Share on twitter.</a>
+<a href="{% twitter_share_url %}" style="text-decoration:none">
+<span style="background-color:#56BBFF;border:solid 1px #660000;text-decoration:none;color:#ffffff;padding:10px 18px;font-weight:bold">
+SHARE ON TWITTER
+</span>
+</a>
 </p>
 
 <p>

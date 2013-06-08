@@ -6,7 +6,7 @@
   = title effort.title
 .welcome-text.mt10
   %p
-    = @effort.landing_page_welcome_text
+    = @effort.landing_page_welcome_text.html_safe if @effort.landing_page_welcome_text
 
 
 .location-label.mt5.clearfix.center
@@ -15,4 +15,4 @@
   .search-area.pull-left
     %form.big-efforts-search.effort-location-search{ action: effort_near_index_path(effort), method: 'GET' }
       #efforts-near-container.near-effort-search.query-container.span6{'data-organisation-country' => current_organisation.settings[:country]}
-        = render :partial => 'efforts/search_container'
+        = render :partial => 'search_container'

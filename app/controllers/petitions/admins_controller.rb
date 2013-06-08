@@ -7,19 +7,19 @@ class Petitions::AdminsController < ApplicationController
 
   def new
     @campaign_admin = CampaignAdmin.new
-    @admins = [@petition.user] + @petition.campaign_admins
+    @admins = ([@petition.user] + @petition.campaign_admins).flatten.compact
   end
 
   def create
     invitation_email = params[:campaign_admin][:invitation_email]
     invitation = CampaignAdmin.find_by_invitation_email_and_petition_id(invitation_email, @petition.id)
 
-    if invitation_email.strip.casecmp(@petition.email) == 0
-      error 'You cannot invite campaign creator'
+    if @petition.user && invitation_email.strip.casecmp(@petition.email) == 0
+      error t('controllers.petitions.admin.can_not_invite')
     elsif invitation || (invitation = create_invitation(invitation_email)).save
       InvitationMailer.delay.send_to_campaign_admin(invitation)
 
-      flash[:notice] = "Invitation email has been sent to #{invitation_email}"
+      flash[:notice] = t('controllers.petitions.admin.success_create', email: invitation_email)
       redirect_to new_petition_admin_path(@petition)
     else
       error invitation.errors.full_messages.join(',')
@@ -29,11 +29,17 @@ class Petitions::AdminsController < ApplicationController
 
   def show
     if user_signed_in? && params_valid?
-      @campaign_admin.user = current_user
-      @campaign_admin.save!
+      if @petition.user.present?
+        @campaign_admin.user = current_user
+        @campaign_admin.save!
+      else
+        @petition.user = current_user
+        @petition.save!
+        @campaign_admin.destroy
+      end
       redirect_to petition_manage_path(@petition)
     elsif user_signed_in?
-      redirect_to root_path, alert: 'Incorrect token or email address for petition admin invitation.'
+      redirect_to root_path, alert: t('controllers.petitions.admin.invalid_token')
     else
       session[:user_return_to] = request.url
       redirect_to new_user_registration_path(email: @campaign_admin.invitation_email)
@@ -43,7 +49,7 @@ class Petitions::AdminsController < ApplicationController
   def destroy
     if @campaign_admin.petition == @petition && @campaign_admin.destroy
       redirect_to new_petition_admin_path(@petition)
-      flash[:notice] = "Admin '#{@campaign_admin.invitation_email}' has been removed from the campaign admin list."
+      flash[:notice] = t('controllers.petitions.admin.success_delete', email: @campaign_admin.invitation_email)
     else
       raise ActiveRecord::RecordNotFound
     end

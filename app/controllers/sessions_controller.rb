@@ -3,6 +3,11 @@ class SessionsController < Devise::SessionsController
 
   before_filter :load_organisation_id, only: [:create]
 
+  def destroy
+    super
+    session[:facebook_access_token] = nil
+  end
+  
   private
 
   def load_organisation_id

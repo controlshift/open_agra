@@ -1,7 +1,13 @@
 require 'spec_helper'
 
 describe Petitions::EmailsController do
-  include_context 'setup_default_organisation'
+
+  before(:each) do
+    @organisation = Factory(:organisation, notification_url: "http://any.url.com", contact_email: 'test@test.com') if !defined?(@organisation)
+    stub_request(:any, @organisation.notification_url)
+    Organisation.stub(:find_by_host) { @organisation }
+    controller.stub(:current_organisation) { @organisation }
+  end
   
   context 'user not yet confirmed' do
     before(:each) do
@@ -93,19 +99,18 @@ describe Petitions::EmailsController do
       end
 
       it 'should not send blast if there have already been 3 this week' do
-        3.times {
-          post :create, petition_id: @petition, petition_blast_email: @email
-          flash[:notice].should == 'Your email has been sent to your supporters.'
-        }
+        Petition.stub(:find_by_slug!).and_return(@petition)
+        3.times { FactoryGirl.create(:petition_blast_email, petition: @petition)}
 
-          subject.should_not_receive(:send_email_to_supporters).with(kind_of(PetitionBlastEmail))
-          post :create, petition_id: @petition, petition_blast_email: { subject: 'rejected subject', body: 'rejected content' }
-          response.should render_template :new
+        subject.should_not_receive(:send_email_to_supporters).with(kind_of(PetitionBlastEmail))
+        post :create, petition_id: @petition, petition_blast_email: { subject: 'rejected subject', body: 'rejected content' }
+        response.should be_success
+        response.should render_template :new
       end
     end
 
     describe '#test' do
-      it 'should not sent test email if email not valid' do
+      it 'should not send test email if email not valid' do
         blast_email = mock
         full_messages = mock
         errors = mock
@@ -113,6 +118,7 @@ describe Petitions::EmailsController do
         PetitionBlastEmail.stub(:new) {blast_email}
         blast_email.stub(:valid?) {false}
         blast_email.should_receive(:petition=){@petition}
+        blast_email.should_receive(:organisation=){@organisation}
 
         blast_email.stub(:errors) {errors}
         blast_email.should_receive(:errors)
@@ -125,7 +131,7 @@ describe Petitions::EmailsController do
         response.body.should have_content 'error messages'
       end
 
-      it 'should not sent test email if there is an exception' do
+      it 'should not send test email if there is an exception' do
         exception = Exception.new('exception raised')
         subject.stub(:send_test_email_to_myself).and_raise(exception)
 
@@ -135,7 +141,14 @@ describe Petitions::EmailsController do
         response.body.should have_content 'exception raised'
       end
 
-      it 'should sent test email to petition admin' do
+      it "should always send email to the current user" do
+        subject.stub(:send_test_email_to_myself)
+        post :test, petition_id: @petition, format: :json, petition_blast_email: @email
+
+        assigns[:email].from_address.should == @user.email
+      end
+
+      it 'should send test email to petition admin' do
         subject.should_receive(:send_test_email_to_myself)
         
         post :test, petition_id: @petition, format: :json, petition_blast_email: @email

@@ -33,7 +33,15 @@ module Documents
     end
 
     def additional_field_columns(signature)
-      additional_field_keys.map{|key| signature.respond_to?(key.intern) ? signature.send(key.intern) : "" }
+      additional_field_keys.map{|key| signature.respond_to?(key.intern) ? render_additional_field(signature, key) : "" }
+    end
+
+    def render_additional_field(signature, key)
+      if signature.respond_to?("#{key}?".intern)
+        signature.send("#{key}?".intern) ? "x" : ""
+      else
+        signature.send(key.intern)
+      end
     end
 
     def main_body_content(pdf)

@@ -6,7 +6,7 @@ class Groups::ManageController < ApplicationController
   end
 
   def export
-    streaming_csv(Queries::Exports::MembersForGroupExport.new(group: @group, organisation: current_organisation))
+    streaming_csv(Queries::Exports::MembersForGroupExport.new(group_id: @group.id, organisation: current_organisation))
   end
 
   private

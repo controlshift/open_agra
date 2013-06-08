@@ -36,6 +36,16 @@ describe UsersController do
       
       response.should render_template :edit
     end
+
+    it "should redirect to crop when image is present" do
+      params = { user: {"image" => "image.gif"}}
+      users_service = users_service_mock
+      users_service.should_receive(:update_attributes).with(@user, params[:user]) {true}
+
+      put :update, params
+
+      response.should render_template :crop
+    end
   end
   
   describe "#update_password" do

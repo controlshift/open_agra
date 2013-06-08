@@ -9,7 +9,8 @@ module HasPaperclipFile
 
   module ClassMethods
     def has_paperclip_file(attr_name, options)
-      has_attached_file attr_name, Rails.configuration.paperclip_file_options
+      paperclip_options = options[:paperclip_options] || {}
+      has_attached_file attr_name, Rails.configuration.paperclip_file_options.merge(paperclip_options)
       eval("before_#{attr_name}_post_process :should_preprocess_file")
       attr_accessible attr_name if options[:attr_accessible]
     end

@@ -1,0 +1,122 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Petitions', org_petitions_path
+    %span.divider
+      >
+  %li.active
+    = "#{@petition.title} Admin"
+.clear
+
+.row
+  .span7
+    = title "#{@petition.title}", class: 'left'
+
+    .manage-buttons
+      .btn-group
+        = link_to petition_path(@petition), id: "view-petition-button", class: "btn btn-manage" do
+          %i.icon-eye-open
+          View
+        = link_to petition_manage_path(@petition), id: "manage-petition-button", class: "btn btn-manage" do
+          %i.icon-cog
+          Manage
+
+.row
+  - if @petition.user.present?
+    .leader-info-box.clearfix.mt30
+      .leader-icon.pull-left.mr20.ml20
+        - if @petition.user.facebook_id.present?
+          = image_tag "http://graph.facebook.com/#{@petition.user.facebook_id}/picture", class: 'profile-image'
+        - else
+          %i.icon-user
+      .leader-info.pull-left.mr20
+        .leader-name.mb10
+          = @petition.user.full_name
+        .email= @petition.user.email
+        .phone-number= @petition.user.phone_number
+      .actions.pull-left
+        .edit-user.ml5.mt10
+          %p
+            = link_to 'Edit User', edit_org_user_path(@petition.user)
+          %p
+            = link_to 'Switch User', edit_org_petition_user_path(@petition, @user)
+  - else
+    .no-leader.mt20.mb10
+      The petition has no leader yet.
+.row
+  .admin-notes.span6.mt10.mb10
+    = simple_form_for(@petition, url: org_petition_note_path(@petition), method: :put, wrapper: 'compact') do |f|
+      = f.input :admin_notes, as: :text, label: "Notes", input_html: {rows: 5, class:'span6'}
+      = f.button :submit, class: "btn right"
+
+.row
+  .span7
+    %h3 Information
+
+    %table{'class' => 'table table-striped'}
+      %thead
+        %tr
+          %th
+            Field
+          %th
+            Value
+      %tbody
+        - {'Created At' => @petition.created_at, 'Updated At' => @petition.updated_at, 'Cancelled' => @petition.cancelled,
+            'Launched' => @petition.launched, 'Moderation Status' => @petition.admin_status, 'Last Moderated At' => @petition.administered_at ?  @petition.administered_at : 'Not Moderated',
+            'Source' => @petition.source }.each do |key, value|
+          %tr{class: cycle("odd", "even")}
+            %td
+              = key.blank? ? 'no source' : key
+            %td
+              = value
+
+.row
+  .span7
+    %h3 Signatures
+
+    %table{'class' => 'table table-striped'}
+      %thead
+        %tr
+          %th
+            Source
+          %th
+            Count
+
+      %tbody
+        - @petition.signature_counts_by_source.each do |key, value|
+          %tr{class: cycle("odd", "even")}
+            %td
+              = key.blank? ? 'no source' : key
+            %td
+              = value
+.row
+  .span7
+    %h3 Options
+
+    %ul
+      %li
+        = link_to 'Download Signatures', org_petition_signatures_path(@petition, format: 'csv')
+      %li
+        = link_to 'Manage Signatures', org_petition_signatures_path(@petition)
+      %li
+        = link_to 'Manage Comments', org_petition_comments_path(@petition)
+
+- if @admins.any?
+  .row
+    .campaign-admins.span7.mt20
+      %h3 Additional Campaign Admins
+      = table_for(@admins) do |t|
+        = t.data do
+          - t.cell(:name) { |a| a.full_name }
+          - t.cell(:email) { |a| a.email }
+          - t.cell(:phone) { |a| a.phone_number }
+      = link_to "Manage Campaign Admins", new_petition_admin_path(@petition), class: "right"
+
+.row
+  .span7.mt10
+    %h3 Advanced Options
+    %ul
+      %li
+        = link_to 'Manage Facebook Share Experiment', org_petition_facebook_share_variants_path(@petition)
+      %li
+        = link_to 'Settings', org_petition_settings_path(@petition)
+

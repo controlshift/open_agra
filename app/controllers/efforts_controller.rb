@@ -3,7 +3,7 @@ class EffortsController < ApplicationController
   before_filter :load_effort
 
   def show
-    @petitions = @effort.order_petitions_by_location(params[:location])
+    @petitions = @effort.order_petitions_by_location(params[:location]).paginate page: params[:page], per_page: 15
     if @effort.specific_targets?
       render 'show_specific_targets_effort'
     else

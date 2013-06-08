@@ -1,0 +1,25 @@
+:scout:
+  #Rails Machine's 'Cloud image' key, for standardized plugin set
+  :agent_key: c59ececc-7d50-4d2e-9a66-07ba3b85f797
+
+:ssh:
+  # Make sure Rails Machine is authorized
+  :authorized_keys:
+    railsmachine:
+      :type: ssh-rsa 
+      :key: AAAAB3NzaC1yc2EAAAABIwAAAQEA8eS7AIiTm5EyIs8Sivourxb5JxLwtGspzCMuJou3cvpbxqhPOuk3DVZq/T3JOpOcw1AZqz4UlfyKihUVkxpBhVDQHEBciPXYJ4M/FkpvOU7ANG/Dwc+SkhrSg3bRW94bT2JoYLfli8S4dqIOM/496HbbJ3i3jMfR18DaS5QTpNhH6NJyshOk+bvWgWGEMMXC/nYHzCywaCNb7iuDzc2r/5Mle/yl2w4/L1aUck0qFTgShmLUgBwpd+lawBoevBqRfSCKuq8IBFP5peGW9v+VUb5Zf1mKQl5jokF61FCGpl/WoEPYXc062Bv0s/O86uKStgURpniVkzkgQkQLRgYttw==
+    railsmachine-monitoring:
+      :type: ssh-rsa 
+      :key: AAAAB3NzaC1yc2EAAAABIwAAAQEA0r18G+Ux0s1PpZgJm/u4677h5IWayXFf67ageRmkogT2CpOqFRCBtIssWcUfGKmXaUUhp9qYu4VKA5N/PcEO7ZHMFOWTBelZhbNSCdGdmOoKKPAC+TG4+10A0C8jA2amlcH941344PyqMQSVn1JeFXCQim5+SVyRcyFDa7lgudlPIfxnDtssp+w9zDHuTMQ1FkaRjTl+mZiU5I69noZrbkehYViMUkxXWaeCjqRgpXHRiCLXGa3RAmBASFwUVegOjQvJ+v0AsuMPUa+yFqiTabUL3lIhgMFvjYpMxkqMuG3mDrRVtfkF+y6ea1U1wIA98ydpt57lv8BpmXhHuUlMZw==
+
+:denyhosts:
+  # Make sure Rails Machine monitoring servers are white listed
+  :allow:
+  - 'ALL : 127.0.0.1     # localhost'
+  - 'ALL : 64.22.127.245 # Rails Machine'
+  - 'ALL : 64.22.127.26  # Rails Machine'
+
+:heartbeat:
+  # Rails Machine heartbeat is always managed done over eth1
+  :interface: eth1
+  :logfacility: local1 # don't use local0, to avoid being lumped with haproxy

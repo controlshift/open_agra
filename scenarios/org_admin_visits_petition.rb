@@ -17,9 +17,6 @@ describe "Org admin visits a petition'", type: :request, nip: true do
   it "should show petition details from the same organisation" do
     visit petition_path(@petition)
     
-    page.should have_content(@user.email)
-    page.should have_content(@user.phone_number)
-    
     page.should have_link "Manage"
   end
   

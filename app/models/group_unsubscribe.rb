@@ -2,7 +2,7 @@ class EmailAndSubscriptionMustMatchValidator < ActiveModel::Validator
   def validate(record)
     if record.email && record.subscription
       if record.subscription.email.casecmp(record.email.to_s) != 0
-        record.errors[:email] << "does not match subscribed address."
+        record.errors[:email] << I18n.t('errors.messages.email_subscription.dont_match')
       end
     end
   end

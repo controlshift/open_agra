@@ -1,0 +1,11 @@
+%p Hi #{@user.first_name},
+
+%p
+  Your export has been processed and is ready for download. Please note that the link shall only work for a month, post which you will have to get a fresh link for your data.
+
+%p  
+  #{link_to "Download File", org_csv_report_url(@csv_report,  host: @organisation.host)}
+
+%p Thanks,
+
+%p The #{@csv_report.export.organisation.name} Team

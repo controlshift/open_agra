@@ -104,4 +104,12 @@ describe Story do
       story.errors[:image].should == []
     end
   end
+
+  describe ".featured_stories" do
+    it "should return the featured story" do
+      organisation = Factory(:organisation)
+      story = Factory(:story, organisation: organisation, featured: true)
+      Story.featured_stories(organisation).should == [story]
+    end
+  end
 end

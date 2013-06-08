@@ -1,0 +1,40 @@
+- cache [@petition, @petition.effort, @petition.group] do
+  - if @petition.effort.present?
+    = render partial: "petitions/view/petition_upper_link", locals: {obj: @petition.effort, obj_class: "effort-link", path: effort_url(@petition.effort)}
+  - elsif @petition.group.present?
+    = render partial: "petitions/view/petition_upper_link", locals: {obj: @petition.group, obj_class: "group-link", path: group_url(@petition.group)}
+  - title @petition.title
+
+  %h2.label.back-label.mb10
+    = link_to @petition do
+      %i.icon-arrow-left
+      Back to petition
+
+  .petition-box
+    .row
+      .span9
+        %h1.title= @petition.title
+    %h2.who
+      %span{id:'petition-who-to'}
+        To:
+      #{@petition.who}
+
+- cache @comment do
+  %h2.comments-box-title
+    Reason for signing
+
+  .comments
+    .comments-box.span11.detailed
+      = content_tag_for(:li, @comment) do
+        .comment-header
+          %span.name
+            = @comment.signature.full_name_with_mask
+          %span.label
+            %abbr.timeago{ title: "#{@comment.created_at_iso_8601}" }= @comment.created_at
+        .comment
+          = @comment.text
+        .actions
+          = link_to(like_petition_comment_path(@petition, @comment), {remote: true, method: :put, class:'tooltip-link', 'data-original-title' => 'Like This'}) do
+            %i.icon-heart
+:javascript
+  $('abbr.timeago').timeago();

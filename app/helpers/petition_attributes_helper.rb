@@ -2,14 +2,18 @@ module PetitionAttributesHelper
   def attributes_for_petition(hash)
     hash.symbolize_keys.slice(:image, :title, :who, :what, :why, :delivery_details,
                               :campaigner_contactable, :effort_id, :group_id, :source, :categorized_petitions_attributes,
-                              :share_on_facebook, :share_with_friends_on_facebook, :share_on_twitter, :share_via_email)
+                              :share_on_facebook, :share_with_friends_on_facebook, :share_on_twitter, :share_via_email, :external_site, :external_facebook_page)
   end
 
   def attributes_for_categorized_petitions(petition, category_ids)
     attributes = []
     unless category_ids.nil?
+      new_category_ids = case category_ids
+      # handle single select id
+      when String then [category_ids.to_i]
       # convert the category_ids to an array of integer and exclude 0 from it
-      new_category_ids = category_ids.map {|cid| cid.to_i }.reject {|cid| cid == 0 }
+      when Array then category_ids.map {|cid| cid.to_i }.reject {|cid| cid == 0 }
+      end
 
       # remove deselected
       if petition

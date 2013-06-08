@@ -1,8 +1,8 @@
 .row
   .span7
-    = title "Partner Groups"
+    = title "Partnerships"
   .span3
-    = link_to 'New Group', new_org_group_path, class: "btn btn-primary", id: 'new-group'
+    = link_to 'New Partnership', new_org_group_path, class: "btn btn-primary", id: 'new-group'
 
 - if @groups.any?
   = table_for(@groups) do |t|
@@ -15,9 +15,9 @@
   .row
     .span4.offset4{style:"padding-top:50px;"}
       %p
-        Groups are partner organisations that each have their own special area on the platform.
+        Partners are organisations that each have their own special area on the platform.
       %p
-        Partner group admins can export signatures and track activity for the petitions that they and their members create.
+        Partner admins can export signatures and track activity for the petitions that they and their members create.
 
     .span1
       = image_tag "target-arrow.png"

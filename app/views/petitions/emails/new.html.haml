@@ -4,8 +4,9 @@
     %hr.mt50
     %h4
       =image_tag "icon-bulb.png"
+      %span{ style: 'padding-left:4px;' }
       Email Tips
-    %ul
+    %ul.email-tips
       %li Your subject line is the first thing people will see – and it's how people will decide if they want to open your email.  Keep it short and punchy and test it out on your friends.
       %li Double check your emails for spelling and grammar mistakes – better yet, have a friend read over it for you.
       %li Most people only skim emails – so keep it short and bold important information.
@@ -31,12 +32,11 @@
 
       %h4 From:
       .well
-        = current_user.email
+        = @email.from
 
       %h4 To:
-      .well
-        = " #{pluralize(@petition.cached_signatures_size, 'supporter')} of the \"#{@petition.title}\" petition"
-
+      .well#recipient
+        = render :partial => 'recipient' # override for Coworker
 
       = f.input :subject, label: 'Subject'
       .mb10
@@ -48,7 +48,6 @@
         .btn-desc
           to #{pluralize(@petition.signatures.count, 'supporter')}
         = f.button :submit, 'Send', class: 'btn-primary', disable_with: 'Sending…', id: 'send-email-btn'
-
 
 %br
 %section#templates-and-examples

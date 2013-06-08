@@ -2,15 +2,14 @@
 #
 # Table name: blast_emails
 #
-#  id                :integer         not null
+#  id                :integer         not null, primary key
 #  petition_id       :integer
 #  from_name         :string(255)     not null
 #  from_address      :string(255)     not null
 #  subject           :string(255)     not null
 #  body              :text            not null
-#  delayed_job_id    :integer
-#  created_at        :datetime
-#  updated_at        :datetime
+#  created_at        :datetime        not null
+#  updated_at        :datetime        not null
 #  recipient_count   :integer
 #  moderation_status :string(255)     default("pending")
 #  delivery_status   :string(255)     default("pending")
@@ -19,12 +18,13 @@
 #  type              :string(255)
 #  group_id          :integer
 #  organisation_id   :integer
+#  target_recipients :string(255)
 #
 
 class BodyDefaultTextValidator < ActiveModel::Validator
   def validate(record)
-    if record && record.body && record.body.include?("Not sure what to write? There are templates on the bottom half of the page that you can use")
-      record.errors['body'] << "must not include the help text. Please remove it before sending your message."
+    if record && record.body && record.body.include?(I18n.t('petition_blast_email.default_text'))
+      record.errors['body'] << I18n.t('errors.messages.petition_blast_email.default_text')
     end
   end
 end
@@ -46,7 +46,7 @@ class PetitionBlastEmail < BlastEmail
   end
 
   def recipients
-    petition.subscribed_signatures
+    petition.subscribed_signatures(self.target_recipients)
   end
 
   def new_email_path
@@ -69,7 +69,7 @@ class PetitionBlastEmail < BlastEmail
 
   def max_three_emails_per_week
     if PetitionBlastEmail.where(petition_id: petition_id).where("created_at >= ? AND  moderation_status != ?", 7.days.ago, 'inappropriate').count >= 3
-      errors.add(:petition_id, "can have a maximum of three emails in a week.")
+      errors.add(:petition_id, I18n.t('errors.messages.max_three_emails_per_week'))
     end
   end
 end

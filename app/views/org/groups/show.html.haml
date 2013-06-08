@@ -1,10 +1,24 @@
-.breadcrumbs
-  = link_to 'Groups', org_groups_path
-  >
-  #{@group.title} Group
+%ul.breadcrumb
+  %li
+    = link_to 'Partnerships', org_groups_path
+    %span.divider
+      >
+  %li.active
+    = @group.title
 
-= title "\"#{@group.title}\" Group"
-
+.row
+  .span7
+    = title @group.title
+    %h2 Partnership
+  .span3
+    .manage-buttons
+      .btn-group
+        = link_to group_path(@group), id: "view-group-button", class: "btn btn-manage" do
+          %i.icon-eye-open
+          View
+        = link_to group_manage_path(@group), id: "manage-group-button", class: "btn btn-manage" do
+          %i.icon-cog
+          Manage
 
 
 .row.mt20
@@ -26,14 +40,14 @@
       %h3
         %i.icon-pencil
         Edit
-      Change group settings and content
+      Change partnership settings and content
 
   .span2.well
     = link_to org_group_users_path(@group), class: 'well-button', id: 'group-admin-users' do
       %h3
         %i.icon-user
         Admins
-      Allow partner org staff to mange group
+      Users with access to partnership
 
 
 %h4
@@ -51,16 +65,16 @@
   .row
     .span8
       %p
-        No petitions have been created inside this group yet.
+        No petitions have been created inside this partnership yet.
       %p
-        The partner group can create petitions themselves through the group new petition page, or distribute
+        The partner can create petitions themselves through the partnership's new petition page, or distribute
         the URL to the new petition page to their members.
       %p
-        Petitions created elsewhere on the site can also be manually added to the group by the site administrator.
+        Petitions created elsewhere on the site can also be manually added to the partnership by the site administrator.
 
 = link_to "#", id: "move-petition-into-group", href: "#petition-modal", rel: 'popover', data: { toggle: 'modal' } do
   %i.icon-plus
-  Move Petition Into Group
+  Move Petition Into Partnership
 
 :coffeescript
   $(document).on "pjax:end ready", ->
@@ -71,7 +85,7 @@
   .modal.hide.fade.petition-selector-modal#petition-modal{'data-petition-check-url' => org_group_path(@group), 'data-petition-action-url' => org_group_path(@group)}
     .modal-header
       %button.close{ "data-dismiss" => "modal" } x
-      %h3 Move Petition Into Group
+      %h3 Move Petition Into Partnership
     .modal-body.petition-form
       %b URL of petition to move:
       .mt10

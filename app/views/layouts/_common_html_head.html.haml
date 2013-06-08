@@ -2,12 +2,11 @@
 
 - cache("v1_common_html_head_#{current_organisation.cache_key}", expires_in: 10.seconds) do
   / this changes on each deploy, so short expiry.
-  %link{rel: 'stylesheet', type: 'text/css', href: 'http://fonts.googleapis.com/css?family=Bree+Serif' }
-  - if Agra::Application.assets.find_asset("organisations/#{current_organisation.slug}/application")
-    = stylesheet_link_tag  "organisations/#{current_organisation.slug}/application"
-  - else
-    = stylesheet_link_tag  'organisations/default/application'
+  %link{rel: 'stylesheet', type: 'text/css', href: '//fonts.googleapis.com/css?family=Bree+Serif' }
+  = stylesheet_link_tag  "organisations/#{current_organisation.slug}/application"
+
   - unless Rails.env.test?
+    / font awesome causes capybara-webkit to explode.
     %link{rel: "stylesheet", type: "text/css", href: "/fonts/font-awesome.css" }
   /[if IE 8]
     = stylesheet_link_tag  'ie8'
@@ -17,7 +16,7 @@
       %link{rel: "stylesheet", type: "text/css", href: "/fonts/font-awesome-ie7.css" }
 
 
-  - if Rails.env.production?
+  - if Rails.env.production? || Rails.env.staging? || Rails.env.controlshiftqa?
     %script{ type: 'text/javascript', src: 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js' }
   - else
     = javascript_include_tag 'jquery'

@@ -1,0 +1,12 @@
+<%= remotipart_response do %>
+  $('#status-img').hide();
+  
+  <% if @success %>
+    $('div.preview-image').html('<%= image_content(entity: @petition, style: :form) %>');
+    $('#status-text').text('Image uploaded!');
+  <% else %>
+    $('#status-text').text('Failed to upload. Please try again.');
+  <% end %>
+  $('.btn.primary, .btn-secondary').unbind('click');
+  $('.btn.primary, .btn-secondary').removeAttr('disabled');
+<% end %>

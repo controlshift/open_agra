@@ -1,3 +1,4 @@
+.env
 .bundle
 db/*.sqlite3
 log/*.log*
@@ -15,3 +16,4 @@ solr/pids
 log/*log.lck
 tags
 .zeus.sock
+dump.rdb

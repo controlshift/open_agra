@@ -89,6 +89,7 @@ class SignaturesService < ApplicationService
   end
 
   def increment_organisation_signatures_count
+
     update_organisation_signatures_count do
       Rails.cache.increment(current_organisation.signatures_count_key, 1, raw: true)
     end
@@ -111,14 +112,13 @@ class SignaturesService < ApplicationService
   end
 
   def notify_partner_org
-    OrgNotifier.new.delay.notify_sign_up(organisation: current_object.petition.organisation, 
-                                         petition: current_object.petition, user_details: current_object, role: 'signer')
+    NotifySignupWorker.perform_async(current_object.petition.organisation.id, current_object.petition.id, current_object.id, 'signer')
     true
   end
 
   def create_group_subscription
     group = current_object.petition.group
-    if group.present? && current_object.join_organisation == true
+    if group.present? && current_object.join_group? && current_object.join_organisation?
       GroupSubscription.subscribe!(current_object.member, group )
     end
     true

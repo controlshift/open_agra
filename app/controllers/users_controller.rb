@@ -6,7 +6,11 @@ class UsersController < ApplicationController
   def update
     @user = current_user
     if UsersService.new.update_attributes(@user, params[:user])
-      redirect_to account_path, notice: "Your account details have been updated!"
+      if params[:user][:image].blank?
+        redirect_to account_path, notice: t('controllers.user.success_update')
+      else
+        render :crop
+      end    
     else
       render :edit
     end
@@ -16,7 +20,7 @@ class UsersController < ApplicationController
     @user = current_user
     if @user.update_with_password(params[:user_password])
       sign_in(@user, bypass: true)
-      redirect_to account_path, notice: "Your Password has been updated!"
+      redirect_to account_path, notice: t('controllers.user.success_update_password')
     else
       render :edit
     end

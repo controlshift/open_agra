@@ -1,0 +1,14 @@
+$(".sidebar-box.comment").html('<%= escape_javascript(render(:partial => "comment_thank_you")) %>');
+if($('.comments').length > 0) {
+  if ($('.comments li').length == 3) {
+  	$("ul.comments-box").find('li:last').remove();	
+  }
+  $("ul.comments-box").prepend('<%= escape_javascript(render(:partial => "petitions/comments/comment", locals: {comment: @comment} )) %>');
+} else {
+  <% @comments = [@comment] %>
+  $(".comments-container").html('<%= escape_javascript(render(:partial => "petitions/comments/index")) %>');
+}
+$(".comments abbr.timeago").timeago();
+
+window.Cs.sidebarFixer();
+$('.content-wrapper').resize();

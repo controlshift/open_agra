@@ -1,12 +1,19 @@
-.row
-  .span3
-    = link_to user_omniauth_authorize_path(:facebook, token: params[:token]), class: "btn btn-facebook-login" do
-      = image_tag "facebook-logo-text.png"
-      .logo-separator
-      %strong Log in
-      with
-      %strong Facebook
-.row
-  .span3
-    .subtle.center.mt10
-      We'll never post anything without your permission.
+- cache [current_organisation, params[:token]] do
+  .row
+    .span3
+      = link_to user_omniauth_authorize_path(:facebook, token: params[:token]), class: "btn btn-facebook-login" do
+        = image_tag "facebook-logo-text.png"
+        .logo-separator
+        %strong Log in
+        with
+        %strong Facebook
+  .row
+    .span3
+      .subtle.center.mt10
+        %p
+          We'll never post anything without your permission.
+
+        %p
+          %em
+            = current_organisation.new_account_disclaimer
+

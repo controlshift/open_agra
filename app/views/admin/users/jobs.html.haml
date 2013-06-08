@@ -1,0 +1,32 @@
+%h1
+	All Jobs That have Executed
+%table{:class => "table table-striped"}
+	%tr
+		%th
+			Report name
+		%th
+			Enqueued by
+		%th
+			Enqueued at
+		%th
+			Generated at
+		%th
+			Get Report
+	- @jobs.each do |report|
+		%tr
+			%td
+				= report.name
+			%td
+				= link_to report.exported_by.full_name, 'mailto:' + report.exported_by.full_name + '<' + report.exported_by.email + '>'
+			%td
+				= report.created_at
+			%td
+				- if report.report.present?
+					= report.updated_at
+				- else
+					Being Generated
+			%td
+				- if report.report.present?
+					= link_to 'Download', report.report.url
+%hr
+= will_paginate(@jobs)

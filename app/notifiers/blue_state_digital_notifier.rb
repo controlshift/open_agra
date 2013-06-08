@@ -70,7 +70,7 @@ class BlueStateDigitalNotifier
 
 
         attrs = cons_group_attrs(category.name, category.created_at.utc.to_i)
-        cons_group = connection.constituent_groups.replace_constituent_group!(category.external_id, attrs)
+        cons_group = connection.constituent_groups.rename_group(category.external_id, attrs[:name])
 
         category.external_id = cons_group.id
         category.save!
@@ -134,11 +134,16 @@ class BlueStateDigitalNotifier
   end
 
   def format_data(user_details)
-    {
+    basic_info = {
       firstname: user_details.first_name, 
       lastname: user_details.last_name,
       create_dt: user_details.created_at,
       emails: [{ email: user_details.email, is_subscribed: user_details.join_organisation? ? 1 : 0 }]
     }
+
+    basic_info = basic_info.merge({phones: [{phone: user_details.phone_number, phone_type: 'unknown'}]}) if user_details.phone_number.present?
+    basic_info = basic_info.merge({addresses: [{ country: user_details.country, zip: user_details.postcode, is_primary: 1}]}) if user_details.postcode.present?
+
+    basic_info
   end
 end

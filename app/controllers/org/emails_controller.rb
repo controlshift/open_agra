@@ -24,10 +24,15 @@ class Org::EmailsController < Org::OrgController
       if BlastEmailsService.new.save(@email)
         redirect_to moderation_org_emails_path
       else
-        render :moderation
+        if @email.errors[:moderation_reason].any?
+          flash[:notice] = t('controllers.org.email.moderation_reason_blank')
+        else
+          flash[:notice] = t('controllers.org.email.error_update')
+        end
+        render :show
       end
     else
-      redirect_to moderation_org_emails_path, :notice => 'You may not moderate this email multiple times.'
+      redirect_to moderation_org_emails_path, :notice => t('controllers.org.email.moderation_not_allowed')
     end
   end
 end

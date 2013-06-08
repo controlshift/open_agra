@@ -2,20 +2,19 @@ require 'zip/zip'
 
 module Jobs
   class GeneratePetitionLetterJob
-    def initialize(petition, filename, user)
-      @petition = petition
+    include Sidekiq::Worker
+    
+    def perform petition_id, filename, user_id
+      @petition = Petition.find petition_id
       @filename = filename
-      @user = user
-    end
-
-    def perform
+      @user = User.find user_id
       if @petition.cached_signatures_size < 50000
         generate_single_pdf
       else
         generate_zipped_pdfs
       end
       GC.start
-      end
+    end
 
     def generate_single_pdf
       data = Documents::PetitionLetter.new(petition: @petition ).render

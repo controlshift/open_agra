@@ -2,7 +2,7 @@
 .right.subtle
   %abbr * required field
 
-= simple_form_for @petition, url: post_path, validate: true, wrapper: :compact, html: { id: 'petition_form', multipart: true, class: "petition-form", novalidate: "true"} do |f|
+= simple_form_for @petition, url: post_path, validate: true, wrapper: :compact, html: { id: 'petition_form', multipart: show_details, class: "petition-form", novalidate: "true"} do |f|
   = f.input :effort_id, as: 'hidden', input_html: { value: @effort.id } if @effort
   = f.input :group_id,  as: 'hidden', input_html: { value: @group.id } if @group
 
@@ -28,14 +28,12 @@
 
   - if show_details
     = input_field_for_petition(f, :delivery_details, 'How do you plan to deliver the petition?', 'Will you email the signatures, deliver them in person or stage a press conference?', {rows: 6, maxlength: 5000})
+    = input_field_for_petition(f, :external_facebook_page, 'Facebook page URL',  cf('petition_form_external_facebook_page_help'))
+    = input_field_for_petition(f, :external_site, 'External site URL',  cf('petition_form_external_site_help'))
   - if current_organisation.show_petition_category_on_creation? || show_details
     = render partial: '/petitions/form_categories', locals: { f: f }
-
   - if ask_for_location?
-    #location-container{'data-location-help-text' => cf('petition_form_where_help'),
-                        'data-location-kind'  => @petition.location  ? 'local' : 'national',
-                        'data-location-query' => @petition.location ? @petition.location.query : ""}
-
+    #location-container{'data-location-help-text' => cf('petition_form_where_help'),'data-location-kind'  => @petition.location ? (@petition.location.query.present? ? 'local' : 'custom') : 'national', 'data-location-query' => @petition.location ? @petition.location.query : ""}
     %script{ type: 'text/javascript', src:'http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true'}
     = javascript_include_tag 'location'
   .mt30

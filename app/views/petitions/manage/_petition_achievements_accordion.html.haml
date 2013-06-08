@@ -3,7 +3,7 @@
   = achievements_accordion 'Share on Facebook', :share_on_facebook do
     .row
       .span3
-        = link_to "#", class: "btn btn-primary nofloat facebook", id: "share_on_facebook_button", data: { href: facebook_share_href(@petition) } do
+        = link_to "#", class: "btn btn-primary nofloat facebook", id: "share_on_facebook_button", data: { href: facebook_share_href(@petition), slug: @petition.slug } do
           %i.icon-facebook
           Share on Facebook
       .span4
@@ -11,12 +11,16 @@
           Posting to your facebook wall is one of the most effective ways to spread your campaign
 
 
-  - if can_share_with_friends_on_facebook?
-    = achievements_accordion 'Invite your friends', :share_with_friends_on_facebook do
-      %p.important
-        Who might support this campaign? Invite them to sign with a quick personal note.
+  = achievements_accordion 'Invite your friends', :share_with_friends_on_facebook do
+    %p.important
+      Who might support this campaign? Invite them to sign with a quick personal note.
+    - if can_share_with_friends_on_facebook?
+      = javascript_include_tag "http://connect.facebook.net/#{I18n.locale}/all.js"
       .mb20.mt10
-        = facebook_share_widget_helper template: { name: @petition.title, link: petition_url(@petition) }
+        = facebook_share_widget_helper template: { name: @petition.title, link: petition_url(@petition), appId: @petition.organisation.settings[:fb_app_id] }
+    - else
+      = render partial: "users/shared/facebook_login"
+
   = achievements_accordion 'Share on Twitter', :share_on_twitter do
     = link_to twitter_share_href(@petition), class: "btn btn-primary nofloat", id: "share_on_twitter_button" do
       %i.icon-twitter

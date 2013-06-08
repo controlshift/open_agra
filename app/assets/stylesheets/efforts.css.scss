@@ -151,42 +151,44 @@
 }
 
 
+.body-efforts, .body-near, .body-lead, .body-training {
 
-.sidebar {
-  .title {
-    font-size: 12pt;
-  }
-  ul {
-    color: $accent-color;
-    margin-left: 1.2em;
-    li {
-      margin-top: 10px;
-      span {
+  .sidebar {
+    .title {
+      font-size: 12pt;
+    }
+    ul {
+      color: $accent-color;
+      margin-left: 1.2em;
+      li {
+        margin-top: 10px;
+        span {
+          color: $text-color-light;
+        }
+      }
+    }
+    .progressbar {
+      .text {
+        font-size: 13pt;
+      }
+    }
+    .petition-information {
+      margin-bottom: 20px;
+      line-height: 20px;
+      .target-name {
+        font-size: 12pt;
+      }
+      .location-text {
         color: $text-color-light;
       }
     }
-  }
-  .progressbar {
-    .text {
-      font-size: 13pt;
-    }
-  }
-  .petition-information {
-    margin-bottom: 20px;
-    line-height: 20px;
-    .target-name {
-      font-size: 12pt;
-    }
-    .location-text {
-      color: $text-color-light;
-    }
-  }
 
-  .petition-map {
-    position: relative;
-    .shadow {
-      width: 200px;
-      height: 180px;
+    .petition-map {
+      position: relative;
+      .shadow {
+        width: 200px;
+        height: 180px;
+      }
     }
   }
 }
@@ -215,7 +217,6 @@ ul.ui-autocomplete {
     }
   }
 }
-
 .effort-petition-location {
   font: normal 100% "Bree Serif", serif;
   font-size: 1.1em;

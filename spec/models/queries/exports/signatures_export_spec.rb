@@ -20,10 +20,11 @@ describe Queries::Exports::SignaturesExport do
 
     it "should export signatures" do
       subject.as_csv_stream.to_s.should_not == ""
+      subject.total_rows.should == 1
     end
 
     it "should have a header_row" do
-      subject.header_row.should == ["id", "petition_id", "email", "first_name", "last_name", "phone_number", "postcode", "created_at", "join_organisation", "deleted_at", "unsubscribe_at", "external_constituent_id", "member_id"]
+      subject.header_row.should == ["id", "petition_id", "email", "first_name", "last_name", "phone_number", "postcode", "created_at", "join_organisation", "deleted_at", "unsubscribe_at", "external_constituent_id", "member_id", "source", "join_group", "external_id", "new_member", "comment"]
     end
 
     context "as a magician" do
@@ -32,7 +33,7 @@ describe Queries::Exports::SignaturesExport do
       end
 
       it "should have a magical header row" do
-        subject.header_row.should == ["id", "petition_id", "email", "first_name", "last_name", "phone_number", "postcode", "created_at", "join_organisation", "deleted_at", "unsubscribe_at", "external_constituent_id", "member_id", "magician"]
+        subject.header_row.should == ["id", "petition_id", "email", "first_name", "last_name", "phone_number", "postcode", "created_at", "join_organisation", "deleted_at", "unsubscribe_at", "external_constituent_id", "member_id", "source", "join_group", "external_id", "new_member", "comment", "magician", "magician_kind"]
       end
     end
   end

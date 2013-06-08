@@ -12,7 +12,7 @@ describe PetitionUpdateHelper do
       helper.should_receive(:attributes_for_categorized_petitions).with(petition, petition.attributes[:category_ids])
       PetitionsService.should_receive(:new).and_return(service = mock)
       service.should_receive(:update_attributes).with(petition, petition_attributes).and_return(true)
-      Location.should_not_receive(:find_or_create_by_query)
+      Location.should_not_receive(:find_by_query)
 
       helper.update_petition(petition, petition.attributes).should be_true
     end
@@ -20,7 +20,7 @@ describe PetitionUpdateHelper do
     it 'returns false if something wrong happened while updating the petition' do
       helper.should_receive(:attributes_for_petition).with(petition.attributes).and_return(petition_attributes)
       helper.should_receive(:attributes_for_categorized_petitions).with(petition, petition.attributes[:category_ids])
-      Location.should_not_receive(:find_or_create_by_query)
+      Location.should_not_receive(:find_by_query)
       PetitionsService.should_receive(:new).and_return(service = mock)
       service.should_receive(:update_attributes).with(petition, petition_attributes).and_return(false)
 
@@ -30,7 +30,7 @@ describe PetitionUpdateHelper do
     it 'updates petition as well as creating or finding a given location' do
       helper.should_receive(:attributes_for_petition).with(petition.attributes).and_return(petition_attributes)
       helper.should_receive(:attributes_for_categorized_petitions).with(petition, petition.attributes[:category_ids])
-      Location.should_receive(:find_or_create_by_query).with(location.attributes[:query], location.attributes).and_return(location)
+      Location.should_receive(:find_by_query).with(location.attributes['query']).and_return(location)
       PetitionsService.should_receive(:new).and_return(service = mock)
       service.should_receive(:update_attributes).with(petition, petition_attributes).and_return(true)
 

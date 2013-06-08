@@ -52,6 +52,20 @@ describe Org::EmailsController do
   end
 
   describe "#update" do
+    it "should render show if save fails" do
+      BlastEmail.should_receive(:find).with('1').and_return(email = mock())
+      email.should_receive(:moderation_status).and_return('pending')
+      email.should_receive(:moderation_reason=)
+      email.should_receive(:moderation_status=)
+      email.stub(:errors).and_return( ActiveModel::Errors.new(email) )
+
+      BlastEmailsService.stub(:new).and_return(service = mock())
+      service.should_receive(:save).with(email).and_return(false)
+
+      post :update, :id => 1, :petition_blast_email => {:moderation_status => 'approved', :moderation_reason => 'foo'}
+      response.should be_success
+    end
+
     it "should update the moderation fields" do
       BlastEmail.should_receive(:find).with('1').and_return(email = mock())
       email.should_receive(:moderation_status).and_return('pending')
@@ -59,9 +73,10 @@ describe Org::EmailsController do
       email.should_receive(:moderation_status=)
 
       BlastEmailsService.stub(:new).and_return(service = mock())
-      service.should_receive(:save).with(email)
+      service.should_receive(:save).with(email).and_return(true)
 
       post :update, :id => 1, :petition_blast_email => {:moderation_status => 'approved', :moderation_reason => 'foo'}
+      response.should be_redirect
     end
 
     it "should not allow updates if the email is already moderated" do

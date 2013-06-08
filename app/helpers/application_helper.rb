@@ -52,13 +52,44 @@ module ApplicationHelper
     entity = params[:entity]
     style = params[:style]
     content_class = params[:content_class]
+    image = entity.send(:"#{params[:image_field]}")
     content_tag(:div, class: content_class) do
       unless entity.errors.any? || entity.send("#{params[:image_field]}_file_name").blank?
-        image_tag(entity.send("#{params[:image_field]}").url(style), title: entity.title, alt: entity.title)
+        image_tag(image.url(style), title: (entity.respond_to?(:title) ? entity.title : 'Picture'), alt: (entity.respond_to?(:title) ? entity.title : 'Picture'))
       else
-        image_tag("image-placeholder-#{style}.png")
+        placeholder_image(style)
       end
     end
+  end
+
+  def placeholder_image(style = 'hero')
+    if current_organisation.placeholder.present?
+      image_tag(current_organisation.placeholder)
+    else
+      image_tag("image-placeholder-#{style}.png")
+    end
+  end
+
+  def display_profile_image(options={})
+    params = {:style => :icon, content_class: 'profile-image', image_field: 'image'}.merge(options)
+    entity = params[:entity]
+    style = params[:style]
+    content_class = params[:content_class]
+    unless entity.errors.any? || entity.send("#{params[:image_field]}_file_name").blank?
+        image_tag entity.send("#{params[:image_field]}").url(style), alt: (entity.respond_to?(:title) ? entity.title : 'Picture'), class: content_class   
+    else 
+      if entity.facebook_id.present?
+        image_tag "http://graph.facebook.com/#{entity.facebook_id}/picture", class: content_class        
+      end
+    end     
+  end
+
+  def image_url(source)
+    abs_path = image_path(source)
+    unless abs_path =~ /^http/
+      abs_path = "#{request.protocol}#{request.host_with_port}#{abs_path}"
+    end
+    abs_path
   end
 
   private

@@ -1,0 +1,86 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Landing Pages', org_landing_pages_path
+    %span.divider
+      >
+  %li.active
+    Manage #{@effort.title}
+.clear
+
+.row.mb20
+  .span10
+    = title @effort.title
+    %h2 Landing Page
+.clear
+
+
+.row
+  .span2.well
+    = link_to new_effort_petition_path(@effort), id: "landing-effort-button", class: 'well-button' do
+      %h3
+        %i.icon-share-alt
+        New Petition
+      Create campaign landing page
+  .span2.well
+    = link_to effort_path(@effort), id: "view-effort-button", class: 'well-button' do
+      %h3
+        %i.icon-eye-open
+        Hub Page
+      Public directory of campaigns
+
+  .span2.well
+    = link_to edit_org_landing_page_path(@effort), id: "edit-effort", class: 'well-button' do
+      %h3
+        %i.icon-pencil
+        Edit
+      Change settings & content
+
+
+%h4
+  Petitions
+
+- if @petitions.any?
+  = table_for(@petitions) do |t|
+    = t.data do
+      - t.cell(:title) { |p| link_to(p.title, petition_path(p), class: petition_class(p)) }
+      - t.cell(:total_signatures) { |p| p.cached_signatures_size }
+      - t.cell(:created_by) { |p| link_to_edit_user(p.user) }
+      - t.cell(:created_at) { |p| pretty_date_format(p.created_at, "%Y-%m-%d %H:%M") }
+      - t.cell(:admin_status)
+  = will_paginate @petitions
+- else
+  .row
+    .span8
+      %p
+        No petitions have been created from this landing page yet.
+      %p
+        Your members can create campaigns through the public new petition page.
+      %p
+        Petitions created elsewhere on the site can also be manually added to the landing page hub page by the site administrator.
+
+= link_to "#", id: "move-petition-into-effort", href: "#petition-modal", rel: 'popover', data: { toggle: 'modal' } do
+  %i.icon-plus
+  Move Petition Into Landing Page Hub
+
+:coffeescript
+  $ ->
+    new PetitionSelector
+
+- content_for :end_of_body do
+  / render div at the end of body for fixing IE7 z-index problem
+  .modal.hide.fade.petition-selector-modal#petition-modal{'data-petition-check-url' => org_effort_path(@effort), 'data-petition-action-url' => org_effort_path(@effort)}
+    .modal-header
+      %button.close{ "data-dismiss" => "modal" } x
+      %h3 Move Petition Into Page
+    .modal-body.petition-form
+      %b URL of petition to move:
+      .mt10
+        .inline-block.petition-host-label
+          = petition_url("")
+        .inline-block
+          %input.span2#petition-slug-textbox
+          %span.indicator
+          .control-group.error
+            .help-inline
+    .modal-footer
+      %a.btn.btn-primary.disabled#btn-confirm{ href: "#" } Confirm

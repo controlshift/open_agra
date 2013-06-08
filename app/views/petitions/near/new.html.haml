@@ -1,0 +1,56 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Petitions', categories_path
+    %span.divider
+      >
+
+  %li.active
+    Near
+
+= render :partial => 'search_near_petitions', locals: {effort: @effort}
+
+.row
+  .span8#location-categories
+    = form_tag '', :method => 'GET' do
+      - if params[:location]
+        - params[:location].each_pair do |k, v|
+          = hidden_field_tag :"location[#{k}]", v
+
+      .title Filter by category
+      = radio_button_tag :category, '', params[:category].blank?
+      = label :category, '', 'All'
+      - current_organisation.categories.each do |category|
+        = radio_button_tag :category, category.slug, params[:category] == category.slug
+        = label :category, category.slug, category.name
+.row
+  .span8
+    .inner-shadow
+      #location-map
+    -#.right
+    -#  = link_to "#" do
+    -#    %i.icon-external-link
+    -#    Embed
+%br
+- if @petitions
+  .locations-json.hidden= @locations.to_json
+  .row
+    .span8
+      .title Nearest Campaigns
+      - if @petitions.empty?
+        No nearby petitions found.
+      - else
+        %ul.petition_list
+          = render partial: "petitions/view/petition_list_item", collection: @petitions
+
+
+- elsif @categories && current_organisation.list_petitions_under_map
+  .row
+    .span8
+      - @categories.each do |category|
+        - if (petitions = category.petitions.appropriate.order('title ASC')).count > 0
+          .title= category.name
+          %ul.petition_list
+            = render partial: "petitions/view/petition_list_item", collection: petitions
+
+- content_for :sidebar do
+  = render partial: "/petitions/shared/near_sidebar"

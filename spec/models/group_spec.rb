@@ -13,6 +13,7 @@
 #  image_updated_at   :datetime
 #  created_at         :datetime        not null
 #  updated_at         :datetime        not null
+#  settings           :text
 #
 
 require 'spec_helper'
@@ -27,6 +28,32 @@ describe Group do
     it { should validate_presence_of(:title) }
     it { should validate_presence_of(:description) }
     it { should validate_presence_of(:organisation) }
+    it { should respond_to(:signature_disclaimer)}
+    it { should respond_to(:display_opt_in)}
+
+    context "when opt in is set to false" do
+      before(:each) do
+        subject.display_opt_in = '0'
+      end
+
+      it "should have a boolean value for display_opt_in" do
+        subject.display_opt_in?.should be_false
+      end
+
+      it { should_not validate_presence_of(:opt_in_label)}
+    end
+
+    context "when opt in is set to true" do
+      before(:each) do
+        subject.display_opt_in = '1'
+      end
+
+      it "should have a boolean value for display_opt_in" do
+        subject.display_opt_in?.should be_true
+      end
+
+      it { should validate_presence_of(:opt_in_label)}
+    end
   end
 
   describe "#subscribed_signatures" do

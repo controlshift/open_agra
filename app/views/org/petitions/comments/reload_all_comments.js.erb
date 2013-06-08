@@ -1,0 +1,5 @@
+<% if @comments.any? %>
+	$( ".all_comments" ).html('<%= escape_javascript( render( :partial => "comments_table", locals: { show_petition: false })) %>');
+<% else %>
+	$( ".all_comments" ).html("<h4 class = 'mt10'> No flagged comments found.</h4>");
+<% end %>

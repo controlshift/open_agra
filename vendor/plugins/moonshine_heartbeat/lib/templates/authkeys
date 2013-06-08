@@ -1,0 +1,2 @@
+auth 2
+2 sha1 <%= configuration[:heartbeat][:password] || 'insecure!' %>

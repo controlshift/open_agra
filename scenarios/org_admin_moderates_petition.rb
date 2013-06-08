@@ -17,7 +17,7 @@ describe "Org admin moderates a petition", type: :request, nip: true do
     page.should have_content "Administrative Tools"
     page.should have_content "Notes"
     find("#notes-toggle").click
-    fill_in("notes", with: 'this is a note here.')
+    fill_in("admin-notes-field", with: 'this is a note here.')
     find("#btn-save-notes").click
     wait_until{ @petition.reload.admin_notes == 'this is a note here.' }
 
@@ -42,8 +42,9 @@ describe "Org admin moderates a petition", type: :request, nip: true do
   it "should allow admin to input reason for inappropriate petition", js: true do
     visit petition_path(@petition)
     page.should have_content "Administrative Tools"
-    find(".inappropriate-reason-popover").should_not be_visible
 
+    find(".inappropriate-reason-popover").should_not be_visible
+    
     select "Inappropriate", from: "petition_admin_status"
     find(".inappropriate-reason-popover").should be_visible
     fill_in("petition_admin_reason", with: "reason goes here.")
@@ -51,6 +52,12 @@ describe "Org admin moderates a petition", type: :request, nip: true do
     click_on "Save & next petition"
 
     visit petition_path(@petition)
-    find(".inappropriate-reason-popover").should be_visible
+    wait_until do
+      find(".inappropriate-reason-popover", :visible => true)
+    end
+  end
+
+  def visible?
+    native.xpath("./ancestor-or-self::*[contains(@style, 'display:none') or contains(@style, 'display: none') or name()='script' or name()='head']").size == 0
   end
  end

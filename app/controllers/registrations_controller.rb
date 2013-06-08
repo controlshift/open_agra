@@ -3,14 +3,6 @@ class RegistrationsController < Devise::RegistrationsController
 
   layout :layout_by_resource
 
-  def layout_by_resource
-    if session[:header_content] == "lead_petition_breadcrumb_steps"
-      'application_sidebar'
-    else
-      'application'
-    end
-  end
-
   def new
     defaults = {email: params[:email], default_organisation_slug: current_organisation.slug}
     resource = build_resource(defaults.delete_if {|key, value| value.blank? })
@@ -18,12 +10,12 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def create
-    if is_user_registerable
+    if is_user_registerable?
       @petition = params[:token].blank? ? nil : Petition.find_by_token!(params[:token])
       super
       PetitionsService.new.link_petition_with_user!(@petition, resource) if @petition && resource.persisted?
     else
-      flash[:alert] = 'Did you receive an email with an invitation to use this site? If so, you can only register using that email address. You may have tried to use a different address; please click the back button and try again.'
+      flash[:alert] = t('controllers.registration.error_create')
       redirect_to intro_path
     end
   end
@@ -48,10 +40,20 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  private
+
+  def layout_by_resource
+    if session[:header_content] == "lead_petition_breadcrumb_steps"
+      'application_sidebar'
+    else
+      'application'
+    end
+  end
+
   def resource_for_facebook_user_is_valid?
     # if you are creating an account while signed into facebook, you are only
     # allowed to create accounts for that user.
-    raise('Someone is trying to hack the site!') if facebook_email_and_user_email_not_match?
+    raise(t('errors.messages.hacking')) if facebook_email_and_user_email_not_match?
     resource.valid?
   end
 
@@ -59,7 +61,7 @@ class RegistrationsController < Devise::RegistrationsController
     session[:facebook_email] && self.resource.email != session[:facebook_email]
   end
 
-  def is_user_registerable
+  def is_user_registerable?
     email = params[:user][:email]
     email.downcase! unless email.blank?
     email.blank? || EmailWhiteList.find_by_email(email) || current_organisation.skip_white_list_check?

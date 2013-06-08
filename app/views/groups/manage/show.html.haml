@@ -1,13 +1,20 @@
 - content_for :sidebar do
   = render partial: 'group_admin_sidebar'
 
-=title @group.title
+.row
+  .span7
 
-.manage-buttons
-  .group2.btn-group
-    = link_to group_path(@group), id: "view-group-button", class: "btn btn-manage" do
-      %i.icon-eye-open
-      View
+    =title @group.title
+  .span3
+    .manage-buttons
+      .group2.btn-group
+        = link_to group_path(@group), id: "view-group-button", class: "btn btn-manage" do
+          %i.icon-eye-open
+          View
+        - if can?(:manage, current_organisation)
+          = link_to org_group_path(@group), id: "manage-group-button", class: "btn btn-manage" do
+            %i.icon-wrench
+            Admin
 
 .row
   .span7

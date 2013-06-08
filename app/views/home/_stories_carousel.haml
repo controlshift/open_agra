@@ -1,0 +1,39 @@
+- content_for :head do
+  = javascript_include_tag "jquery.jcarousel.min"
+
+%ul.petition_carousel#petition_carousel
+  - @featured_stories.each do |story|
+    %li
+      .list-item-image
+        = link_to story.link.present? ? story.link : "#" do
+          = image_tag story.image.url(:hero)
+      .list-item-desc-box
+        .list-item-desc
+          %span.list-item-title= story.title
+          %span.list-item-why= story.content
+
+:javascript
+  $(function() {
+    $('#petition_carousel').jcarousel({
+      wrap: 'both',
+      scroll: 1,
+      start: 2,
+      itemVisibleInCallback: {
+        onBeforeAnimation: function(carousel, item, idx, state) {
+          $('.list-item-desc-box', item).show();
+        },
+        onAfterAnimation: function(carousel, item, idx, state) {
+
+        }
+      },
+      itemVisibleOutCallback: {
+        onBeforeAnimation: function(carousel, item, idx, state) {
+          $('.list-item-desc-box', item).hide();
+        },
+        onAfterAnimation: function(carousel, item, idx, state) {
+
+        }
+      },
+      itemFallbackDimension: 590
+    });
+  });

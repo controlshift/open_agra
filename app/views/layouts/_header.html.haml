@@ -3,7 +3,7 @@
     .navbar
       .navbar-inner
         .container
-          %a{ href: root_path }
+          %a{ href: current_organisation.home_link_override.blank? ? root_path : current_organisation.home_link_override }
             .logo
           %form.filter.navbar-search.pull-left{ action: search_petitions_path, method: "GET" }
             %input.search-query{ name: "q", placeholder: "Search" }
@@ -16,14 +16,13 @@
                   %li= link_to 'Start a campaign', new_petition_path(:source => 'header'), id: 'nav-start-petition'
                   %li.dropdown
                     %a.dropdown-toggle#nav-user{'data-toggle' => 'dropdown', :href => '#'}
-                      - if current_user.facebook_id.present?
-                        = image_tag "http://graph.facebook.com/#{current_user.facebook_id}/picture", class: 'profile-image'
+                      = display_profile_image(entity: current_user)
                       %span= current_user.full_name
                       %b.caret
                     %ul.dropdown-menu
                       %li= link_to 'My Campaigns', petitions_path, id: 'nav-user-dropdowns-campaigns'
                       - if current_user.groups.any?
-                        %li= link_to 'My Groups', groups_path
+                        %li= link_to 'My Partnerships', groups_path
                       %li.divider
                       %li= link_to 'Global Admin', admin_path, id: 'nav-global-admin' if can?(:manage, :all)
                       %li= link_to "#{current_organisation.name} Admin", org_path, id: 'nav-org-admin' if can?(:manage, current_organisation)

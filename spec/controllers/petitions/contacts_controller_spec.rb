@@ -11,6 +11,7 @@ describe Petitions::ContactsController do
       @petition = FactoryGirl.create(:petition, user: @petition_owner, organisation: @organisation)
       FactoryGirl.create(:campaign_admin, petition: @petition, user: @petition_admin, invitation_email: @petition_admin.email)
       @email = Factory.attributes_for(:email)
+      Sidekiq::Worker.clear_all
     end
 
     context "valid contact email" do
@@ -60,11 +61,7 @@ describe Petitions::ContactsController do
   end
 
   def should_have_sent_contact_email
-    Delayed::Job.count.should == @petition.admins.length
-    success, failure = Delayed::Worker.new.work_off
-    success.should == @petition.admins.length
-    failure.should == 0
-
+    Sidekiq::Worker.drain_all
     should have_sent_email_to(@petition_owner.email)
     should have_sent_email_to(@petition_admin.email)
   end

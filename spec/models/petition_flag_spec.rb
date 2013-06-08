@@ -6,8 +6,8 @@
 #  petition_id :integer
 #  user_id     :integer
 #  ip_address  :string(255)
-#  created_at  :datetime
-#  updated_at  :datetime
+#  created_at  :datetime        not null
+#  updated_at  :datetime        not null
 #  reason      :text
 #
 

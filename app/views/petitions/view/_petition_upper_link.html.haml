@@ -1,3 +1,4 @@
-.link-container.separator
-  = link_to path, class: obj_class do
-    #{obj.title}
+- cache obj do
+  .link-container.separator
+    = link_to path, class: obj_class do
+      #{obj.title}

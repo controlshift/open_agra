@@ -23,23 +23,6 @@ describe "petition admin", type: :request, nip: true, js: true do
       end
     end
   end
-
-  it "should see campaigner's information" do
-    click_on @petition.title
-
-    page.should have_content(@user.email)
-    page.should have_content(@user.phone_number)
-    page.should_not have_css("#view_contact_user_form")
-  end
-
-  it "should see campaigner's information when not contactable" do
-    @petition.update_attribute(:campaigner_contactable, false)
-    click_on @petition.title
-
-    page.should have_content(@user.email)
-    page.should have_content(@user.phone_number)
-    page.should_not have_css("#view_contact_user_form")
-  end
 end
 
 describe "user admin", type: :request, nip: true, js: true do
@@ -123,22 +106,4 @@ describe "administer organisations", type: :request, nip: true do
     page.should have_content "www.fearandstagnation.com"
   end
   
-  describe "visual appearance" do
-    before(:each) do
-      @petition = Factory(:petition, organisation: @current_organisation, user: Factory(:user, organisation: @current_organisation))
-      log_in(@admin.email, "onlyusknowit")
-    end
-
-    it "show have social share buttons" do
-      visit edit_admin_organisation_path(@current_organisation)
-      check "organisation_show_share_buttons_on_petition_page"
-      click_on "Save"
-      @current_organisation.reload
-      
-      visit petition_path(@petition)
-
-      page.should have_css('a.share.facebook')
-      page.should have_css('a.share.twitter')
-    end
-  end
 end

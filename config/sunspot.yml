@@ -1,5 +1,4 @@
 # we use websolr in production.
-
 development:
   solr:
     hostname: localhost
@@ -11,3 +10,18 @@ test:
     hostname: localhost
     port: <%= ENV['TEST_SOLR_PORT'] || '8981' %>
     log_level: WARNING
+
+environment: &environment
+  solr:
+    port: <%= ENV['SOLR_PORT'] || '8983' %>
+    hostname: <%= ENV['SOLR_HOSTNAME'] %> 
+    log_level: WARNING
+
+controlshiftqa:
+  <<: *environment
+
+staging:
+  <<: *environment
+
+production:
+  <<: *environment

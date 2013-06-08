@@ -12,7 +12,7 @@ class ConfirmationsController < Devise::ConfirmationsController
   def redirect_if_confirmed
     if current_user
       if current_user.confirmed?
-        flash[:notice] = "You have already confirmed your email"
+        flash[:notice] = t('controllers.confirmation.already_confirmed')
         redirect_to session["after_confirmation_path"] || petitions_path
       end
     else

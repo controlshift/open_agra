@@ -2,7 +2,7 @@
   .span7.offset2
     .create
       = render partial: "petitions/petition_chevron"
-    
+    = cf('new_petition_lede')
     = title "New Campaign"
     %br
     - if @petition.persisted?

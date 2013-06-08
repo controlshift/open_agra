@@ -11,7 +11,7 @@ class Groups::UnsubscribesController < ApplicationController
     @unsubscribe = GroupUnsubscribe.new(:subscription => @subscription, :email => params[:group_unsubscribe][:email].strip)
 
     if @unsubscribe.unsubscribe
-      flash[:notice] = "You have successfully unsubscribed from #{@group.title}."
+      flash[:notice] = t('controllers.groups.unsubscribe.success',:group_title => @group.title)
       redirect_to group_path(@group)
     else
       render :show

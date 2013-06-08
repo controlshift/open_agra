@@ -2,13 +2,12 @@
 - content_for :head do
   %meta{property: "og:title", content: "#{current_organisation.name}"}
   %meta{property: "og:image", content:"#{request.protocol}#{request.host_with_port}/assets/organisations/#{current_organisation.slug}/logo_share.png"}
-
 - content_for :before_content do
 
   .home-banner
     .overlay-left
     .overlay-right
-    
+
     .wordings
       %h1.highlight
         =cf('homepage_headline')
@@ -20,35 +19,24 @@
         = link_to "", intro_path, class: "btn-register-your-interest"
       .about-and-contact
         = link_to "About Us", about_us_path
-    
+
     .spotlight
-      %ul.petition_carousel#petition_carousel
-        - @featured_stories.each do |story|          
-          %li
-            .list-item-image
-              = link_to story.link.present? ? story.link : "#" do
-                = image_tag story.image.url(:hero)
-            .list-item-desc-box
-              .list-item-desc
-                %span.list-item-title= story.title
-                %span.list-item-why= story.content
-                
+      = render partial: 'stories_carousel'
+
 .row
   .span5
     .featured-petitions-logo
-    .featured-effort
-      - if @featured_effort.present?
-        = render partial: "featured_effort", locals:{effort: @featured_effort}
     .featured-petitions
       - cache("home_index_#{current_organisation.id}_featured", expires_in: 1.minute) do
-        = render partial: "/home/featured_petition", collection: @featured_petitions
+        = render partial: "home/featured_item", collection: @featured_petitions
     .featured-more
       = link_to categories_path, class: "btn btn-primary" do
         More Campaigns
-        
+
   .span6.offset1
     .explain-site
       =cf('homepage_explainer')
+
 :javascript
   function adjustOverlay() {
     var left = $(".spotlight").position().left + 590;
@@ -68,27 +56,5 @@
 
     $(window).resize(function() {
       adjustOverlay();
-    });
-
-    $('#petition_carousel').jcarousel({
-      wrap: 'both', 
-      scroll: 1, 
-      start: 2,
-      itemVisibleInCallback: {
-        onBeforeAnimation: function(carousel, item, idx, state) {
-          $('.list-item-desc-box', item).show();
-        },
-        onAfterAnimation: function(carousel, item, idx, state) {
-
-        }
-      },
-      itemVisibleOutCallback: {
-        onBeforeAnimation: function(carousel, item, idx, state) {
-          $('.list-item-desc-box', item).hide();
-        },
-        onAfterAnimation: function(carousel, item, idx, state) {
-
-        }
-      }
     });
   });

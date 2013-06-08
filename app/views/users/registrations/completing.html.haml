@@ -17,8 +17,10 @@
         .clearall
         = f.input :postcode, :required => true
 
+        - @user.additional_field_configs.each do |field_name, field_config|
+          = additional_field_input(f, field_name, field_config)
+
         .mt10
-          - resource.join_organisation = true
           = check_box_tag(:join_organisation, 1, true, id: "user_join_organisation", name: "user[join_organisation]")
           %label.subtle.mr10
             = join_label
@@ -36,6 +38,3 @@
         .submit_button
           = f.button :submit, "Continue", :class => 'btn-primary', id: "user_registration_submit"
         .clearall
-    
-      :javascript
-        email_suggest("#user_registration #user_email");

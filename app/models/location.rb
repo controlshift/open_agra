@@ -18,15 +18,18 @@
 #
 
 class Location < ActiveRecord::Base
+  set_rgeo_factory_for_column(:point, RGeo::Geographic.spherical_factory(:srid => 4326))
+
   store :extras, accessors: [:types]
   
-  validates_presence_of :query, :latitude, :longitude
+  validates_presence_of :latitude, :longitude, :query, :point
   validates_uniqueness_of :query
-  
-  #searchable do
-  #  text :query, :country, :region, :locality, :street, :postal_code
-  #  latlon(:location) { Sunspot::Util::Coordinates.new(latitude, longitude) }
-  #end
+
+  before_validation :set_point
+
+  def set_point
+    self.point = "POINT(#{longitude} #{latitude})"
+  end
 
   def formatted_string(options = {})
     separator = options[:separator] ? options[:separator] : "\n"

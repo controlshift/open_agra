@@ -1,10 +1,16 @@
-.breadcrumbs
-  = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
-  >
-  = link_to 'Blast Email Templates', org_contents_templates_path, {:class => 'use-pjax'}
-  >
-  Edit
-  = @content.name
+%ul.breadcrumb
+  %li
+    = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
+    %span.divider
+      >
+  %li
+    = link_to 'Blast Email Templates', org_contents_templates_path, {:class => 'use-pjax'}
+    %span.divider
+      >
+  %li.active
+    Edit
+    = @content.name
+.clear
 
 = title "Edit #{@content.name}"
 

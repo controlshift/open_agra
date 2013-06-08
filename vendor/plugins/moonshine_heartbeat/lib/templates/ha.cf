@@ -1,0 +1,74 @@
+#       Facility to use for syslog()/logger
+#
+logfacility     <%= configuration[:heartbeat][:logfacility] || 'local0' %>
+
+#       keepalive: how long between heartbeats?
+#
+keepalive <%= configuration[:heartbeat][:keepalive] || '2' %>
+
+#       deadtime: how long-to-declare-host-dead?
+#
+#               If you set this too low you will get the problematic
+#               split-brain (or cluster partition) problem.
+#               See the FAQ for how to use warntime to tune deadtime.
+#
+deadtime <%= configuration[:heartbeat][:deadtime] || '30' %>
+
+#       warntime: how long before issuing "late heartbeat" warning?
+#       See the FAQ for how to use warntime to tune deadtime.
+#
+warntime <%= configuration[:heartbeat][:warntime] || '10' %>
+
+#       Very first dead time (initdead)
+#
+#       On some machines/OSes, etc. the network takes a while to come up
+#       and start working right after you've been rebooted.  As a result
+#       we have a separate dead time for when things first come up.
+#       It should be at least twice the normal dead time.
+#
+initdead <%= configuration[:heartbeat][:initdead] || '120' %>
+
+#       What UDP port to use for bcast/ucast communication?
+#
+udpport <%= configuration[:heartbeat][:udpport] || '694' %>
+
+#       What interfaces to broadcast heartbeats over?
+#
+bcast <%= configuration[:heartbeat][:interface] || 'eth0' %>
+
+#       Set up a multicast heartbeat medium
+#       mcast [dev] [mcast group] [port] [ttl] [loop]
+#
+#       [dev]           device to send/rcv heartbeats on
+#       [mcast group]   multicast group to join (class D multicast address
+#                       224.0.0.0 - 239.255.255.255)
+#       [port]          udp port to sendto/rcvfrom (set this value to the
+#                       same value as "udpport" above)
+#       [ttl]           the ttl value for outbound heartbeats.  this effects
+#                       how far the multicast packet will propagate.  (0-255)
+#                       Must be greater than zero.
+#       [loop]          toggles loopback for outbound multicast heartbeats.
+#                       if enabled, an outbound packet will be looped back and
+#                       received by the interface it was sent on. (0 or 1)
+#                       Set this value to zero.
+#
+#
+<% if (configuration[:heartbeat][:mode] || :ucast) == :mcast %>mcast <%= configuration[:heartbeat][:interface] || 'eth0' %> <%= configuration[:heartbeat][:mcast_group] %> <%= configuration[:heartbeat][:udpport] || '694' %> <%= configuration[:heartbeat][:mcast_ttl] %> 0<% end %>
+
+#       Set up a unicast / udp heartbeat medium
+#       ucast [dev] [peer-ip-addr]
+#
+#       [dev]           device to send/rcv heartbeats on
+#       [peer-ip-addr]  IP address of peer to send packets to
+#
+<% if (configuration[:heartbeat][:mode] || :ucast) == :ucast %>ucast <%= configuration[:heartbeat][:interface] || 'eth0' %> <%= ucast_ip %><% end %>
+
+auto_failback <%= ha_config_boolean(configuration[:heartbeat][:auto_failback], true) %>
+
+<% configuration[:heartbeat][:nodes].each do |hostname, ip| %>node <%= hostname %>
+<% end %>
+
+<% if configuration[:heartbeat][:ping] %>
+respawn hacluster /usr/lib/heartbeat/ipfail
+ping <%= configuration[:heartbeat][:ping] %>
+<% end %>

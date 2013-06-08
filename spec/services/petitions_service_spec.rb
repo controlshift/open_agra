@@ -11,7 +11,7 @@ describe PetitionsService do
   end
 
   describe "thank the petition creator" do
-    let(:petition) { mock }
+    let(:petition) { mock_model(Petition) }
 
     # this is a bit of an integration spec
     it "should send an email while creating a new petition" do
@@ -61,8 +61,8 @@ describe PetitionsService do
 
     it "should thank if the user is present" do
       subject.stub(:current_object).and_return(petition)
-      petition.stub(:user).and_return(user = mock())
-      petition.stub(:organisation).and_return(@organisation)
+      petition.stub(:user).and_return(user = mock_model(User))
+      petition.stub(:organisation).and_return(mock_model(Organisation))
       petition.stub(:slug).and_return('slug')
       delay_job = mock()
       CampaignerMailer.should_receive(:delay).and_return(delay_job)
@@ -76,7 +76,7 @@ describe PetitionsService do
   end
 
   describe "#actions_after_petition_is_created_and_has_user" do
-    let(:petition) { mock }
+    let(:petition) { mock_model(Petition) }
 
     before(:each) do
       @organisation = Factory(:organisation)
@@ -91,12 +91,7 @@ describe PetitionsService do
       petition.stub(:save).and_return(true)
       subject.stub(:current_object).and_return(petition)
 
-      notifier = mock
-      delayed_job = mock
-      OrgNotifier.stub(:new) { notifier }
-      notifier.should_receive(:delay) { delayed_job }
-      delayed_job.should_receive(:notify_sign_up).with(organisation: petition.organisation, petition: petition, 
-                                                       user_details: petition.user, role: 'creator')
+      NotifySignupWorker.should_receive(:perform_async).with(petition.organisation.id, petition.id, petition.user.id, 'creator')
 
       campaigner_mailer = mock()
       campaigner_mailer.should_receive(:thanks_for_creating)
@@ -172,8 +167,8 @@ describe PetitionsService do
 
   describe "petition, meet your maker" do
     it "should link up and send" do
-      petition = Petition.new
-      user = User.new
+      petition = Factory(:petition, user: nil)
+      user = Factory(:user, organisation: petition.organisation)
       petition.should_receive(:save!)
 
       delay_job_thanks = mock()
@@ -207,13 +202,12 @@ describe PetitionsService do
 
       petition.admin_status = :awesome
       subject.save(petition)
-      Delayed::Job.count.should == 0
-
+      Sidekiq::Worker.clear_all
       petition.admin_status = :inappropriate
       petition.admin_reason = "it's inappropriate"
       subject.save(petition)
-      Delayed::Job.count.should == 1
-      Delayed::Job.last.handler.should match(/notify_petition_being_marked_as_inappropriate/i)
+      Sidekiq::Worker.jobs.size.should == 1
+      Sidekiq::Worker.jobs.values.first.first["args"].first.should match(/notify_petition_being_marked_as_inappropriate/i)
     end
 
     it "should not notify campaigner when updating a note field" do
@@ -237,6 +231,29 @@ describe PetitionsService do
       subject.link_petition_with_user!(petition, another_user)
 
       petition.user.should == petition_owner
+    end
+  end
+
+  describe "#save" do
+    let(:petition) { mock }
+
+    before(:each) do
+      petition.stub(:new_record?).and_return(true)
+    end
+
+    it "should retry if there is already an object with that slug" do
+      not_unique = ActiveRecord::RecordNotUnique.new('foo', Exception.new)
+      petition.should_receive(:save).twice.and_raise(not_unique)
+      begin
+        subject.save(petition)
+      rescue ActiveRecord::RecordNotUnique
+      end
+    end
+
+    it "should only be called once in the normal flow" do
+      petition.should_receive(:save).once.and_return(petition)
+      subject.should_receive(:send_creation_thank_you_and_schedule_launch_reminder)
+      subject.save(petition)
     end
   end
 end

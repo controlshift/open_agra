@@ -1,0 +1,23 @@
+.row
+  .span7
+    = title "Landing Pages"
+  .span3
+    = link_to 'New Landing Page', new_org_landing_page_path, class: "btn btn-primary"
+
+- if @efforts.any?
+  = table_for(@efforts) do |t|
+    = t.data do
+      - t.cell(:title) { |e| link_to(e.title, org_landing_page_path(e.slug)) }
+      - t.cell(:petitions) { |e| e.petitions.count }
+      - t.cell(:public_view) {|e | link_to "(public view)", effort_path(e)  }
+  = will_paginate @efforts
+- else
+  .row
+    .span4.offset4{style:"padding-top:50px;"}
+      %p
+        Landing pages allow site admins to create landing pages with a custom new petition form and help text with special instructions.
+      %p
+        Every landing page also has a special hub page where members can see all the campaigns created through that page.
+
+    .span1
+      = image_tag "target-arrow.png"

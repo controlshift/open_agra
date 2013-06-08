@@ -53,7 +53,7 @@ describe "Campaigner edits petition from the manage page", type: :request do
     uncheck 'Supporters can contact me'
     
     click_on "View"
-    page.should_not have_css("#view_contact_user_form")
+    page.should_not have_css("#view-contact-user-form")
 
     # toggling contactable should not count as editing the petition.
     Petition.find_by_slug('save-the-whales').admin_status.should == :good

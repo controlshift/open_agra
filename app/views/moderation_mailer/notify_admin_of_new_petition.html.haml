@@ -2,7 +2,7 @@
 
 %p Just wanted to let you know that a new petition "#{@petition.title}" needs to be moderated.
 
-%p #{link_to 'Moderate Petitions', moderation_queue_org_petitions_url}.
+%p #{link_to 'Moderate Petitions', moderation_queue_org_petitions_url(host: @organisation.host)}.
 
 %p Cheers,
 

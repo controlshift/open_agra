@@ -13,8 +13,8 @@
 #  last_sign_in_at          :datetime
 #  current_sign_in_ip       :string(255)
 #  last_sign_in_ip          :string(255)
-#  created_at               :datetime
-#  updated_at               :datetime
+#  created_at               :datetime        not null
+#  updated_at               :datetime        not null
 #  first_name               :string(255)
 #  last_name                :string(255)
 #  admin                    :boolean
@@ -32,6 +32,10 @@
 #  member_id                :integer
 #  additional_fields        :hstore
 #  cached_organisation_slug :string(255)
+#  image_file_name          :string(255)
+#  image_content_type       :string(255)
+#  image_file_size          :integer
+#  image_updated_at         :datetime
 #
 
 require 'spec_helper'
@@ -61,7 +65,7 @@ describe User do
   
   it { should ensure_length_of(:first_name).is_at_most(50) }
   it { should ensure_length_of(:last_name).is_at_most(50) }
-  it { should ensure_length_of(:phone_number).is_at_most(50) }
+  it { should ensure_length_of(:phone_number).is_at_most(30) }
   it { should ensure_length_of(:postcode).is_at_most(20) }
   
   it { should allow_mass_assignment_of(:first_name) }
@@ -70,6 +74,17 @@ describe User do
   it { should allow_mass_assignment_of(:phone_number) }
   it { should allow_mass_assignment_of(:postcode) }
   it { should allow_mass_assignment_of(:opt_out_site_email) }
+  it { should allow_mass_assignment_of(:facebook_id) }
+
+  context "existing user" do
+    let(:subject) { Factory(:user, facebook_id: '123') }
+    it { should validate_uniqueness_of(:facebook_id).scoped_to(:organisation_id) }
+  end
+
+  context "no fb id" do
+    let(:subject) { Factory(:user, facebook_id: nil) }
+    it { should_not validate_uniqueness_of(:facebook_id) }
+  end
 
   describe "#find_by_email" do
     let(:user) {Factory(:user)}
@@ -268,6 +283,46 @@ describe User do
       fields = user.signature_attributes(Signature.new)
       fields.should_not == {}
       fields[:first_name].should == user.first_name
+    end
+  end
+
+  describe "attaching an image" do
+    it { should_not validate_attachment_presence(:image) }
+    it { should validate_attachment_content_type(:image).allowing('image/jpeg', 'image/png').rejecting('text/plain', 'text/xml') }
+
+    it "copies specific paperclip errors to #image for SimpleForm integration" do
+      user = FactoryGirl.build_stubbed(:user)
+      user.errors.add(:image_content_type, "must be an image file")
+      user.run_callbacks(:validation)
+      user.errors[:image].should == ["must be an image file"]
+    end
+
+    it "removes unreadable paperclip errors from #image" do
+      user = FactoryGirl.build_stubbed(:user)
+      user.errors.add(:image, "/var/12sdfsdf.tmp no decode delegate found")
+      user.run_callbacks(:validation)
+      user.errors[:image].should == []
+    end
+
+    it "returns true when the image is cropped" do
+      user = FactoryGirl.build_stubbed(:user) 
+      user.crop_whxy = "20x20+20+20"
+      user.cropping?.should == true
+    end
+
+    it "should call reprocess for image if it has cropping attributes" do
+      user = FactoryGirl.build(:user)
+      user.save!
+      user.crop_whxy = "20x20+20+20"
+      user.should_receive(:reprocess_image).and_return(nil)
+      user.save!
+    end
+
+    it "should return ratio between original and large size for user" do
+      src = File.join(Rails.root, 'spec', 'fixtures', "tiny_image.jpg")
+      user = FactoryGirl.build(:user)
+      user.image = mock(path: src)
+      user.original_to_large_ratio.should == 1
     end
   end
 end

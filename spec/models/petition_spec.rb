@@ -7,8 +7,8 @@
 #  who                          :string(255)
 #  why                          :text
 #  what                         :text
-#  created_at                   :datetime
-#  updated_at                   :datetime
+#  created_at                   :datetime        not null
+#  updated_at                   :datetime        not null
 #  user_id                      :integer
 #  slug                         :string(255)
 #  organisation_id              :integer         not null
@@ -37,6 +37,12 @@
 #  achievements                 :text
 #  bsd_constituent_group_id     :string(255)
 #  target_id                    :integer
+#  external_id                  :string(255)
+#  redirect_to                  :text
+#  external_facebook_page       :string(255)
+#  external_site                :string(255)
+#  show_progress_bar            :boolean         default(TRUE)
+#  comments_updated_at          :datetime
 #
 
 require 'spec_helper'
@@ -100,7 +106,7 @@ describe Petition do
 
       describe "validations" do
         it "should pass if effort is present without target" do
-          subject.effort = Factory.build(:effort)
+          subject.effort = FactoryGirl.build_stubbed(:effort)
           subject.should have(0).errors_on(:effort)
         end
 
@@ -109,7 +115,7 @@ describe Petition do
         end
 
         it "should fail if target is present without effort" do
-          subject.target = Factory.build(:target)
+          subject.target = FactoryGirl.build_stubbed(:target)
           subject.should have(1).errors_on(:effort)
         end
       end
@@ -188,28 +194,12 @@ describe Petition do
           @petition.flags_count.should == 0
         end
 
-        it "returns 2 if 3 flags but 2 after been reviewed" do
+        it "returns 1 if 2 flags but 1 after been reviewed" do
           @petition.admin_status = :awesome
           @petition.save
           Factory(:petition_flag, petition: @petition, user: Factory(:user, organisation: @user.organisation))
-          Factory(:petition_flag, petition: @petition, user: Factory(:user, organisation: @user.organisation))
-          @petition.flags_count.should == 2
+          @petition.flags_count.should == 1
         end
-      end
-
-      it "returns 2 if 3 flags but 2 after been reviewed and edited" do
-        @user = Factory(:user)
-        p = Factory(:petition, user: @user)
-        Factory(:petition_flag, petition: p, user: @user)
-        p.admin_status = :awesome
-        p.save
-        Factory(:petition_flag, petition: p, user: Factory(:user, organisation: @user.organisation))
-        Factory(:petition_flag, petition: p, user: Factory(:user, organisation: @user.organisation))
-        p.flags_count.should == 2
-
-        p.admin_status = :edited
-        p.save
-        p.flags_count.should == 2
       end
     end
 
@@ -255,80 +245,80 @@ describe Petition do
 
     describe "#update_admin_status" do
       context "unreviewed petition" do
-        before(:each) do
-          organisation = Factory(:organisation)
-          @petition = Factory(:petition, user: Factory(:user, organisation: organisation), organisation: organisation)
-          @petition.update_attribute(:admin_status, :unreviewed)
-        end
+        include_context "setup_stubbed_petition"
 
         [:title, :who, :what, :why, :delivery_details].each do |attribute|
           it "should keep petition unreviewed if #{attribute} has been changed" do
-            @petition.update_attribute(attribute, "changed")
+            @petition.send("#{attribute}=".intern, "changed")
+            @petition.send(:set_admin_status)
             @petition.admin_status.should == :unreviewed
           end
         end
 
         it "should keep petition unreviewed if image has been changed" do
           @petition.image_updated_at = Time.now
-          save_petition_and_assert :unreviewed
+          @petition.send(:set_admin_status)
+          @petition.admin_status.should == :unreviewed
         end
       end
       
       context "appropriate petition" do
         before(:each) do
-          organisation = Factory(:organisation)
-          @petition = Factory(:petition, user: Factory(:user,  organisation: organisation), organisation: organisation)
-          @petition.update_attribute(:admin_status, :approved)
+          organisation = FactoryGirl.build_stubbed(:organisation)
+          @petition = FactoryGirl.build_stubbed(:petition, user: FactoryGirl.build_stubbed(:user, organisation: organisation),
+                                         organisation: organisation,
+                                         slug: 'slug',
+                                         admin_status: 'approved')
         end
 
         [:title, :who, :what, :why, :delivery_details].each do |attribute|
           it "should mark petition edited if #{attribute} has been changed" do
-            @petition.update_attribute(attribute, "changed")
+            @petition.send("#{attribute}=".intern, "changed")
+            @petition.send(:set_admin_status)
             @petition.admin_status.should == :edited
           end
         end
 
         it "should mark petition edited if image has been changed" do
           @petition.image_updated_at = Time.now
-          save_petition_and_assert :edited
+          @petition.send(:set_admin_status)
+          @petition.admin_status.should == :edited
         end
       end
 
       context "prohibited petition" do
         before(:each) do
-          organisation = Factory(:organisation)
-          @petition = Factory(:petition, user: Factory(:user, organisation: organisation), organisation: organisation, admin_status: :inappropriate, admin_reason: "Bad")
+          organisation = FactoryGirl.build_stubbed(:organisation)
+          @petition = FactoryGirl.build_stubbed(:petition, user: FactoryGirl.build_stubbed(:user, organisation: organisation),
+                                         organisation: organisation,
+                                         slug: 'slug',
+                                         admin_status: 'approved')
           @petition.stub(:prohibited?).and_return(true)
         end
 
         [:title, :who, :what, :why, :delivery_details].each do |attribute|
           it "should mark petition edited inappropriate if #{attribute} has been changed" do
-            @petition.update_attribute(attribute, "changed")
+            @petition.send("#{attribute}=".intern, "changed")
+            @petition.send(:set_admin_status)
             @petition.admin_status.should == :edited_inappropriate
           end
         end
 
         it "should mark petition edited inappropriate if image has been changed" do
           @petition.image_updated_at = Time.now
-          save_petition_and_assert :edited_inappropriate
+          @petition.send(:set_admin_status)
+          @petition.admin_status.should == :edited_inappropriate
         end
-      end
-
-      def save_petition_and_assert(expected_admin_status)
-        @petition.save!
-        @petition.admin_status.should == expected_admin_status
       end
     end
 
     describe "#update_admin_attributes" do
-
       Petition::ADMINISTRATIVE_STATUSES.each do |status|
         if status != :unreviewed
           it "should set administered_at when status is #{status}" do
-            petition = Factory.build(:petition)
-            petition.admin_status = status
+            petition = FactoryGirl.build(:petition, admin_status: status)
             petition.admin_reason = "reason" if status == :inappropriate
-            petition.save!
+            petition.send(:update_admin_attributes)
             petition.administered_at.should_not be_nil
           end
         end
@@ -336,10 +326,9 @@ describe Petition do
 
       Petition::EDIT_STATUSES.push(:unreviewed).each do |status|
         it "should not set administered_at when status is #{status}" do
-          petition = Factory.build(:petition)
+          petition = FactoryGirl.build_stubbed(:petition, admin_status: status)
           administrated_at_before_status_changed = petition.administered_at
-          petition.admin_status = status
-          petition.save!
+          petition.send(:update_admin_attributes)
           petition.administered_at.should == administrated_at_before_status_changed
         end
       end
@@ -361,15 +350,15 @@ describe Petition do
     describe "#prohibited?" do
       [:inappropriate, :edited_inappropriate].each do |status|
         it "should return true if admin status is #{status}" do
-          @petition.admin_status = status
-          @petition.prohibited?.should be_true
+          subject.admin_status = status
+          subject.prohibited?.should be_true
         end
       end
 
       [:unreviewed, :awesome, :good, :approved, :edited].each do |status|
         it "should return false if admin status is #{status}" do
-          @petition.admin_status = status
-          @petition.prohibited?.should be_false
+          subject.admin_status = status
+          subject.prohibited?.should be_false
         end
       end
 
@@ -393,45 +382,12 @@ describe Petition do
 
     describe "#generate_token" do
       it "should generate token" do
-        @petition = Factory.build(:petition)
+        @petition = FactoryGirl.build(:petition)
         @petition.token.should be_nil
 
-        @petition.save!
+        @petition.send(:generate_token)
         @petition.token.should_not be_nil
       end
-    end
-
-    describe "#find_by_token" do
-      it "should find by token" do
-        @petition = Factory(:petition)
-
-        token = @petition.token
-
-        Petition.find_by_token(token).id.should == @petition.id
-      end
-
-      it "should return nil petition if token is nil" do
-        Petition.find_by_token(nil).should be_nil
-      end
-    end
-
-    describe "#find_by_token!" do
-      it "should find by token" do
-        @petition = Factory(:petition)
-
-        token = @petition.token
-
-        Petition.find_by_token!(token).id.should == @petition.id
-      end
-
-      it "should raise exception if token is nil" do
-        lambda {Petition.find_by_token!(nil)}.should raise_exception(ActiveRecord::RecordNotFound)
-      end
-
-      it "should raise exception if token is not found" do
-        lambda {Petition.find_by_token!("unfound_token")}.should raise_exception(ActiveRecord::RecordNotFound)
-      end
-
     end
   end
 
@@ -440,14 +396,14 @@ describe Petition do
     it { should validate_attachment_content_type(:image).allowing('image/jpeg', 'image/png').rejecting('text/plain', 'text/xml') }
 
     it "copies specific paperclip errors to #image for SimpleForm integration" do
-      petition = Factory.stub(:petition)
+      petition = FactoryGirl.build_stubbed(:petition)
       petition.errors.add(:image_content_type, "must be an image file")
       petition.run_callbacks(:validation)
       petition.errors[:image].should == ["must be an image file"]
     end
 
     it "removes unreadable paperclip errors from #image" do
-      petition = Factory.stub(:petition)
+      petition = FactoryGirl.build_stubbed(:petition)
       petition.errors.add(:image, "/var/12sdfsdf.tmp no decode delegate found")
       petition.run_callbacks(:validation)
       petition.errors[:image].should == []
@@ -457,16 +413,16 @@ describe Petition do
   describe "#awesome" do
     before(:each) do
       @current_org = Factory(:organisation)
-      @user = Factory(:user, organisation: @current_org)
+      @user = FactoryGirl.build_stubbed(:user, organisation: @current_org)
     end
 
     it "should retrieve awesome petitions" do
-      Factory(:petition, organisation: @current_org, user: @user).update_attribute(:admin_status, :unreviewed)
-      Factory(:petition, organisation: @current_org, user: @user).update_attribute(:admin_status, :approved)
-      Factory(:petition, organisation: @current_org, user: @user).update_attribute(:admin_status, :inappropriate)
-      Factory(:petition, organisation: @current_org, user: @user).update_attribute(:admin_status, :awesome)
-      Factory(:petition_without_leader, organisation: @current_org).update_attribute(:admin_status, :awesome)
-      Factory(:petition, organisation: @current_org, cancelled: true).update_attribute(:admin_status, :awesome)
+      Factory(:petition, organisation: @current_org, user: @user, admin_status: 'unreviewed')
+      Factory(:petition, organisation: @current_org, user: @user, admin_status: 'approved')
+      Factory(:petition, organisation: @current_org, user: @user, admin_status: 'inappropriate', admin_reason: 'reason')
+      Factory(:petition, organisation: @current_org, user: @user, admin_status: 'awesome')
+      Factory(:petition_without_leader, organisation: @current_org, admin_status: 'awesome')
+      Factory(:petition, organisation: @current_org, cancelled: true, admin_status: 'awesome')
 
       petitions = Petition.awesome
       petitions.count.should == 2
@@ -483,7 +439,7 @@ describe Petition do
   describe "#hot" do
     before(:each) do
       @current_org = Factory(:organisation)
-      @user = Factory(:user, organisation: @current_org)
+      @user = FactoryGirl.build_stubbed(:user, organisation: @current_org)
     end
 
     it "should retrieve hot petitions" do
@@ -541,51 +497,14 @@ describe Petition do
     end
   end
 
-  describe "#one_signature" do
-    before :each do
-      @petition = Factory(:petition)
-    end
-
-    it "should return petitions being signed once only" do
-      Factory(:signature, petition: @petition)
-      Petition.one_signature.should include(@petition)
-    end
-
-    it "should not return petitions being signed more than once" do
-      2.times {Factory(:signature, petition: @petition)}
-      Petition.one_signature.should_not include(@petition)
-    end
-
-    it "should not return any draft" do
-      draft = Factory(:petition, launched: false)
-      Factory(:signature, petition: draft)
-      Petition.one_signature.should_not include(draft)
-    end
-
-    it "should not return any prohibited" do
-      edited_inappropriate = Factory(:petition, admin_status: :edited_inappropriate, admin_reason: 'a reason')
-      Factory(:signature, petition: edited_inappropriate)
-      inappropriate = Factory(:petition, admin_status: :inappropriate, admin_reason: 'another reason')
-      Factory(:signature, petition: inappropriate)
-      Petition.one_signature.should_not include(edited_inappropriate)
-      Petition.one_signature.should_not include(inappropriate)
-    end
-
-    it "should not return any cancelled" do
-      cancelled = Factory(:petition, cancelled: true)
-      Factory(:signature, petition: cancelled)
-      Petition.one_signature.should_not include(cancelled)
-    end
-
-  end
-
   describe "#awaiting_moderation" do
     before :each do
       @current_org = Factory(:organisation)
+      @user = FactoryGirl.build_stubbed(:user, organisation: @current_org)
     end
 
     def petition_with_admin_status(admin_status)
-      petition = Factory(:petition, organisation: @current_org)
+      petition = Factory(:petition, organisation: @current_org, user: @user)
       petition.update_attribute(:admin_status, admin_status)
       petition
     end
@@ -600,15 +519,15 @@ describe Petition do
 
     it "should return petitions that belongs to own organisation" do
       other_org = Factory(:organisation)
-      petition_self = Factory(:petition, organisation: @current_org)
-      petition_other = Factory(:petition, organisation: other_org)
+      petition_self = Factory(:petition, organisation: @current_org, user: @user)
+      petition_other = Factory(:petition, organisation: other_org, user: @user)
 
       awaiting = Petition.awaiting_moderation(@current_org.id)
       awaiting.should include(petition_self)
       awaiting.should_not include(petition_other)
     end
   end
-  
+
   describe "#appropriate" do
     it "should retrieve awesome and good petitions with and without leader" do
       unreviewed = Factory(:petition, admin_status: :unreviewed)
@@ -617,29 +536,27 @@ describe Petition do
       orphan_awesome = Factory(:petition_without_leader, admin_status: :awesome)
       approved = Factory(:petition, admin_status: :approved)
       inappropriate = Factory(:petition, admin_status: :inappropriate, admin_reason: "don't like it")
-      
-      Petition.appropriate.all.should =~ [awesome, good, orphan_awesome]
-    end
-
-    it "should not return any cancelled" do
       cancelled = Factory(:cancelled_petition, admin_status: :approved)
-      Petition.appropriate.should_not include(cancelled)
+
+      Petition.appropriate.all.should =~ [awesome, good, orphan_awesome]
     end
   end
 
   describe "#orphans" do
+    include_context "setup_petition"
+
     it "should retrieve petitions which are not orphans" do
       orphan = Factory(:petition_without_leader)
-      petition = Factory(:petition)
       Petition.not_orphan.should_not include(orphan)
-      Petition.not_orphan.should include(petition)
+      Petition.not_orphan.should include(@petition)
       Petition.not_orphan.should have(1).item
     end
   end
 
   describe "#cached_signatures_size" do
-    it "should calculate the count" do
-      @petition = Factory(:petition)
+    include_context "setup_petition"
+
+    it "should calculate the signatures count" do
       @signature = Factory(:signature, petition: @petition)
       @petition.cached_signatures_size.should == 1
       @signature2 = Factory(:signature, petition: @petition)
@@ -647,10 +564,20 @@ describe Petition do
     end
   end
 
-  describe "#admins" do
-    before(:each) do
-      @petition = Factory(:petition)
+  describe "#cached_comments_size" do
+    include_context "setup_petition"
+
+    it "should calculate the comments count" do
+      signature = Factory(:signature, petition: @petition)
+      comment = Factory(:comment, signature: signature)
+      @petition.cached_comments_size.should == 1
+      signature2 = Factory(:signature, petition: @petition)
+      comment2 = Factory(:comment, signature: signature2)
+      @petition.cached_comments_size.should == 1
     end
+  end
+  describe "#admins" do
+    include_context "setup_petition"
 
     it "should include the creator" do
       @petition.admins.should include(@petition.user)
@@ -714,7 +641,6 @@ describe Petition do
       petition = build(:petition)
       petition.achievements[:share_on_facebook] = "1"
       petition.achievements[:share_with_friends_on_facebook] = "0"
-      petition.save
 
       petition.progress.should == "manage"
     end
@@ -726,9 +652,138 @@ describe Petition do
       petition.achievements[:share_on_twitter] = "1"
       petition.achievements[:share_via_email] = "1"
 
-      petition.save
 
       petition.progress.should == "share"
+    end
+  end
+
+  describe "signature counts by source" do
+    include_context "setup_petition"
+
+    before(:each) do
+      @signature = Factory(:signature, petition: @petition, source: 'foo')
+      @signature = Factory(:signature, petition: @petition, source: '')
+    end
+
+    it "should provide a hash of counts" do
+      @petition.signature_counts_by_source.should == {'' => 1, 'foo' => 1}
+    end
+  end
+
+  describe ".featured_petitions" do
+    before(:each) do
+      @organisation = Factory(:organisation)
+    end
+
+    it "should return the featured petitions" do
+      Factory(:petition, organisation: @organisation, admin_status: :awesome)
+      Factory(:petition_without_leader, organisation: @organisation, admin_status: :awesome)
+      Petition.featured_homepage_petitions(@organisation).count.should == 2
+    end
+
+    it "should return the latest featured effort" do
+      earlier_featured_petition = create(:effort, organisation: @organisation, featured: true)
+      latest_featured_petition = create(:effort, organisation: @organisation, featured: true)
+      Petition.featured_homepage_petitions(@organisation).should == [latest_featured_petition]
+    end
+  end
+
+  describe "does not crop image attachment" do
+    it "should not call reprocess for image" do
+      petition = FactoryGirl.build(:petition)
+      petition.should_not_receive(:reprocess_image).and_return(nil)
+      petition.save!
+    end
+  end
+
+  describe "recent comments" do
+    before :each do
+      @petition = FactoryGirl.create(:petition)
+      4.times.each do |count|
+        signature = FactoryGirl.create(:signature, :petition => @petition)
+        Factory :comment, :text => "This is a test comment #{count}", :signature => signature, flagged_at: nil
+      end
+      FactoryGirl.create(:signature, :petition => @petition)
+    end
+
+    it "should be able to get recent 3 signatures that have comments" do
+      @petition.recent_comments.size.should == 3
+      @petition.recent_comments.last.text.should == "This is a test comment 1"
+    end
+
+    it "should be able to scroll through the rest of the comments" do
+      @petition.recent_comments(3,3).size.should == 1
+      @petition.recent_comments(3,3).first.text.should == "This is a test comment 0"
+    end
+
+    it "should not return flagged and unapproved comments if any" do
+      signature = FactoryGirl.create(:signature, :petition => @petition)
+      comment = Factory :comment, :text => "this comment should not come at the first place", :flagged_at => Time.now, signature: signature
+      @petition.recent_comments.first.text.should_not == "this comment should not come at the first place"
+      comment.approved = false
+      comment.save!
+      comment.reload
+      @petition.recent_comments.first.text.should_not == "this comment should not come at the first place"
+      comment.approved = true
+      comment.save!
+      @petition.recent_comments.first.text.should == "this comment should not come at the first place"
+    end
+
+    it "should return blank if the petition is prohibited" do
+      @petition.admin_status = :inappropriate
+      @petition.recent_comments.size.should == 0
+    end
+
+  end
+
+  describe "all comments" do
+
+    before :each do
+      @petition = FactoryGirl.create(:petition)
+      4.times.each do |count|
+        signature = FactoryGirl.create(:signature, :petition => @petition)
+        Factory :comment, :text => "This is a test comment #{count}", :signature => signature
+      end
+      FactoryGirl.create(:signature, :petition => @petition)
+    end
+
+    it "should return all comments" do
+      @petition.comments.size.should == 4
+      @petition.comments.first.text.should == "This is a test comment 3"
+    end    
+  end
+
+  describe "#subscribed_signatures" do
+    before :each do
+      @petition = FactoryGirl.create(:petition)
+      Factory :signature, petition: @petition, unsubscribe_at: nil, join_organisation: true
+      Factory :signature, petition: @petition, unsubscribe_at: Time.now, join_organisation: true
+      Factory :signature, petition: @petition, unsubscribe_at: nil, join_organisation: true, additional_fields: {"is_employee" => "1"}
+      Factory :signature, petition: @petition, unsubscribe_at: nil, join_organisation: true, additional_fields: {"is_employee" => "0"}
+    end
+
+    it "should be able to get all subscribed signatures when scope is nil" do
+      @petition.subscribed_signatures(nil).size.should == 3
+    end
+
+    it "should be able to get all subscribed signatures when scope is empty" do
+      @petition.subscribed_signatures("").size.should == 3
+    end
+
+    it "should be able to get signatures according to the scope when scope is present" do
+      @petition.subscribed_signatures("employees").size.should == 1
+    end
+  end
+
+  describe "#comments_size" do
+    it "should just return the visible comments collection size" do
+      petition = Factory(:petition)
+      first_signature = Factory(:signature, petition: petition)
+      second_signature = Factory(:signature, petition: petition)
+      comment_visible = Factory(:comment, signature: first_signature)
+      comment_not_visible = Factory(:comment, signature: second_signature, flagged_at: Time.now)
+
+      petition.comments_size.should == 1
     end
   end
 end

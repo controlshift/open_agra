@@ -30,7 +30,7 @@ class CampaignAdmin < ActiveRecord::Base
   end
 
   def user_email
-    errors.add(:user_id, 'User does not have the same email as the invitation.') unless self.user.email == self.invitation_email
+    errors.add(:user_id, I18n.t('errors.messages.user_email.doesnt_match')) unless self.user.email == self.invitation_email
   end
 
   def email

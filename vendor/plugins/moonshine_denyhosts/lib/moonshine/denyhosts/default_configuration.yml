@@ -1,0 +1,56 @@
+# Most operating systems:
+hosts_deny: /etc/hosts.deny
+
+# never purge:
+purge_deny:
+
+# a denied host can be purged/re-added indefinitely
+purge_threshold: 0
+
+#To block only sshd:
+block_service: sshd
+
+deny_threshold_invalid: 5
+deny_threshold_valid: 10
+deny_threshold_root: 1
+deny_threshold_restricted: 1
+
+work_dir: /var/lib/denyhosts
+
+suspicious_login_report_allowed_hosts: true
+hostname_lookup: true
+
+lock_file: /var/run/denyhosts.pid
+
+admin_email: root@localhost
+smtp_host: localhost
+smtp_port: 25
+smtp_username: null
+smtp_password: null
+smtp_from: "DenyHosts <nobody@localhost>"
+smtp_date_format: "%a, %d %b %Y %H:%M:%S %z"
+
+syslog_report: true
+allowed_hosts_hostname_lookup: false
+
+age_reset_valid: 5d
+age_reset_root: 25d
+age_reset_restricted: 25d
+age_reset_invalid: 10d
+reset_on_success: false
+plugin_deny: null
+plugin_purge: null
+userdef_failed_entry_regex: null
+
+daemon_log: /var/log/denyhosts
+daemon_log_time_format: null
+daemon_log_message_format: '%(asctime)s - %(name)-12s: %(levelname)-8s %(message)s'
+daemon_sleep: 30s
+daemon_purge: 1h
+
+sync_server: null
+sync_interval: 1h
+sync_upload: true
+sync_download: true
+sync_download_threshold: 3
+sync_download_resiliency: 5h

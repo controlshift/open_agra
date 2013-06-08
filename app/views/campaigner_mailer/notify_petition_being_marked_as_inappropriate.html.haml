@@ -9,7 +9,7 @@
 = simple_format(@petition.admin_reason)
 \----
 
-%p #{link_to "Edit your petition", petition_manage_url(@petition)} to correct this issue.
+%p #{link_to "Edit your petition", petition_manage_url(@petition,  host: @organisation.host)} to correct this issue.
 
 %p We'll review any changes you make and approve your campaign if it meets our guidelines.
 

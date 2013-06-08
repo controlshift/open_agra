@@ -16,7 +16,7 @@
             .span2
               = content_for?(:sidebar) ? content_for(:sidebar) : render(partial: 'layouts/org_admin_sidebar')
                       
-            .span10.relative
+            .span10.relative.main-content-with-sidebar
               %div{'data-pjax-container' => true}
                 .loader{style: "display:none;"}
                   =image_tag 'ajax-loader-16.gif'

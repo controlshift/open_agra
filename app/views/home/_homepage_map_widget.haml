@@ -1,0 +1,20 @@
+- content_for :head do
+  %script{ type: "text/javascript", src:"http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"}
+  = javascript_include_tag 'location'
+.row
+  .span8{:style => 'width: 590px'}
+    .inner-shadow
+      #location-map{'data-default-bounds' => current_organisation.default_map_bounds.to_json}
+    .span6.search-area.pull-left
+      %form.big-efforts-search.effort-location-search{ action: petitions_near_index_path, method: 'GET' }
+        #efforts-near-container.near-effort-search.query-container.span8.offset1{'data-organisation-country' => current_organisation.settings[:country]}
+          = render :partial => 'petitions/near/search_container', :locals => {:submit_text => 'Find Petitions'}
+      %br
+      #location-categories
+        .title Filter by category
+        = form_tag new_petitions_near_path, :method => 'GET' do
+          = radio_button_tag :category, '', params[:category].blank?
+          = label :category, '', 'All'
+          - current_organisation.categories.each do |category|
+            = radio_button_tag :category, category.slug, params[:category] == category.slug
+            = label :category, category.slug, category.name

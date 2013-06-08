@@ -1,9 +1,9 @@
-= title  "Members"
+= title  "Members", class: 'left'
 
 .right.search-box
-  = form_tag  email_org_members_path, :method => :get, class: 'search' do
+  = form_tag  email_org_members_path, :method => :get, class: 'admin-search' do
     %input.search-query{ name: "email", placeholder: "email" }
-    %a.search-button#search-btn{ href: "javascript:$('form.search').submit();" }
+    %a.search-button#search-btn{ href: "javascript:$('form.admin-search').submit();" }
       %i.icon-search
 
 - if @members.any?

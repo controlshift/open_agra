@@ -1,0 +1,24 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Petitions', org_petitions_path
+    %span.divider
+      >
+  %li
+    = link_to "#{@petition.title}", org_petition_path(@petition)
+    %span.divider
+      >
+  %li.active
+    Settings
+.clear
+
+= title @petition.title
+%h2
+  Settings
+
+= simple_form_for @petition, url: org_petition_settings_path, method: :put,  validate: true, :wrapper => 'compact' do |form|
+  = form.input :redirect_to, as: :string, label: 'Redirect Petition to URL'
+  = form.input :after_signature_redirect_url, as: :string, label: t('views.org.petitions.settings.after_signature_redirect_url')
+  = form.input :show_progress_bar, as: :boolean
+
+  .actions
+    = form.button :submit

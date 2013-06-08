@@ -1,21 +1,26 @@
-.breadcrumbs
-  = link_to 'Efforts', org_efforts_path
-  >
-  Manage #{@effort.title}
+%ul.breadcrumb
+  %li
+    = link_to 'Efforts', org_efforts_path
+    %span.divider
+      >
+  %li.active
+    Manage #{@effort.title}
+
+.clear
 
 .row.mb20
   .span10
-    = title "\"#{@effort.title}\" Effort"
-.clear
+    = title @effort.title
+    %h2 Effort
 
 
 .row
   .span2.well
-    = link_to new_effort_petition_path(@effort), id: "landing-effort-button", class: 'well-button' do
+    = link_to new_effort_near_path(@effort), id: "landing-effort-button", class: 'well-button' do
       %h3
         %i.icon-share-alt
-        New Petition
-      Create campaign inside effort
+        Landing Page
+      Where members get started
   .span2.well
     = link_to effort_path(@effort), id: "view-effort-button", class: 'well-button' do
       %h3
@@ -30,52 +35,11 @@
         Edit
       Change settings & content
 
+.header.mt30.mb10.clearfix
+  %h4.pull-left Targets
+  - if @effort.target_collection.blank?
+    = link_to find_org_effort_targets_path(@effort), class: "pull-right btn" do
+      %i.icon-plus-sign
+      &nbsp; Add Target
 
-%h4
-  Petitions
-
-- if @petitions.any?
-  = table_for(@petitions) do |t|
-    = t.data do
-      - t.cell(:title) { |p| link_to(p.title, petition_path(p), class: petition_class(p)) }
-      - t.cell(:total_signatures) { |p| p.cached_signatures_size }
-      - t.cell(:created_by) { |p| link_to_edit_user(p.user) }
-      - t.cell(:created_at) { |p| pretty_date_format(p.created_at, "%Y-%m-%d %H:%M") }
-      - t.cell(:admin_status)
-  = will_paginate @petitions
-- else
-  .row
-    .span8
-      %p
-        No petitions have been created inside this effort yet.
-      %p
-        Your members can create campaigns inside this effort through it's public new petition page.
-      %p
-        Petitions created elsewhere on the site can also be manually added to the effort by the site administrator.
-
-= link_to "#", id: "move-petition-into-effort", href: "#petition-modal", rel: 'popover', data: { toggle: 'modal' } do
-  %i.icon-plus
-  Move Petition Into Effort
-
-:coffeescript
-  $ ->
-    new PetitionSelector
-
-- content_for :end_of_body do
-  / render div at the end of body for fixing IE7 z-index problem
-  .modal.hide.fade.petition-selector-modal#petition-modal{'data-petition-check-url' => org_effort_path(@effort), 'data-petition-action-url' => org_effort_path(@effort)}
-    .modal-header
-      %button.close{ "data-dismiss" => "modal" } x
-      %h3 Move Petition Into Effort
-    .modal-body.petition-form
-      %b URL of petition to move:
-      .mt10
-        .inline-block.petition-host-label
-          = petition_url("")
-        .inline-block
-          %input.span2#petition-slug-textbox
-          %span.indicator
-          .control-group.error
-            .help-inline
-    .modal-footer
-      %a.btn.btn-primary.disabled#btn-confirm{ href: "#" } Confirm
+= render partial: 'target_petition_table'

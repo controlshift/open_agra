@@ -21,7 +21,7 @@ class Petitions::ManageController < ApplicationController
     @success = update_petition(@petition, params[:petition], params[:location])
     if @success
       respond_to do |format|
-        format.html { redirect_to petition_path(@petition), notice: "The petition has been successfully updated!" }
+        format.html { redirect_to petition_path(@petition), notice: t('controllers.petitions.manage.success_update') }
         format.js { render layout: false }
       end
     else
@@ -46,14 +46,14 @@ class Petitions::ManageController < ApplicationController
     if @petition.save
       render json: { url: petition_alias_url(@petition.alias) }, status: :ok
     else
-      render json: { message: "Failed to update petition alias" }, status: :not_acceptable
+      render json: { message: t('controllers.petitions.manage.error_update_alias') }, status: :not_acceptable
     end
   end
 
   def download_letter
     if @petition.cached_signatures_size > 500
-      Delayed::Job.enqueue Jobs::GeneratePetitionLetterJob.new(@petition, "#{@petition.slug}_form.pdf", current_user)
-      redirect_to deliver_petition_manage_path(@petition), notice: "#{current_user.email} will receive an email with download instructions as soon as the PDF has been generated."
+      Jobs::GeneratePetitionLetterJob.perform_async(@petition.id, "#{@petition.slug}_form.pdf", current_user.id)
+      redirect_to deliver_petition_manage_path(@petition), notice: t('controllers.petitions.manage.download_message', email: current_user.email)
     else
       output = Documents::PetitionLetter.new(petition: @petition).render
       send_data output, filename: "#{@petition.slug}_letter.pdf", type: "application/pdf"
@@ -74,7 +74,7 @@ class Petitions::ManageController < ApplicationController
   def activate
     @petition.cancelled = false
     PetitionsService.new.save(@petition)
-    redirect_to petition_manage_path(@petition), notice: "Your petition has been reactivated!"
+    redirect_to petition_manage_path(@petition), notice: t('controllers.petitions.manage.success_activate')
   end
 
   def contact_admin
@@ -85,7 +85,7 @@ class Petitions::ManageController < ApplicationController
 
     if @email.save
       UserMailer.delay.contact_admin(@petition, @email)
-      redirect_to petition_manage_path(@petition), notice: "Thank you for contacting us, we will review your petition soon."
+      redirect_to petition_manage_path(@petition), notice: t('controllers.petitions.manage.success_submission')
     else
       render :show_inappropriate
     end
@@ -95,7 +95,7 @@ class Petitions::ManageController < ApplicationController
 
   def load_and_authorize_petition
     @petition = Petition.find_by_slug!(params[:petition_id])
-    authorize! :manage, @petition, message: "You are not authorized to view that page."
+    authorize! :manage, @petition, message: t('unauthorized.default')
     raise  ActiveRecord::RecordNotFound  if @petition.organisation != current_organisation
   end
 

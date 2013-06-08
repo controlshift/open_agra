@@ -3,20 +3,21 @@
 # be included in the compiled file accessible from http://example.com/assets/application
 # It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
 # the compiled file.
+#= require control_shift
 #= require jquery_ujs
 #= require jquery-ui
 #= require jquery.form
 #= require jquery.remotipart
 #= require jquery.pjax
-#= require jquery.ba-resize
+#= require jquery_error_handler
 #= require rails.validations
 #= require rails.validations.simple_form
 #= require rails.validations.customValidators
 #= require bootstrap
-#= require jquery.jcarousel.min
+#= require bootstrap-modal
+#= require bootstrap-modalmanager
 #= require jquery.timeago.min
 #= require ZeroClipboard
-#= require jquery.mailcheck
 #= require copy_button
 #= require email
 #= require petitions
@@ -32,10 +33,11 @@
 #= require collapse-arrow
 #= require location_map
 #= require embedly
-
-$ -> $("form:not(.filter) :input[type=text]:visible:enabled:first").focus()
+#= require jquery-cookie
+#= require mailcheck
 
 $ ->
+
   ClientSideValidations.formBuilders['SimpleForm::FormBuilder']['wrappers']["compact"] =
     add: (element, settings, message) ->
       wrapper = element.closest(settings.wrapper_tag)
@@ -48,8 +50,10 @@ $ ->
       wrapper.removeClass(settings.wrapper_error_class)
       errorElement = wrapper.find("#{settings.error_tag}.#{settings.error_class}")
       errorElement.remove()
+  ClientSideValidations.formBuilders['SignatureFormBuilder'] = ClientSideValidations.formBuilders['SimpleForm::FormBuilder']
+  
+  $("form:not(.filter) :input[type=text]:visible:enabled:first").focus()
 
-$ ->
   $('input[rel=popover], textarea[rel=popover]').popover
     offset: 10, 
     trigger: "focus",

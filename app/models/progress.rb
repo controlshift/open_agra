@@ -1,18 +1,12 @@
 module Progress
+  MILESTONES_GAPS = { "500"=>100, "1000"=>200, "10000"=>1000, "50000"=>5000, "100000"=>25000 }
   def goal
-    if cached_signatures_size < 500
-      (cached_signatures_size + 1).round_to_nearest(100)
-    elsif cached_signatures_size < 1000
-      (cached_signatures_size + 1).round_to_nearest(200)
-    elsif cached_signatures_size < 10000
-      (cached_signatures_size + 1).round_to_nearest(1000)
-    elsif cached_signatures_size < 50000
-      (cached_signatures_size + 1).round_to_nearest(5000)
-    elsif cached_signatures_size < 100000
-      (cached_signatures_size + 1).round_to_nearest(25000)
-    else
-      (cached_signatures_size + 1).round_to_nearest(100000)
+    MILESTONES_GAPS.each do |key, value|
+      if cached_signatures_size < key.to_i
+        return (cached_signatures_size + 1).round_to_nearest(value)
+      end
     end
+    return (cached_signatures_size + 1).round_to_nearest(100000)
   end
 
   def percent_to_goal
@@ -24,6 +18,16 @@ module Progress
     @cached_signatures_size = Rails.cache.fetch(signatures_count_key, raw: true) do
       signatures_size
     end
-    @cached_signatures_size  = @cached_signatures_size.to_i # we need to do this, because we store as raw in memcached.
+    @cached_signatures_size  = @cached_signatures_size.respond_to?(:value) ? @cached_signatures_size.value.to_i : @cached_signatures_size.to_i # we need to do this, because we store as raw in memcached.
   end
+
+  def cached_comments_size
+    return @cached_comments_size if defined?(@cached_comments_size)
+    @cached_comments_size = Rails.cache.fetch(comments_count_key, raw: true) do 
+      comments_size
+    end
+
+    @cached_comments_size = @cached_comments_size.respond_to?(:value) ? @cached_comments_size.value.to_i : @cached_comments_size.to_i
+  end
+
 end

@@ -15,6 +15,12 @@ describe Admin::PetitionsController do
       sign_in Factory(:admin)
     end
 
+    it "should catch organisation not found exceptions" do
+      controller.stub!(:current_organisation) { raise OrganisationNotFoundException }
+      get :index
+      response.should render_template 'errors/organisation_not_found'
+    end
+
     context "with a petition object" do
       before(:each) { @petition = Factory(:petition, organisation: @organisation,  user: Factory(:user, organisation: @organisation)) }
 

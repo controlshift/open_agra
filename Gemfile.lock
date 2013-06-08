@@ -1,17 +1,12 @@
 GIT
-  remote: git://github.com/controlshift/agra_private_sample.git
-  revision: 282f6a74f6eee3b2a55fea59d17d6975615dbee7
+  remote: git://github.com/controlshift/split.git
+  revision: 2f7971203381511dcededbf9454ff6929bc43375
   specs:
-    agra_private (0.0.1)
-      rails (~> 3.2.5)
-
-GIT
-  remote: git://github.com/controlshift/vanity.git
-  revision: 4c37544b93e1e57cdd2814f2d8a325e06c9bf7a5
-  specs:
-    vanity (1.8.0)
-      redis (~> 3.0)
-      redis-namespace (~> 1.2.1)
+    split (0.6.0)
+      redis (>= 2.1)
+      redis-namespace (>= 1.1.0)
+      simple-random
+      sinatra (>= 1.2.6)
 
 GIT
   remote: git://github.com/ctran/annotate_models.git
@@ -27,12 +22,6 @@ GIT
       pg
       rails
       rake
-
-GIT
-  remote: git://github.com/galetahub/simple-captcha.git
-  revision: 7bf17fe6bceda3313b3cce37853f685cbc64afde
-  specs:
-    galetahub-simple_captcha (0.1.3)
 
 GIT
   remote: git://github.com/nabeta/sunspot-rails-tester.git
@@ -55,16 +44,40 @@ GIT
     sunspot_solr (2.0.0.pre.120925)
 
 GIT
+  remote: https://controlshiftdeployment:ZxcG2LQVsU6cBF@github.com/controlshift/agra_private.git
+  revision: 660ec290343063e86efd37b086d685ef80bfd231
+  specs:
+    agra_private (0.0.6)
+      rails (~> 3.2.5)
+
+GIT
   remote: https://github.com/bcardarella/client_side_validations.git
   revision: 7145c84c3737f6bd8b158ba204dc8c38197753c8
   specs:
     client_side_validations (3.2.1)
 
 GIT
-  remote: https://github.com/controlshift/blue_state_digital.git
-  revision: 83f043a5ba6a2fa52c562c2cd6f8f2e1e2c62bbd
+  remote: https://github.com/controlshift/action_kit_rest.git
+  revision: 604f66415817fea8411599c2effe5023a4c626bb
   specs:
-    blue_state_digital (0.5.1)
+    action_kit_rest (0.1.0)
+      activesupport
+      faraday
+      faraday_middleware
+      hashie
+
+GIT
+  remote: https://github.com/controlshift/activerecord-postgis-adapter.git
+  revision: a74ac3f06938b2e07a474434353fcf5550494383
+  specs:
+    activerecord-postgis-adapter (0.6.4.nonrelease)
+      rgeo-activerecord (~> 0.5.0)
+
+GIT
+  remote: https://github.com/controlshift/blue_state_digital.git
+  revision: 4a5d77930b6b02c7da2df83f406df53dc93dc600
+  specs:
+    blue_state_digital (0.5.2)
       activesupport
       builder
       crack
@@ -73,7 +86,7 @@ GIT
 
 GIT
   remote: https://github.com/controlshift/facebook_share_widget_rails.git
-  revision: 86df68fea6918046cc6c2835ae098236a573e726
+  revision: 623920f6bc741416b4442d1d46d78820ccba7ae7
   specs:
     facebook_share_widget (0.0.10)
       coffee-rails
@@ -83,23 +96,19 @@ GIT
       sass-rails
 
 GIT
+  remote: https://github.com/controlshift/pulse.git
+  revision: 527c1dfe170ba3963e7d3467ddb63b727bb22823
+  specs:
+    rails-pulse (0.5.0)
+      rails
+
+GIT
   remote: https://github.com/dockyard/client_side_validations-simple_form.git
   revision: 7364ed2fe0a620f58753d0c0953f2b0e15bedcaa
   specs:
     client_side_validations-simple_form (2.0.0)
       client_side_validations (~> 3.2.0)
       simple_form (~> 2.0.3)
-
-GIT
-  remote: https://github.com/mperham/sidekiq.git
-  revision: 40d4176411e901e51f24f32e984198af0bca1a84
-  specs:
-    sidekiq (2.5.4)
-      celluloid (~> 0.12.0)
-      connection_pool (~> 0.9.2)
-      multi_json (~> 1)
-      redis (~> 3)
-      redis-namespace
 
 GIT
   remote: https://github.com/prawnpdf/prawn.git
@@ -116,42 +125,48 @@ GIT
     tinymce-rails (3.5)
       railties (>= 3.1.1)
 
+GIT
+  remote: https://github.com/woodhull/simple-captcha.git
+  revision: 0527e756d2c8a2f980ee831c91d9659275db00a0
+  specs:
+    simple_captcha (0.1.3)
+
 GEM
   remote: http://rubygems.org/
   specs:
     Ascii85 (1.0.2)
     RedCloth (4.2.9)
-    actionmailer (3.2.9)
-      actionpack (= 3.2.9)
+    actionmailer (3.2.12)
+      actionpack (= 3.2.12)
       mail (~> 2.4.4)
-    actionpack (3.2.9)
-      activemodel (= 3.2.9)
-      activesupport (= 3.2.9)
+    actionpack (3.2.12)
+      activemodel (= 3.2.12)
+      activesupport (= 3.2.12)
       builder (~> 3.0.0)
       erubis (~> 2.7.0)
       journey (~> 1.0.4)
-      rack (~> 1.4.0)
+      rack (~> 1.4.5)
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.2.1)
     active_record_query_trace (1.1)
-    activemodel (3.2.9)
-      activesupport (= 3.2.9)
+    activemodel (3.2.12)
+      activesupport (= 3.2.12)
       builder (~> 3.0.0)
-    activerecord (3.2.9)
-      activemodel (= 3.2.9)
-      activesupport (= 3.2.9)
+    activerecord (3.2.12)
+      activemodel (= 3.2.12)
+      activesupport (= 3.2.12)
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
-    activeresource (3.2.9)
-      activemodel (= 3.2.9)
-      activesupport (= 3.2.9)
-    activesupport (3.2.9)
+    activeresource (3.2.12)
+      activemodel (= 3.2.12)
+      activesupport (= 3.2.12)
+    activesupport (3.2.12)
       i18n (~> 0.6)
       multi_json (~> 1.0)
     addressable (2.3.2)
     arel (3.0.2)
-    asset_sync (0.5.0)
+    asset_sync (0.5.4)
       activemodel
       fog
     attr_required (0.0.5)
@@ -161,9 +176,20 @@ GEM
       nokogiri (>= 1.4.4)
       uuidtools (~> 2.1)
     bcrypt-ruby (3.0.1)
+    better_errors (0.0.8)
+      coderay
+      erubis
     binding_of_caller (0.6.8)
     builder (3.0.4)
+    cache_digests (0.2.0)
+      actionpack (>= 3.2)
     cancan (1.6.7)
+    capistrano (2.14.2)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
     capybara (1.1.2)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -174,14 +200,14 @@ GEM
     capybara-webkit (0.11.0)
       capybara (>= 1.0.0, < 1.2)
       json
-    celluloid (0.12.3)
+    celluloid (0.12.4)
       facter (>= 1.6.12)
       timers (>= 1.0.0)
     childprocess (0.3.1)
       ffi (~> 1.0.6)
     chunky_png (1.2.6)
     cocaine (0.2.1)
-    coderay (1.0.7)
+    coderay (1.0.9)
     coffee-filter (0.1.1)
       coffee-script (>= 2.2.0)
       haml (>= 3.0.18)
@@ -191,7 +217,7 @@ GEM
     coffee-script (2.2.0)
       coffee-script-source
       execjs
-    coffee-script-source (1.3.3)
+    coffee-script-source (1.6.1)
     colorize (0.5.8)
     columnize (0.3.6)
     compass (0.12.2)
@@ -200,10 +226,9 @@ GEM
       sass (~> 3.1)
     compass-rails (1.0.3)
       compass (>= 0.12.2, < 0.14)
-    connection_pool (0.9.2)
-    crack (0.3.1)
-    daemons (1.1.9)
-    dalli (1.1.5)
+    connection_pool (1.0.0)
+    crack (0.3.2)
+    dalli (2.6.3)
     database_cleaner (0.7.0)
     databasedotcom (1.3.1)
       json
@@ -214,29 +239,26 @@ GEM
       debugger-ruby_core_source (~> 1.1.3)
     debugger-linecache (1.1.2)
       debugger-ruby_core_source (>= 1.1.1)
-    debugger-ruby_core_source (1.1.3)
-    delayed_job (3.0.1)
-      activesupport (~> 3.0)
-    delayed_job_active_record (0.3.2)
-      activerecord (> 2.1.0)
-      delayed_job (~> 3.0.0)
+    debugger-ruby_core_source (1.1.9)
     devise (2.0.4)
       bcrypt-ruby (~> 3.0)
       orm_adapter (~> 0.0.3)
       railties (~> 3.1)
       warden (~> 1.1.1)
+    devise-async (0.5.1)
+      devise (>= 1.1, < 2.2.0)
     diff-lcs (1.1.3)
+    dotenv (0.5.0)
     email_spec (1.2.1)
       mail (~> 2.2)
       rspec (~> 2.0)
     erubis (2.7.0)
-    eventmachine (1.0.0)
-    exception_notification (2.5.2)
+    exception_notification (3.0.1)
       actionmailer (>= 3.0.4)
-    excon (0.16.8)
+    excon (0.19.5)
     execjs (1.4.0)
       multi_json (~> 1.0)
-    facter (1.6.14)
+    facter (1.6.17)
     factory_girl (2.3.2)
       activesupport
     factory_girl_rails (1.4.0)
@@ -244,22 +266,22 @@ GEM
       railties (>= 3.0.0)
     faker (1.0.1)
       i18n (~> 0.4)
-    faraday (0.7.6)
-      addressable (~> 2.2)
+    faraday (0.8.7)
       multipart-post (~> 1.1)
-      rack (~> 1.1)
+    faraday_middleware (0.9.0)
+      faraday (>= 0.7.4, < 0.9)
     fb_graph (2.4.19)
       httpclient (>= 2.2.0.2)
       rack-oauth2 (>= 0.14.4)
       tzinfo
     ffi (1.0.11)
-    fog (1.7.0)
+    fog (1.10.0)
       builder
       excon (~> 0.14)
       formatador (~> 0.2.0)
       mime-types
       multi_json (~> 1.0)
-      net-scp (~> 1.0.4)
+      net-scp (~> 1.1)
       net-ssh (>= 2.1.3)
       nokogiri (~> 1.5.0)
       ruby-hmac
@@ -268,11 +290,15 @@ GEM
     formatador (0.2.4)
     fssm (0.2.9)
     going_postal (0.1.1)
-    guard (1.0.2)
-      ffi (>= 0.5.0)
-      thor (~> 0.14.6)
-    guard-rspec (0.7.0)
-      guard (>= 0.10.0)
+    guard (1.7.0)
+      formatador (>= 0.2.4)
+      listen (>= 0.6.0)
+      lumberjack (>= 1.0.2)
+      pry (>= 0.9.10)
+      thor (>= 0.14.6)
+    guard-rspec (2.5.2)
+      guard (>= 1.1)
+      rspec (~> 2.11)
     haml (3.1.7)
     haml-rails (0.3.4)
       actionpack (~> 3.0)
@@ -291,45 +317,56 @@ GEM
       netrc (~> 0.7.1)
       rest-client (~> 1.6.1)
       rubyzip
-    hike (1.2.1)
+    highline (1.6.15)
+    hike (1.2.3)
     hpricot (0.8.6)
     httparty (0.8.1)
       multi_json
       multi_xml
     httpauth (0.1)
     httpclient (2.2.7)
-    i18n (0.6.1)
+    i18n (0.6.4)
     journey (1.0.4)
     jquery-rails (2.1.3)
       railties (>= 3.1.0, < 5.0)
       thor (~> 0.14)
-    json (1.7.5)
+    json (1.8.0)
     launchy (2.1.2)
       addressable (~> 2.3)
     liquid (2.3.0)
+    listen (0.7.3)
+    lumberjack (1.0.3)
     mail (2.4.4)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    method_source (0.8)
-    mime-types (1.19)
+    method_source (0.8.1)
+    mime-types (1.23)
     mobile-fu (1.0.0)
       rack-mobile-detect
       rails
-    multi_json (1.4.0)
+    multi_json (1.7.6)
     multi_xml (0.4.1)
-    multipart-post (1.1.5)
-    net-scp (1.0.4)
-      net-ssh (>= 1.99.1)
-    net-ssh (2.6.1)
+    multipart-post (1.2.0)
+    net-scp (1.1.0)
+      net-ssh (>= 2.6.5)
+    net-sftp (2.1.1)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.6.6)
+    net-ssh-gateway (1.2.0)
+      net-ssh (>= 2.6.5)
     netrc (0.7.7)
-    newrelic_rpm (3.3.1)
-    nokogiri (1.5.5)
+    newrelic-redis (1.4.0)
+      newrelic_rpm (~> 3.0)
+      redis (< 4.0)
+    newrelic_rpm (3.6.0.78)
+    nokogiri (1.5.6)
     nyan-cat-formatter (0.0.4)
     oauth2 (0.6.1)
       faraday (~> 0.7)
       httpauth (~> 0.1)
       multi_json (~> 1.3)
+    obscenity (1.0.1)
     omniauth (1.1.0)
       hashie (~> 1.2)
       rack
@@ -351,16 +388,16 @@ GEM
     pg (0.14.1)
     polyglot (0.3.3)
     pr_geohash (1.0.0)
-    pry (0.9.10)
+    pry (0.9.12)
       coderay (~> 1.0.5)
       method_source (~> 0.8)
-      slop (~> 3.3.1)
+      slop (~> 3.4)
     pry-debugger (0.2.0)
       debugger (~> 1.1.3)
       pry (~> 0.9.9)
     pry-stack_explorer (0.4.7)
       binding_of_caller (~> 0.6.8)
-    rack (1.4.1)
+    rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
     rack-mobile-detect (0.3.0)
@@ -375,41 +412,48 @@ GEM
     rack-pjax (0.5.9)
       hpricot (~> 0.8.6)
       rack (~> 1.3)
-    rack-protection (1.2.0)
+    rack-protection (1.5.0)
       rack
     rack-rewrite (1.2.1)
-    rack-ssl (1.3.2)
+    rack-ssl (1.3.3)
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
-    rails (3.2.9)
-      actionmailer (= 3.2.9)
-      actionpack (= 3.2.9)
-      activerecord (= 3.2.9)
-      activeresource (= 3.2.9)
-      activesupport (= 3.2.9)
+    rails (3.2.12)
+      actionmailer (= 3.2.12)
+      actionpack (= 3.2.12)
+      activerecord (= 3.2.12)
+      activeresource (= 3.2.12)
+      activesupport (= 3.2.12)
       bundler (~> 1.0)
-      railties (= 3.2.9)
+      railties (= 3.2.12)
+    rails-i18n (0.7.2)
+      i18n (~> 0.5)
     rails_autolink (1.0.5)
       rails (~> 3.1)
-    railties (3.2.9)
-      actionpack (= 3.2.9)
-      activesupport (= 3.2.9)
+    railties (3.2.12)
+      actionpack (= 3.2.12)
+      activesupport (= 3.2.12)
       rack-ssl (~> 1.3.2)
       rake (>= 0.8.7)
       rdoc (~> 3.4)
       thor (>= 0.14.6, < 2.0)
-    rake (10.0.2)
-    rb-fsevent (0.9.1)
-    rdoc (3.12)
+    rake (10.0.4)
+    rb-fsevent (0.9.3)
+    rdoc (3.12.2)
       json (~> 1.4)
-    redis (3.0.2)
-    redis-namespace (1.2.1)
+    redis (3.0.4)
+    redis-namespace (1.3.0)
       redis (~> 3.0.0)
     remotipart (0.4.2)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     retryable (1.3.0)
+    rgeo (0.3.20)
+    rgeo-activerecord (0.5.0)
+      activerecord (>= 3.0.3)
+      arel (>= 2.0.6)
+      rgeo (>= 0.3.20)
     rsolr (1.0.8)
       builder (>= 2.1.2)
     rspec (2.11.0)
@@ -417,22 +461,24 @@ GEM
       rspec-expectations (~> 2.11.0)
       rspec-mocks (~> 2.11.0)
     rspec-core (2.11.1)
-    rspec-expectations (2.11.2)
+    rspec-expectations (2.11.3)
       diff-lcs (~> 1.1.3)
-    rspec-mocks (2.11.1)
+    rspec-mocks (2.11.3)
     rspec-rails (2.11.0)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       railties (>= 3.0)
       rspec (~> 2.11.0)
     ruby-hmac (0.4.0)
+    ruby-prof (0.13.0)
     ruby-rc4 (0.1.5)
     rubyzip (0.9.9)
-    sass (3.2.1)
-    sass-rails (3.2.5)
+    sass (3.2.7)
+    sass-rails (3.2.6)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
       tilt (~> 1.3)
+    scrap (0.0.4)
     seed-fu (2.2.0)
       activerecord (~> 3.1)
       activesupport (~> 3.1)
@@ -446,17 +492,24 @@ GEM
       json
     shoulda-matchers (1.2.0)
       activesupport (>= 3.0.0)
+    sidekiq (2.8.0)
+      celluloid (~> 0.12.0)
+      connection_pool (~> 1.0)
+      multi_json (~> 1)
+      redis (~> 3)
+      redis-namespace
+    simple-random (0.9.3)
     simple_form (2.0.4)
       actionpack (~> 3.0)
       activemodel (~> 3.0)
-    sinatra (1.3.3)
-      rack (~> 1.3, >= 1.3.6)
-      rack-protection (~> 1.2)
+    sinatra (1.3.6)
+      rack (~> 1.4)
+      rack-protection (~> 1.3)
       tilt (~> 1.3, >= 1.3.3)
     slim (1.3.4)
       temple (~> 0.5.5)
       tilt (~> 1.3.3)
-    slop (3.3.3)
+    slop (3.4.4)
     sprockets (2.2.2)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -467,22 +520,18 @@ GEM
     tabletastic (0.2.3)
       activesupport (~> 3.0)
     temple (0.5.5)
-    thin (1.5.0)
-      daemons (>= 1.0.9)
-      eventmachine (>= 0.12.6)
-      rack (>= 1.0.0)
-    thor (0.14.6)
-    tilt (1.3.3)
+    thor (0.18.1)
+    tilt (1.3.7)
     timecop (0.3.5)
-    timers (1.0.1)
-    treetop (1.4.12)
+    timers (1.1.0)
+    treetop (1.4.14)
       polyglot
       polyglot (>= 0.3.1)
     ttfunk (1.0.3)
-    turbo-sprockets-rails3 (0.3.2)
+    turbo-sprockets-rails3 (0.3.6)
       railties (> 3.2.8, < 4.0.0)
       sprockets (>= 2.0.0)
-    tzinfo (0.3.35)
+    tzinfo (0.3.37)
     uglifier (1.2.0)
       execjs (>= 0.3.0)
       multi_json (>= 1.0.2)
@@ -496,36 +545,42 @@ GEM
     xpath (0.1.4)
       nokogiri (~> 1.3)
     yajl-ruby (1.1.0)
-    zeus (0.12.0)
-      method_source (>= 0.6.7)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   RedCloth
+  action_kit_rest!
   active_record_query_trace
+  activerecord-postgis-adapter!
   activerecord-postgres-hstore!
   agra_private!
   annotate!
   asset_sync
   aws-sdk
+  better_errors
+  binding_of_caller
   blue_state_digital!
+  cache_digests
   cancan
+  capistrano
   capybara
   capybara-webkit (~> 0.11.0)
   client_side_validations!
   client_side_validations-simple_form!
   coffee-filter
-  coffee-rails (~> 3.2.1)
+  coffee-rails (~> 3.2.2)
   colorize
   compass-rails
   dalli
   database_cleaner
   databasedotcom
+  debugger (= 1.1.4)
   debugger-ruby_core_source
-  delayed_job_active_record (~> 0.3.2)
   devise
+  devise-async
+  dotenv
   email_spec
   exception_notification
   facebook_share_widget!
@@ -533,7 +588,6 @@ DEPENDENCIES
   faker
   fb_graph
   foreigner
-  galetahub-simple_captcha!
   going_postal
   guard-rspec
   haml-rails
@@ -543,8 +597,10 @@ DEPENDENCIES
   jquery-rails
   liquid
   mobile-fu
+  newrelic-redis
   newrelic_rpm
   nyan-cat-formatter
+  obscenity
   omniauth-facebook
   paperclip (~> 2.5.0)
   pg
@@ -554,33 +610,36 @@ DEPENDENCIES
   pry-stack_explorer
   rack-pjax
   rack-rewrite
-  rails (= 3.2.9)
+  rails (= 3.2.12)
+  rails-i18n
+  rails-pulse!
   rails_autolink
   rb-fsevent
   remotipart (~> 0.4)
   rest-client
   retryable
   rspec-rails
-  sass-rails (~> 3.2.3)
+  ruby-prof
+  sass-rails (~> 3.2.6)
+  scrap
   seed-fu (~> 2.2.0)
   sendgrid
   shoulda-matchers
-  sidekiq!
+  sidekiq
+  simple_captcha!
   simple_form (= 2.0.4)
   sinatra
   slim
+  split!
   strip_attributes
   sunspot-rails-tester!
   sunspot_rails (= 2.0.0.pre.120925)
   sunspot_solr!
   tabletastic
-  thin
   timecop
   tinymce-rails!
   turbo-sprockets-rails3
   uglifier
-  vanity!
   webmock
   will_paginate (~> 3.0)
   yajl-ruby
-  zeus

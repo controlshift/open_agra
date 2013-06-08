@@ -2,7 +2,7 @@ Exception Information from REST Client:
 
 <%= @exception.message %>
 
-<%= @exception.http_code %>
-<%= @exception.http_body %>
+<%= @exception.http_code if @exception.respond_to?(:http_code) %>
+<%= @exception.http_body if @exception.respond_to?(:http_body) %>
 
 <%= @params.inspect %>

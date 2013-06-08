@@ -1,0 +1,20 @@
+= title "Switch Petition Creator"
+
+.row
+  .span6
+    %p
+      Switching the creator of the petition to a different user is an uncommon, but occasionally useful administrative feature. Most of the time,
+      the ability to have multiple, secondary, campaign admins beyond the creator is more useful.
+    %p
+      Occasionally, users will create campaigns with an email address they did not intend to use, or otherwise make some sort of error
+      that they can not recover from on their own. In these cases, the admin can use this tool to switch which users account
+      the system thinks was the original creator of the campaign.
+    %p
+      The user account the campaign is switched to must already exist.
+
+
+    = simple_form_for(@petition.user, url: org_petition_user_path(@petition), method: :put, wrapper: 'compact') do |f|
+      = f.input :email, label: 'Petition Creator Email Address'
+      = f.submit
+
+

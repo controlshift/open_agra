@@ -1,0 +1,37 @@
+.breadcrumbs
+  = link_to 'Efforts', org_efforts_path
+  >
+  = link_to "Manage #{@effort.title}", org_effort_path(@effort)
+  >
+  Import Targets
+
+= title "Import Targets"
+
+= simple_form_for [:org, @effort], url: org_effort_imports_path(@effort), method: :post, :wrapper => 'compact', html: {class: 'mt30', multipart: true} do |f|
+  .form-inputs.row
+    /= f.input :group
+    = f.input :target, as: :file, :wrapper_html => { :class => 'span4' }, :label => 'CSV', :input_html => {name: 'csv', id: 'csv-file-input'}
+  .row
+    = f.input :target, as: :string, :wrapper_html => { :class => 'span4' }, :label => 'Group Name', :input_html => {name: 'group_name', id: 'group_name', :placeholder => 'group name (optional)', :value => ''}
+  .row
+    .span2
+      = f.button :submit, value: "Import CSV", class: 'mt20'
+
+-if @group_counts.any?
+  %h2
+    Import from Target Groups
+  = table_for(@group_counts) do |t|
+    = t.data do
+      - t.cell(:group) {|group| group.to_s}
+      - t.cell(:count)
+      - t.cell(:import) {|group| link_to 'Import All', import_org_effort_targets_path(@effort, group: group.to_s), method: :post }
+
+-if @other_efforts.any?
+  %h2
+    Import from another effort
+  = table_for(@other_efforts) do |t|
+    = t.data do
+      - t.cell(:title)
+      - t.cell(:count) {|effort| effort.petitions.map(&:target).compact.count }
+      - t.cell(:import) {|effort|  link_to 'Import All', import_org_effort_targets_path(@effort, effort: effort.id), method: :post}
+

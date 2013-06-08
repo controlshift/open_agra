@@ -1,0 +1,22 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Petitions', categories_path
+    %span.divider
+      >
+
+  %li
+    = link_to 'Near', new_petitions_near_path
+    %span.divider
+      >
+
+  %li.active
+    Embed
+
+
+= title "Nearby Petitions Embed"
+
+%p
+  Use this code to embed the petition map on your site.
+
+%textarea{rows: "4", cols:"80", style: 'width:400px;'}
+  %iframe{src: iframe_petitions_near_url(params[:id]), style: 'width: 620px; height: 420px;', scrolling: 'no' }

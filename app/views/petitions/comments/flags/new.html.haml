@@ -1,0 +1,4 @@
+= form_tag petition_comment_flags_path(@petition, @comment), :remote => true, :id => 'flag-captcha-form' do
+  = show_simple_captcha label: "Please type the text from the image."
+  .actions
+    = button_tag 'Submit', id: "captcha-button", class: "btn btn-primary mb10 mr5"

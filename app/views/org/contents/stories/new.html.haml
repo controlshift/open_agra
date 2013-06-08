@@ -1,8 +1,11 @@
-.breadcrumbs
-  = link_to 'Manage Story', org_contents_stories_path
-  >
-  New Story
-  
+%ul.breadcrumb
+  %li
+    = link_to 'Manage Story', org_contents_stories_path
+    %span.divider
+      >
+  %li.active
+    New Story
+.clear
 = title "New Story"
 %br
 = render partial: 'form'

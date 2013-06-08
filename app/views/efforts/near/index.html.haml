@@ -6,9 +6,9 @@
       .effort-petition-location.muted
         Closest
       .ml5.closest-petition-text
-        .strong.mt10= @closest_petition.target.name
+        .strong.mt10= @closest_petition.target.try(:name) || @closest_petition.title
         .location-text
-          = @closest_petition.location.query
+          = @closest_petition.location ? @closest_petition.location.query : @closest_petition.target.geography.name
       .closest-petition-container.clearfix
         .closest-petition-panel.pull-left
           - if @closest_petition.user.blank?
@@ -21,11 +21,9 @@
             .connector.title or
             .action.mb10.mt20
               = link_to "Sign the petition", petition_path(@closest_petition), id: 'sign-closest-petition', class: "btn btn-primary nofloat"
-
-          -else
+          - else
             .action.mb10.mt20
               = link_to "Sign the petition", petition_path(@closest_petition), id: 'sign-closest-petition', class: "btn btn-primary nofloat"
-
             .action.leader-detail.leader-detail-closest
               .leader-name.strong
                 = @closest_petition.user.full_name
@@ -33,7 +31,10 @@
 
         .closest-petition-map.pull-left
           .map
-            = google_static_map(location: @closest_petition.location, size: "400x360")
+            - if @closest_petition.location
+              = google_static_map(location: @closest_petition.location, size: "400x360")
+            - else
+              = google_static_map(geography: @closest_petition.target.geography, size: "400x360")
           .shadow
 
       #leader_duties_text.modal.hide.leader-duty-modal
@@ -52,7 +53,7 @@
         - @other_petitions_nearby.each_with_index do |petition, index|
           .nearby-petition.ml10
             %img{src: asset_path("near-marker.png")}
-            %a.strong.accordion-toggle.ml10.mt10{"data-toggle" => 'collapse', "data-target" => "#petition-details-#{index}"} #{petition.target.name}
+            %a.strong.accordion-toggle.ml10.mt10{"data-toggle" => 'collapse', "data-target" => "#petition-details-#{index}"} #{petition.target.try(:name) || petition.title}
             %span.collapse-arrow-down.right.collapse-arrow{id: "icon-arrow-#{index}"}
             .collapse.ml30{id: "petition-details-#{index}"}
               .location-text= petition.location.query

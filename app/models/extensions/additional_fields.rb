@@ -6,12 +6,13 @@ module Extensions
       include BooleanFields
       serialize :additional_fields, ActiveRecord::Coders::Hstore
       after_initialize :setup_additional_fields
-
+      
       attr_accessible :default_organisation_slug
       attr_accessor   :default_organisation_slug
       class_attribute :_additional_field_extension_cache
       self._additional_field_extension_cache = {}
       self._additional_field_extension_cache.default = true
+      validates_with AdditionalFieldValidator
     end
 
     module InstanceMethods
@@ -40,6 +41,10 @@ module Extensions
             end
           end
         end
+      end
+
+      def sanitize_additional_fields
+        self.additional_fields &&= self.additional_fields.map { |key,value| {key.to_s => value} }.inject(:merge)
       end
 
       def mass_assignment_authorizer(role)
@@ -86,12 +91,12 @@ module Extensions
       def postgres_hstore_accessor(store_attribute, *keys)
         Array(keys).flatten.each do |key|
           define_method("#{key}=") do |value|
-            send(store_attribute)[key] = value
+            send(store_attribute)[key.to_s] = value
             send("#{store_attribute}_will_change!")
           end
 
           define_method(key) do
-            send(store_attribute)[key] || send(store_attribute)[key.to_s]
+            send(store_attribute)[key.to_s]
           end
         end
       end

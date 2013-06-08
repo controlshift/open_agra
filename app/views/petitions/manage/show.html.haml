@@ -17,9 +17,12 @@
     = link_to petition_path(@petition), id: "view-petition-button", class: "btn btn-manage" do
       %i.icon-eye-open
       View
-
+    - if can?(:manage, current_organisation)
+      = link_to org_petition_path(@petition), id: "manage-petition-button", class: "btn btn-manage" do
+        %i.icon-wrench
+        Admin
 .row
-  .span6
+  .petition-title-span
     %h1= @petition.title
     
 .mt20

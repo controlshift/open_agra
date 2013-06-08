@@ -1,0 +1,13 @@
+= Moonshine Postgres9
+
+=== A plugin for Moonshine[http://github.com/railsmachine/moonshine]
+
+A plugin for installing and managing postgres_9.
+
+=== Instructions
+
+* <tt>script/plugin install git://github.com/railsmachine/moonshine_postgres_9.git</tt>
+* Configure settings if needed
+    configure(:postgres9 => {:foo => true})
+* Invoke the recipe(s) in your Moonshine manifest
+    recipe :postgres9

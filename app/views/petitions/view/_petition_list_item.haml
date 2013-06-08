@@ -1,0 +1,12 @@
+- if petition_list_item.launched? && !petition_list_item.cancelled?
+  %li
+    .list-item-title
+      %h2= link_to petition_list_item.title, petition_path(petition_list_item)
+
+      %div
+        %cite
+          - if petition_list_item.user.present? && petition_list_item.user != current_user
+            created by #{petition_list_item.user.full_name}
+    .list-item-progressbar
+      = render partial: "petitions/view/petition_progress",
+               locals: { petition: petition_list_item, has_text: true }

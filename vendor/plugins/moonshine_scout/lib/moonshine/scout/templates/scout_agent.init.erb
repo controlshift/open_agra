@@ -1,0 +1,61 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:             scout_agent
+# Required-Start:       $all
+# Required-Stop:        $all
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    Old Scout Agent
+### END INIT INFO
+
+NAME=scout_agent
+DESC="scout reporting agent"
+
+set -e
+
+. /lib/lsb/init-functions
+
+RETVAL=0
+
+case "$1" in
+start)
+  echo "Disabled. Use scout via cron instead."
+  RETVAL=1
+  ;;
+stop)
+  echo -n "Stopping $DESC: "
+  if test -x /usr/bin/scout_agent; then
+    /usr/bin/scout_agent stop
+    RETVAL=$?
+  else
+    RETVAL=0
+  fi
+
+  echo "$NAME."
+  ;;
+restart)
+  echo -n "Stopping $DESC: "
+  if test -x /usr/bin/scout_agent; then
+    echo "Disabled. Use scout via cron instead."
+    /usr/bin/scout_agent stop
+  else
+    RETVAL=0
+  fi
+  ;;
+status)
+  echo "Disabled. Use scout via cron instead."
+  if test -x /usr/bin/scout_agent; then
+    /usr/bin/scout_agent status
+    RETVAL=$?
+  else
+    RETVAL=1
+  fi
+  ;;
+*)
+  echo "Usage: scout_agent {start|stop|restart|status}"
+  RETVAL=1
+  ;;
+esac
+
+exit $RETVAL

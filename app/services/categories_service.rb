@@ -9,13 +9,17 @@ class CategoriesService < ApplicationService
     category = current_object
     organisation = current_object.organisation
 
-    OrgNotifier.new.delay.notify_category_creation(organisation: organisation, category: category)
+    NotifyCategoryCreationWorker.perform_async(organisation.id, category.id)
+
+    true
   end
 
   def notify_external_system_on_update
     category = current_object
     organisation = current_object.organisation
 
-    OrgNotifier.new.delay.notify_category_update(organisation: organisation, category: category)
+    NotifyCategoryUpdateWorker.perform_async(organisation.id, category.id)
+
+    true
   end
 end

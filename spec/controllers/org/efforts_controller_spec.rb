@@ -70,20 +70,6 @@ describe Org::EffortsController do
         get :show, id: @effort
       end
     end
-
-    context "specific targets effort" do
-      before(:each) do
-        @effort = Factory(:specific_targets_effort, organisation: @organisation)
-        Factory(:target_petition, effort: @effort)
-        Factory(:petition_without_leader, effort: @effort)
-
-        get :show, id: @effort
-      end
-
-      it { should assign_to :effort }
-      it { should assign_to :petitions }
-      it { should render_template :show_targets }
-    end
   end
 
   describe "#update" do

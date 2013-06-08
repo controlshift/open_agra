@@ -2,15 +2,14 @@
 #
 # Table name: blast_emails
 #
-#  id                :integer         not null
+#  id                :integer         not null, primary key
 #  petition_id       :integer
 #  from_name         :string(255)     not null
 #  from_address      :string(255)     not null
 #  subject           :string(255)     not null
 #  body              :text            not null
-#  delayed_job_id    :integer
-#  created_at        :datetime
-#  updated_at        :datetime
+#  created_at        :datetime        not null
+#  updated_at        :datetime        not null
 #  recipient_count   :integer
 #  moderation_status :string(255)     default("pending")
 #  delivery_status   :string(255)     default("pending")
@@ -19,10 +18,11 @@
 #  type              :string(255)
 #  group_id          :integer
 #  organisation_id   :integer
+#  target_recipients :string(255)
 #
 
 class BlastEmail < ActiveRecord::Base
-  validates :from_name, presence: true, length: { maximum: 100 }, format: { :with => /\A([\p{Word} \.'\-]+)\Z/u }
+  validates :from_name, presence: true, length: { maximum: 200 }
   validates :from_address, presence: true, format: { :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
   validates :subject, presence: true, length: { maximum: 255 }
   validates :body, presence: true
@@ -46,7 +46,8 @@ class BlastEmail < ActiveRecord::Base
   belongs_to :group
   belongs_to :organisation
 
-  attr_accessible :from_name, :from_address, :subject, :body
+  attr_accessible :from_name, :from_address, :subject, :body, :target_recipients
+
 
   def from
     "\"#{from_name}\" <#{from_address}>"
@@ -58,8 +59,7 @@ class BlastEmail < ActiveRecord::Base
 
   def send_to_all
     self.update_attribute(:delivery_status, 'sending')
-    job_handle = Delayed::Job.enqueue Jobs::BlastEmailJob.new(self)
-    self.update_attribute(:delayed_job_id, job_handle.id)
+    Jobs::BlastEmailJob.perform_async(self.id)
   end
 
   def recipient_count

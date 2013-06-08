@@ -44,4 +44,13 @@ describe HasSlug do
       new_effort.slug.should_not == existing_slug
     end
   end
+
+
+  it "should enforce uniqueness" do
+    old_effort = Factory.create(:effort)
+    new_effort = Factory.build(:effort, slug: old_effort.slug)
+    new_effort.valid?.should be_false
+
+  end
+
 end

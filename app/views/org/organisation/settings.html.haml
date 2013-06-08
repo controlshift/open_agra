@@ -9,6 +9,8 @@
         = form.input :contact_email, input_html: { type: 'email' }, hint: 'For public email'
       .span3
         = form.input :admin_email, input_html: { type: 'email' }, hint: 'For receiving alert email'
+      .span3
+        = form.input :long_name, hint: 'Optional longer version of organisation name'
 
 
   %h3.mt20 Options
@@ -24,15 +26,28 @@
       .span3
         = form.input :always_join_parent_org_when_sign_up, as: :boolean, label: "Always join the org on sign up"
       .span3
-        = form.input :show_share_buttons_on_petition_page, as: :boolean, label: 'Show share buttons (Petition page)'
-      .span3
         = form.input :hide_signatures_csv_download_link, as: :boolean
+      .span3
+        = form.input :hide_phone_number_on_signature_form, as: :boolean
+    .row
+      .span3
+        = form.input :show_categories_as_dropdown, as: :boolean
+      .span3
+        = form.input :list_petitions_under_map, as: :boolean
+      .span3
+        = form.input :expose_broadcast_emails, as: :boolean
+
+    .row
+      .span3
+        = form.input :home_link_override, as: :string
 
     .row
       .span9
         = form.input :signature_disclaimer, as: :text, hint: "Disclaimer will not be used if left blank", input_html: {rows: 3, class:'span7'}
 
-
+    .row
+      .span9
+        = form.input :new_account_disclaimer, as: :text, hint: "Displayed when users create new accounts", input_html: {rows: 3, class:'span7'}
 
   %h3.mt20 Social Media
   %hr
@@ -42,6 +57,15 @@
       .span3
         = form.input :facebook_url
 
+  %h3.mt20 Placeholder Image
+  %hr
+    .row
+      .span4
+        = placeholder_image
+      .span3
+        = link_to 'Edit Placeholder Image', org_placeholder_path
 
-  .actions
-    = form.button :submit, 'Save'
+  .row
+    .span4.mt20
+      .actions
+        = form.button :submit, 'Save'

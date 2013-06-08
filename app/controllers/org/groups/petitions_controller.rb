@@ -5,7 +5,7 @@ class Org::Groups::PetitionsController < Org::OrgController
     if @petition
       render json: @petition.to_json(only: [:slug, :title]), status: :ok
     else
-      render json: { message: "No petition found" }, status: :not_acceptable
+      render json: { message: t('controllers.org.petition.not_found') }, status: :not_acceptable
     end
   end
 

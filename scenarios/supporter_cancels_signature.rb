@@ -20,6 +20,10 @@ describe "Supporter cancels signature", :type => :request, :nip =>true do
   it "should allow the signer to cancel their signature", js: true do
     sign_petition
 
+    wait_until(2) do
+      open_last_email_for('sean.ho@thoughtworks.com') != nil
+    end
+    
     open_last_email_for('sean.ho@thoughtworks.com')
     current_email.subject.should include("Thanks for signing")
     click_email_link_matching(/confirm_destroy/)

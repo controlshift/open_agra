@@ -120,6 +120,7 @@ $ ->
       json.isLocal = this.isLocal()
       json.isNational = this.isNational()
       json.validated = this.validated()
+      json.query_present = this.query_present()
       return json
 
     isLocal: ->
@@ -138,7 +139,7 @@ $ ->
         this.trigger("geocode_complete")
 
     validated: ->
-      this.get("query") && this.get("geocoder_success")
+      (this.get("query") && this.get("geocoder_success"))
 
     query_field: ->
       $('#location-query-field')
@@ -148,6 +149,8 @@ $ ->
 
     query_value: ->
       this.query_field().val()
+
+    query_present: -> this.get('query')
 
     region: ->
       $('#efforts-near-container').data('organisation-country')
@@ -205,6 +208,7 @@ $ ->
             when "street_address" then _.extend(new_values, {street: address_component.short_name})
 
       this.set(new_values)
+      
 
   class Autocomplete
     constructor: (@loc) ->
@@ -247,3 +251,6 @@ $ ->
     field = new SimpleLocationField(model: loc, el: $('#targets-location'))
     target_save_button =  new GeoSubmitButton( model: loc, el: $('#target-save-button'))
     autocomplete = new Autocomplete(loc)
+
+  $('#location-categories input,#location-categories select').change ->
+    $(this).closest('form').submit()

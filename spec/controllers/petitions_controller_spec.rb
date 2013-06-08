@@ -108,6 +108,47 @@ describe PetitionsController do
         Petition.count.should == 0
       end
     end
+
+    describe "with an effort that has categories" do
+      before :each do
+        @user = FactoryGirl.create(:user, organisation: @organisation)
+        sign_in @user
+        @category = FactoryGirl.create(:category, organisation: @organisation)
+      end
+
+      let(:effort) { FactoryGirl.create(:effort, categories: [@category], organisation: @organisation)  }
+
+      context "when the effort category is chosen" do
+        before :each do
+          post :create, petition: Factory.attributes_for(:petition).merge(effort_id: effort.id, category_ids: [@category.id])
+        end
+        it "should exist" do
+          assigns[:petition].reload.persisted?.should == true
+        end
+        it "should have the effort category" do
+          assigns[:petition].reload.categories.should == [@category]
+        end
+      end
+      context "when the effort category is not chosen" do
+        before :each do
+          post :create, petition: Factory.attributes_for(:petition).merge(effort_id: effort.id)
+        end
+        it "should exist" do
+          assigns[:petition].reload.persisted?.should == true
+        end
+        it "should have the effort categories anyway" do
+          assigns[:petition].reload.categories.should == [@category]
+        end
+      end
+      context "when effort has a default_image" do
+        let(:effort) { FactoryGirl.create(:effort, categories: [@category], organisation: @organisation, image_default: fixture_file_upload(File.join(Rails.root, 'spec', 'fixtures', "tiny_image.jpg"), 'image/jpg'))  }
+
+        it "should copy over the image from the effort if no petition image is specified" do
+          post :create, petition: Factory.attributes_for(:petition).merge(effort_id: effort.id)
+          assigns[:petition].reload.image_file_name.should == "tiny_image.jpg"
+        end
+      end
+    end
   end
 
   context "signed in" do

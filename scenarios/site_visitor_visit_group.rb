@@ -12,7 +12,7 @@ describe "user visit", :type => :request do
 
       page.find('.group-link').click
 
-      page.should have_css(".group-title:contains('#{@group.title}')")
+      page.should have_content @group.title
     end
   end
 end

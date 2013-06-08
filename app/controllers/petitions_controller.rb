@@ -2,9 +2,9 @@ class PetitionsController < ApplicationController
   include PetitionUpdateHelper
   include PetitionFilters
 
-  skip_before_filter :authenticate_user!, only: [:new, :create, :contact, :search, :landing]
+  skip_before_filter :authenticate_user!, only: [:new, :create, :contact, :search, :landing, :locations]
 
-  before_filter :load_petition, except: [:index, :new, :create, :search, :landing]
+  before_filter :load_petition, except: [:index, :new, :create, :search, :landing, :locations]
   before_filter :authorize_petition, only: [:launch, :launching, :edit, :update]
 
   def index
@@ -28,7 +28,7 @@ class PetitionsController < ApplicationController
         @featured_petitions = featured_query.petitions
       end
     rescue Errno::ECONNREFUSED
-      flash.now.alert = "Failed to search. Please contact technical support."
+      flash.now.alert = t('errors.messages.search')
     end
   end
 
@@ -50,11 +50,13 @@ class PetitionsController < ApplicationController
     @petition.user = current_user
     @petition.location = Location.find_by_query(params[:location][:query]) || Location.create(params[:location]) if params[:location]
     if @petition.effort.present?
-      @petition.categories << @petition.effort.categories
+      # @petition.categories is empty until save, this is a workaround.
+      @petition.categorized_petitions += @petition.effort.categories.map {|cat| CategorizedPetition.new category: cat}
+      @petition.categorized_petitions.uniq!(&:category_id)
+      @petition.image = @petition.effort.image_default if @petition.image_file_name.blank?
     end
 
-    petitions_service = PetitionsService.new
-    if petitions_service.save(@petition)
+    if PetitionsService.new.save(@petition)
       if user_signed_in?
         redirect_to launch_petition_path(@petition)
       else
@@ -103,7 +105,7 @@ class PetitionsController < ApplicationController
   private
 
   def load_petition
-    @petition = Petition.where(slug: params[:id]).includes(:user).first!
+    @petition = current_organisation.petitions.where(slug: params[:id]).includes(:user).first!
     raise ActiveRecord::RecordNotFound if @petition.organisation != current_organisation
   end
 

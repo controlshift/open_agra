@@ -1,13 +1,14 @@
-- if @petition.cached_signatures_size >= 5
-  .petition-progress
-    = render partial: "petitions/view/petition_progress", locals: { petition: @petition }
-  .petition-signatures
-    %span.number= number_with_delimiter(@petition.cached_signatures_size)
-    %br
-    of
-    %span.strong= number_with_delimiter(@petition.goal)
-    signatures
-    %hr
-- else
-  = "&nbsp;".html_safe
+- cache @petition, expires_in: 30.seconds do
+  - if @petition.cached_signatures_size >= 5 && @petition.show_progress_bar?
+    .petition-progress
+      = render partial: "petitions/view/petition_progress", locals: { petition: @petition }
+    .petition-signatures
+      %span.number= number_with_delimiter(@petition.cached_signatures_size)
+      %br
+      of
+      %span.strong= number_with_delimiter(@petition.goal)
+      signatures
+      %hr
+  - else
+    = "&nbsp;".html_safe
 

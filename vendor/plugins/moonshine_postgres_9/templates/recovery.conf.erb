@@ -1,0 +1,36 @@
+restore_command = 'cp /var/lib/postgresql/<%= version %>/main/pg_xlogarch/%f %p'
+
+# delete unneeded archive files
+archive_cleanup_command = '/usr/lib/postgresql/<%= version %>/bin/pg_archivecleanup /var/lib/postgresql/<%= version %>/main/pg_xlogarch %r'
+
+# use streaming replication
+standby_mode = 'on'
+
+# fail over when the BRINGUP file exists
+trigger_file = '/var/lib/postgresql/<%= version %>/main/BRINGUP'
+
+# the below needs to be changed to the correct IP address on each server
+# it is the connection information for the other server
+primary_conninfo = 'host=<%= postgresql_primary_server[:internal_ip] %> port=5432 user=<%= configuration[:postgresql][:replication_username] %> password=<%= configuration[:postgresql][:replication_password] %>'
+
+# -----------------------------------------------------------------------------
+# The replication-tools package is licensed under the PostgreSQL License:
+#
+# Copyright (c) 2010-2011, PostgreSQL, Experts, Inc.
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose, without fee, and without a written agreement is
+# hereby granted, provided that the above copyright notice and this paragraph
+# and the following two paragraphs appear in all copies.
+#
+# IN NO EVENT SHALL POSTGRESQL EXPERTS, INC. BE LIABLE TO ANY PARTY FOR DIRECT,
+# INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST
+# PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN
+# IF POSTGRESQL EXPERTS, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+# DAMAGE.
+#
+# POSTGRESQL EXPERTS, INC. SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
+# AND POSTGRESQL EXPERTS, INC. HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE,
+# SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.

@@ -1,0 +1,17 @@
+- cache comment do
+  = content_tag_for(:li, comment) do
+    .comment-header
+      %span.name
+        = comment.full_name_with_mask
+      %span.label
+        %abbr.timeago{ title: "#{comment.created_at_iso_8601}" }= comment.created_at
+    .comment
+      = comment.text
+    .actions
+      = link_to(like_petition_comment_path(@petition, comment), {remote: true, method: :put, class:'tooltip-link', 'data-original-title' => 'Like This'}) do
+        %i.icon-heart
+      - if comment.awaiting_approval?
+        = link_to(new_petition_comment_flag_path(@petition, comment), {class: 'flag-comment tooltip-link ml10',  'data-original-title' => 'Flag as Inappropriate', 'data-flag-captcha-url' => new_petition_comment_flag_path(@petition, comment)}) do
+          %i.icon-flag
+
+      = link_to('Permalink', petition_comment_path(@petition, comment), {class: 'details', style: 'display: none;'})

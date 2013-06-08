@@ -21,7 +21,7 @@ class Org::Contents::TemplatesController < Org::OrgController
     if @content.save
       redirect_to org_contents_templates_path
     else
-      flash[:alert] = 'There was a problem saving your content.'
+      flash[:alert] = t('controllers.org.content.error_save')
       render :new
     end
   end

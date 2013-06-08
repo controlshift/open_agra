@@ -1,4 +1,16 @@
-= title "Reset password"
+- if params[:threefifty]
+  = title "You're almost there!"
+  .row
+    .span5
+      %p
+        Thanks for helping us move your Fossil Free petition into the new system. Your user account has been created automatically, but you will need to change your password in order to access your new petition management dashboard.
+      %p
+        Our new system is intended to give you access to more and better tools to help you run and win your divestment campaign. Thanks again for your patience.
+
+- else
+  = title "Reset password"
+
+
 = simple_form_for(resource, :as => resource_name, :url => password_path(resource_name), :wrapper => :compact, :html => { :method => :post }) do |f|
   .mt10
     .inputs

@@ -1,9 +1,15 @@
-.breadcrumbs
-  = link_to 'Efforts', org_efforts_path
-  >
-  = link_to "Manage #{@effort.title}", org_effort_path(@effort)
-  >
-  Add Target
+%ul.breadcrumb
+  %li
+    = link_to 'Efforts', org_efforts_path
+    %span.divider
+      >
+  %li
+    = link_to @effort.title, org_effort_path(@effort)
+    %span.divider
+      >
+  %li.active
+    Add Target
+.clear
 
 = title "Add Target"
 
@@ -12,3 +18,14 @@
     =f.input :name, input_html: {data: {autocomplete_source: org_effort_targets_path(@effort)}}, :wrapper_html => { :class => 'span4' }
     #add_target.span6
       =f.button :submit, value: "Add Target", class: 'mt20'
+
+
+- if current_organisation.target_collections.any? && @effort.petitions.empty?
+  .row
+    .offset1
+      = image_tag 'separator-or-horizontal.png'
+  .row
+    .span5
+      = simple_form_for [:org, @effort], url: add_collection_org_effort_targets_path(@effort), :wrapper => 'compact' do |f|
+        =f.input :target_collection, collection: current_organisation.target_collections, label_method: :name, value_method: :id
+        =f.button :submit, value: "Add Target Collection"

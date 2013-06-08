@@ -9,7 +9,7 @@
 #= require rails.validations
 #= require bootstrap
 #= require jquery.timeago.min
-#= require jquery.mailcheck
+#= require mailcheck
 #= require share
 #= require json2
 #= require history

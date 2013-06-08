@@ -2,15 +2,12 @@
 %meta{ name: "viewport", content: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" }
 
 %link{rel: "stylesheet", type: "text/css", href: "http://fonts.googleapis.com/css?family=Bree+Serif" }
-- if Agra::Application.assets.find_asset("organisations/#{current_organisation.slug}/application_mobile")
-  = stylesheet_link_tag  "organisations/#{current_organisation.slug}/application_mobile"
-- else
-  = stylesheet_link_tag  "organisations/default/application_mobile"
+= stylesheet_link_tag  "organisations/#{current_organisation.slug}/application_mobile"
 
 - unless Rails.env.test?
   %link{rel: "stylesheet", type: "text/css", href: "/fonts/font-awesome.css" }
 
-- if Rails.env.production?
+- if Rails.env.production?  || Rails.env.staging?
   %script{ type: 'text/javascript', src: 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js' }
 - else
   = javascript_include_tag 'jquery'

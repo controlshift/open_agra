@@ -3,13 +3,13 @@ class PostalCodeValidator < ActiveModel::EachValidator
     if record.country.present?
       case record.country
         when 'US'
-          record.errors[attribute] << (options[:message] || 'is not a valid zip code') unless value.present? && GoingPostal.postcode?(value, 'US')
+          record.errors[attribute] << (options[:message] || I18n.t('errors.messages.postcode.zip')) unless value.present? && GoingPostal.postcode?(value, 'US')
         when 'GB', 'AU'
-          record.errors[attribute] << (options[:message] || 'is not a valid postal code') unless value.present? && GoingPostal.postcode?(value, record.country)
+          record.errors[attribute] << (options[:message] || I18n.t('errors.messages.postcode.postal')) unless value.present? && GoingPostal.postcode?(value, record.country)
         when 'IN'
           # do nothing
         else
-          record.errors[attribute] << (options[:message] || 'a postal code is required') unless value.present?
+          record.errors[attribute] << (options[:message] || I18n.t('errors.messages.postcode.blank')) unless value.present?
       end
     end
   end

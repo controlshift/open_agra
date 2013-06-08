@@ -9,8 +9,8 @@ module DeviseAfterSignInPath
       petition = Petition.find_by_token!(token)
       PetitionsService.new.link_petition_with_user!(petition, resource)
       session[:user_return_to] || petitions_path
-    elsif session[:user_return_to].present?
-      session[:user_return_to]
+    elsif session[:user_return_to].present? || request.env['omniauth.origin'].present?
+      session[:user_return_to] || request.env['omniauth.origin'] 
     elsif resource.org_admin?
       org_path
     else

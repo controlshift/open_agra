@@ -43,7 +43,7 @@ describe BlueStateDigitalNotifier do
 
           BlueStateDigital::Connection.should_receive(:new).with({host: 'host', api_id:'id', api_secret: 'secret'}).and_return( connection = mock() )
           connection.should_receive(:constituent_groups).and_return(constituent_groups = mock())
-          constituent_groups.should_receive(:replace_constituent_group!).with('456', attrs) { cons_group }
+          constituent_groups.should_receive(:rename_group).with('456', attrs[:name]) { cons_group }
 
           notifier = BlueStateDigitalNotifier.new('host', 'id', 'secret')
           notifier.should_not_receive(:notify_category_creation)
@@ -158,12 +158,6 @@ describe BlueStateDigitalNotifier do
         category = Factory.build(:category, organisation: @organisation, external_id: "1234")
         @petition.categories << category
 
-        data = {
-          firstname: @user_details.first_name,
-          lastname: @user_details.last_name,
-          create_dt: @user_details.created_at,
-          emails: [{ email: @user_details.email, is_subscribed: @user_details.join_organisation? ? 1 : 0 }],
-        }
         cons_data = mock
         cons_data.stub(:id) { "123" }
         cons_data.stub(:is_new?) { true }
@@ -182,6 +176,12 @@ describe BlueStateDigitalNotifier do
         input << "<email>#{@user_details.email}</email>"
         input << "<is_subscribed>#{ @user_details.join_organisation? ? 1 : 0 }</is_subscribed>"
         input << "</cons_email>"
+
+        input << '<cons_addr>'
+        input << "<zip>#{@user_details.postcode}</zip>"
+        input << '<is_primary>1</is_primary></cons_addr>'
+        input << "<cons_phone><phone>#{@user_details.phone_number}</phone>"
+        input << '<phone_type>unknown</phone_type></cons_phone>'
         input << "</cons>"
         input << "</api>"
 
@@ -201,7 +201,6 @@ describe BlueStateDigitalNotifier do
       end
 
       it "should set constituent data" do
-
         BlueStateDigitalConstituentWorker.should_receive(:perform_async).with('329', ['1234', '42', '42', '42'], {host: 'host', api_id: 'id', api_secret: 'secret'})
         BlueStateDigitalNotifier.new('host', 'id', 'secret').notify_sign_up(petition: @petition, user_details: @user_details, organisation: @organisation, role: 'signer').should be_true
         @petition.bsd_constituent_group_id.should_not be_nil

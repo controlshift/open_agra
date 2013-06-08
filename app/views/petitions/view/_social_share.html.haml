@@ -1,27 +1,24 @@
-%a.share.facebook{ href: "#", data: { href: facebook_share_href(@petition) } }
-  .text Facebook
-  %i.icon-facebook
-  
-%a.share.twitter{ href: twitter_share_href(@petition) }
-  .text Twitter
-  %i.icon-twitter
+- cache [@petition, @petition.facebook_share] do
+  %a.share.facebook{ href: "#", data: { href: facebook_share_href(@petition), slug: @petition.slug, vid: @petition.facebook_share.variant.present? ?  @petition.facebook_share.variant.id : 'none' } }
+    .text Facebook
+    %i.icon-facebook
 
-%a.share.email{ href: "#email_template", id: "view_email_template", "data-toggle" => "modal", "data-backdrop" => "true" }
-  .text Email
-  %i.icon-envelope-alt
-  
-.petition_url
-  %form{action: "action"}
-    = text_field_tag(:petition_link, "#{petition_url(@petition)}", class: "span5", id: 'petition-url-field')
-    %a.btn#copy_petition_url_button
-      = image_tag 'icon-btn-copy.png'
+  %a.share.twitter{ href: twitter_share_href(@petition) }
+    .text Twitter
+    %i.icon-twitter
 
-:coffeescript
-  $ ->
-    ZeroClipboard.setMoviePath( '/ZeroClipboard.swf' )
-    initCopyButtons()
-    new FacebookShare
+  %a.share.email{ href: "#email_template", id: "view_email_template", "data-toggle" => "modal", "data-backdrop" => "true" }
+    .text Email
+    %i.icon-envelope-alt
 
-- content_for :end_of_body do
-  / render div at the end of body for fixing IE7 z-index problem
-  = render partial: "petitions/view/email_template"
+  .petition_url
+    %form{action: "action"}
+      = text_field_tag(:petition_link, "#{petition_url(@petition)}", class: "span5", id: 'petition-url-field')
+      %a.btn#copy_petition_url_button
+        = image_tag 'icon-btn-copy.png'
+
+  :coffeescript
+    $ ->
+      ZeroClipboard.setMoviePath( '/ZeroClipboard.swf' )
+      initCopyButtons()
+      new FacebookShare

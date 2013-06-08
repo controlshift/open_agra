@@ -1,0 +1,7 @@
+= title "#{@country[:printable_name]} Embed"
+
+%p
+  Use this code to embed the petition map on your site.
+
+%textarea{rows: "4", cols:"80", style: 'width:400px;'}
+  %iframe{src: iframe_petitions_country_url(params[:id]), style: 'width: 620px; height: 420px;', scrolling: 'no' }

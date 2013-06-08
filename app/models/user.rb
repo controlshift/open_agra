@@ -13,8 +13,8 @@
 #  last_sign_in_at          :datetime
 #  current_sign_in_ip       :string(255)
 #  last_sign_in_ip          :string(255)
-#  created_at               :datetime
-#  updated_at               :datetime
+#  created_at               :datetime        not null
+#  updated_at               :datetime        not null
 #  first_name               :string(255)
 #  last_name                :string(255)
 #  admin                    :boolean
@@ -32,31 +32,38 @@
 #  member_id                :integer
 #  additional_fields        :hstore
 #  cached_organisation_slug :string(255)
+#  image_file_name          :string(255)
+#  image_content_type       :string(255)
+#  image_file_size          :integer
+#  image_updated_at         :datetime
 #
 
 class User < ActiveRecord::Base
   include HasMember
   include Extensions::AdditionalFields
-
+  
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
+  devise :database_authenticatable, :registerable, :async, 
          :recoverable, :rememberable, :trackable, :confirmable, :omniauthable
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me, :first_name, :last_name,
-                  :phone_number, :postcode, :join_organisation, :agree_toc, :opt_out_site_email
-
+                  :phone_number, :postcode, :join_organisation, :agree_toc, :opt_out_site_email, :facebook_id,
+                  :crop_whxy
+  attr_accessor :crop_whxy
   validates :agree_toc, acceptance: true, allow_nil: false, on: :create
   validates :first_name, :last_name, presence: true, length: {maximum: 50},
             format: {with: /\A([\p{Word} \.'\-]+)\Z/u}
   validates :email, presence: true, uniqueness: {scope: 'organisation_id', case_sensitive: false}, email_format: true
-  validates :phone_number, presence: true, length: {maximum: 50},
-            format: {with: /\A[0-9 \-\.\+\(\)]*\Z/}
+  validates :phone_number, presence: true, length: {maximum: 30, minimum: 4},
+            format: {with: /\d/}
   validates :postcode, presence: true, length: {maximum: 20}, if: Proc.new { |s| s.country != 'IN' }
   validates :postcode, postal_code: true
   validates :password, presence: true, length: {within: 6..128}, confirmation: true, allow_blank: true,
             if: :password_required?
+
+  validates :facebook_id, uniqueness: { allow_blank: true, scope: 'organisation_id' }
 
   validates :organisation, presence: true
 
@@ -85,6 +92,9 @@ class User < ActiveRecord::Base
   has_many :groups, through: :group_members
   has_many :group_members
 
+  include HasPaperclipImage
+  has_paperclip_image styles: {icon: "50x50>", form: "122x122>", large: "500x500>"}, attr_accessible: true
+  
   after_save :update_related_petitions
 
   def full_name
@@ -97,6 +107,10 @@ class User < ActiveRecord::Base
 
   def signature_attributes(signature)
     accessible_attributes.slice(*signature.accessible_attribute_names.map(&:to_sym))
+  end
+
+  def cropping?
+    crop_whxy.present?
   end
 
   protected

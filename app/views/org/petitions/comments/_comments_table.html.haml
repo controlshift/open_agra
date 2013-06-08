@@ -1,0 +1,12 @@
+= table_for(@comments) do |t|
+  = t.data do
+    - t.cell(:petition, :cell_html => {:class => "petition-name"}) { |comment| comment.signature.petition.title } if show_petition
+    - t.cell(:email) { |comment| comment.signature.email }
+    - t.cell(:comment, :cell_html => {:class => "comment-text"}) { |comment| comment.text }
+    - t.cell(:up_count, :cell_html => {:class => "up_count-text"}) { |comment| comment.up_count }
+    - t.cell(:action, :heading => "", :cell_html => {:class => "approve-action"}) {|comment| link_to(content_tag(:i, "", class: "icon-ok btn"),approve_org_petition_comment_path(comment.signature.petition, comment.id), {remote: true, method: :put})} if !show_petition
+    - t.cell(:action, :heading => "", :cell_html => {:class => "remove-action"}) {|comment| link_to(content_tag(:i, "", class: "icon-remove btn"), remove_org_petition_comment_path(comment.signature.petition, comment.id), {remote: true, method: :put})} if !show_petition
+    - t.cell(:action, :heading => "", :cell_html => {:class => "approve-action"}) {|comment| link_to(content_tag(:i, "", class: "icon-ok btn"),approve_org_comment_path(comment.id), {remote: true, method: :put})} if show_petition
+    - t.cell(:action, :heading => "", :cell_html => {:class => "remove-action"}) {|comment| link_to(content_tag(:i, "", class: "icon-remove btn"), remove_org_comment_path(comment.id), {remote: true, method: :put})} if show_petition
+    - t.cell(:status , :cell_html => {:class => "status"} ) { |comment| if comment.approved then "Approved" elsif comment.approved == false then "Removed" end} if !show_petition
+= will_paginate @comments

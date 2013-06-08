@@ -1,7 +1,11 @@
-.breadcrumbs
-  = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
-  >
-  Blast Email Templates
+%ul.breadcrumb
+  %li
+    = link_to 'Manage Content', org_contents_path, {:class => 'use-pjax'}
+    %span.divider
+      >
+  %li.active
+    Blast Email Templates
+.clear
 
 = title "Email Templates"
 

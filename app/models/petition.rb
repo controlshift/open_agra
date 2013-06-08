@@ -7,8 +7,8 @@
 #  who                          :string(255)
 #  why                          :text
 #  what                         :text
-#  created_at                   :datetime
-#  updated_at                   :datetime
+#  created_at                   :datetime        not null
+#  updated_at                   :datetime        not null
 #  user_id                      :integer
 #  slug                         :string(255)
 #  organisation_id              :integer         not null
@@ -37,6 +37,12 @@
 #  achievements                 :text
 #  bsd_constituent_group_id     :string(255)
 #  target_id                    :integer
+#  external_id                  :string(255)
+#  redirect_to                  :text
+#  external_facebook_page       :string(255)
+#  external_site                :string(255)
+#  show_progress_bar            :boolean         default(TRUE)
+#  comments_updated_at          :datetime
 #
 
 class Petition < ActiveRecord::Base
@@ -44,6 +50,8 @@ class Petition < ActiveRecord::Base
   extend EfficientCounts
   include HasSlug
   include Progress
+  include Shareable
+
   SHARE_ACHIEVEMENTS = [:share_on_facebook, :share_with_friends_on_facebook, :share_on_twitter, :share_via_email]
   ACHIEVEMENTS = SHARE_ACHIEVEMENTS + [:leading_progress]
   store :achievements, accessors: ACHIEVEMENTS
@@ -55,14 +63,14 @@ class Petition < ActiveRecord::Base
   APPROPRIATE_STATUSES = [:good, :awesome]
   INAPPROPRIATE_STATUSES = [:inappropriate, :edited_inappropriate]
 
-  validates :title, presence: true, length: { within: 3..100 }, format: { with: /(.*[0-9a-zA-Z].*){3}/, message: "must contain at least 3 letters/numbers" }
+  validates :title, presence: true, length: { within: 3..100 }, format: { with: /(.*[0-9a-zA-Z].*){3}/, message: I18n.t('errors.messages.title.format') }
   validates :who,   presence: true, length: { maximum: 240 }
   validates :what,  presence: true, length: { maximum: 5000 }
   validates :why,   presence: true, length: { maximum: 5000 }
   validates :delivery_details, length: { maximum: 500 }
   validates :alias, length: { within: 3..255 }, allow_blank: true,
-                    format: { with: /\A[0-9a-zA-Z\-]+\z/, message: "can contains only letters/numbers/hyphens" },
-                    uniqueness: { scope: :organisation_id, message: 'has already taken', case_sensitive: false }
+                    format: { with: /\A[0-9a-zA-Z\-]+\z/, message: I18n.t('errors.messages.alias.format') },
+                    uniqueness: { scope: :organisation_id, message: I18n.t('errors.messages.taken') , case_sensitive: false }
 
   validates_inclusion_of :admin_status, in: MODERATION_STATUSES
   validates_presence_of :admin_reason, if: -> { self.admin_status == :inappropriate }
@@ -80,7 +88,9 @@ class Petition < ActiveRecord::Base
   belongs_to :group
   belongs_to :location
   has_many :signatures
+  has_many :comments, through: :signatures, order: 'comments.created_at DESC'
   has_many :campaign_admins
+  has_many :facebook_share_variants
 
   def admins
     # collection of campaign_admin users + the petition creator.
@@ -95,6 +105,7 @@ class Petition < ActiveRecord::Base
 
   liquid_methods :title, :who, :what, :why, :to_param, :organisation
   before_save :update_admin_attributes, :generate_token
+  before_create :set_comments_updated_at_to_now
 
   def_delegator :user, :email
   def_delegator :user, :first_name
@@ -108,7 +119,7 @@ class Petition < ActiveRecord::Base
 
   attr_accessible :title, :who, :what, :why, :delivery_details,
                   :campaigner_contactable, :effort_id, :source, :group_id, :categorized_petitions_attributes, :location_id,
-                  :share_on_facebook, :share_with_friends_on_facebook, :share_on_twitter, :share_via_email, :target_id
+                  :share_on_facebook, :share_with_friends_on_facebook, :share_on_twitter, :share_via_email, :target_id, :external_facebook_page, :external_site
 
   def admin_status
     value = read_attribute(:admin_status)
@@ -141,6 +152,16 @@ class Petition < ActiveRecord::Base
     end
 
     latlon(:location) { location if location }
+
+    string :location_country do
+      location.country if location
+    end
+
+    string :location_region do
+      location.region if location
+    end
+
+
     integer(:organisation_id) # for filtering searches
     integer(:effort_id) { effort_id if effort_id }
     integer(:user_id) # for filtering searches
@@ -153,6 +174,7 @@ class Petition < ActiveRecord::Base
     string :admin_notes_tags, multiple: true
     text :admin_notes_without_tags
     boolean :cancelled
+
   end
 
   def admin_notes_tags
@@ -164,9 +186,13 @@ class Petition < ActiveRecord::Base
   end
 
   def recent_signatures
-    self.signatures.order("created_at DESC").limit(9)
+    self.signatures.order("created_at DESC").limit(10)
   end
 
+  def recent_comments comment_start=0, comment_size=3
+    return comments.where(id: nil) if prohibited? # activerecord scoping needs a scope, i wanted to return nothing so added this
+    comments.visible.ordered_by_comments_over_time_gap.offset(comment_start).limit(comment_size)
+  end
 
   # TODO: This is disgusting. Rewrite.
   scope :hot, ->(organisations, groups = []) {
@@ -214,19 +240,29 @@ SQL
 
   scope :launched, where(launched: true)
 
-  scope :one_signature, launched
-    .where(Petition.arel_table[:admin_status].not_in INAPPROPRIATE_STATUSES)
-    .where(cancelled: false).where(id: Signature.select("petition_id")
-    .group(:petition_id)
-    .having("count(*) = 1"))
-
   scope :awesome, launched.where(admin_status: :awesome, cancelled: false).order("updated_at DESC")
 
-  scope :appropriate, launched.where(admin_status: APPROPRIATE_STATUSES, cancelled: false).order("updated_at DESC")
+  scope :appropriate_unordered, launched.where(admin_status: APPROPRIATE_STATUSES, cancelled: false)
+  scope :appropriate, appropriate_unordered.order("petitions.updated_at DESC")
 
   scope :awaiting_moderation, lambda { |organisation_id|
     launched.where(admin_status: [:unreviewed, :edited, :edited_inappropriate], organisation_id: organisation_id).order("updated_at DESC")
   }
+
+  scope :ordered_by_location, lambda {|longitude, latitude, radius|
+    radius = (radius || 25000) * 1609 # miles to meters
+    distance_fragment = ActiveRecord::Base.send(:sanitize_sql_array, ["ST_Distance(locations.point, 'POINT(? ? 0)'::geography)", longitude, latitude])
+    includes(:location).where("#{distance_fragment} < ?",  radius)
+                       .order("#{distance_fragment} ASC")
+  }
+
+  scope :for_location, lambda {|longitude, latitude|
+    includes(:target => :geography).where("ST_Within(ST_GeomFromText('POINT(#{longitude} #{latitude})', 4326), geographies.shape::geometry)")
+  }
+
+  def self.load_petition(slug)
+    Petition.where(slug: slug).includes(:user).first!
+  end
 
   def flags_count
     @flags_count ||= self.flags.created_after(self.administered_at).count
@@ -236,19 +272,36 @@ SQL
     "#{id}_signatures_count"
   end
 
+  def comments_count_key
+    "petition_#{id}_comments_count"
+  end
+
+  def comments_cache_key
+    comments_updated_at ? comments_updated_at.to_i : '1'
+  end
+
   def signatures_size
     signatures.size
   end
 
-  def subscribed_signatures
-    signatures.subscribed
+  def comments_size
+    comments.visible.size
+  end
+
+  def subscribed_signatures scope
+    if scope.nil? || scope.empty?
+      signatures.subscribed
+    else
+      signatures.subscribed.send(scope)
+    end
   end
 
   def self.create_with_param(attrs)
     effort = attrs[:effort]
     target = attrs[:target]
     petition = Petition.new title: "#{effort.title_default}: #{target.name}", who: target.name,
-                            what: effort.what_default, why: effort.why_default, image: effort.default_petition_image
+                            what: effort.what_default, why: effort.why_default, image: effort.image_default
+    
     petition.organisation = effort.organisation
     petition.location = target.location
     petition.categories << effort.categories
@@ -257,22 +310,49 @@ SQL
     petition
   end
 
+
+  def self.featured_homepage_petitions(current_organisation)
+    featured_effort = Effort.most_recently_featured(current_organisation)
+    petitions = Petition.awesome.where(:organisation_id => current_organisation.id)
+
+    if featured_effort.present?
+      petitions = petitions.limit(2).all
+      [featured_effort] + petitions
+    else
+      petitions.limit(3).all
+    end
+  end
+
   def schedule_reminder_email!
     Jobs::PromotePetitionJob.new.promote(self, :reminder_when_dormant)
   end
 
   def achieve_leading_progress!
     self.achievements[:leading_progress] = "lead"
+    self.save!
   end
 
   def achieve_training_progress!
     self.achievements[:leading_progress] = "training"
+    self.save!
   end
 
   def progress
     return "share" if shared?
     return "manage" if managed?
     achievements[:leading_progress]
+  end
+
+  def signature_counts_by_source
+    signatures.group(:source).count(:source)
+  end
+
+  def email_from_address
+    if user
+      "\"#{user.full_name} via #{organisation.name}\" <#{organisation.contact_email}>"
+    else
+      "\"#{organisation.name}\" <#{organisation.contact_email}>"
+    end
   end
 
   private
@@ -314,5 +394,9 @@ SQL
 
   def generate_token
     self.token = Digest::SHA1.hexdigest("#{slug}#{Agra::Application.config.sha1_salt}")
+  end
+
+  def set_comments_updated_at_to_now
+    self.comments_updated_at = Time.now
   end
 end

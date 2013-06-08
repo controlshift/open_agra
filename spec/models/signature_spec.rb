@@ -18,6 +18,10 @@
 #  member_id                :integer
 #  additional_fields        :hstore
 #  cached_organisation_slug :string(255)
+#  source                   :string(255)     default("")
+#  join_group               :boolean
+#  external_id              :string(255)
+#  new_member               :boolean
 #
 
 require 'spec_helper'
@@ -41,7 +45,7 @@ describe Signature do
   
   it { should ensure_length_of(:first_name).is_at_most(50) }
   it { should ensure_length_of(:last_name).is_at_most(50) }
-  it { should ensure_length_of(:phone_number).is_at_most(50) }
+  it { should ensure_length_of(:phone_number).is_at_most(30) }
   
   it { should allow_mass_assignment_of(:first_name) }
   it { should allow_mass_assignment_of(:last_name) }
@@ -70,25 +74,72 @@ describe Signature do
     should allow_value('(518) 207-6768').for(:phone_number)
   end
 
-  it "should reject duplicate emails in different case for the same petition" do
-    petition = Factory(:petition)
-    first_sig = Factory.build(:signature, email: "ANemail@email.com", postcode: '3245', petition: petition)
-    second_sig = Factory.build(:signature, email: "ANEMAIL@EMAIL.COM", postcode: '3245', petition: petition)
-    first_sig.save.should be_true
-    second_sig.save.should be_false
-    second_sig.errors[:email].should == ['has already signed']
+  it "should allow several variants for how to express a phone number" do
+    should allow_value('(202) 630-6288').for(:phone_number)
+    should allow_value('  (202) 630-6288').for(:phone_number)
+    should allow_value('(202)630-6288').for(:phone_number)
+    should allow_value('2026306288').for(:phone_number)
+    should allow_value('202-630-6288').for(:phone_number)
   end
 
-  it "should not reject duplicate emails for different petitions" do
-    Factory(:signature, email: 'email@email.com', petition: Factory.stub(:petition))
-    another_signature = Factory.stub(:signature, email: 'email@email.com', petition: Factory.stub(:petition))
-    another_signature.should be_valid
+  it "should shorten the akid and source fields" do
+    ipsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+            fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+            mollit anim id est laborum"
+    signature = Factory.build(:signature, source: ipsum, akid: ipsum)
+    signature.valid?
+    signature.akid.length.should == 253
+    signature.source.length.should == 253
+  end
+
+  describe "postcodes" do
+    it { should allow_value('02052').for(:postcode) }
+    describe "in india" do
+      before(:each) { subject.stub(:country).and_return 'IN' }
+      it { should allow_value('').for(:postcode) }
+    end
+    it { should allow_value('02052-1234').for(:postcode) }
+    it { should_not allow_value('fooooooo bar bar gooooof   fooooof fofofofoosd').for(:postcode) }
+  end
+
+  describe "email addresses" do
+    it { should allow_value('george@washington.com').for(:email) }
+    it { should allow_value('george@ul.we.you.us').for(:email) }
+    it { should_not allow_value('fooooooo bar bar gooooof   fooooof fofofofoosd fooooooo bar bar gooooof   fooooof fofofofoosd fooooooo bar bar gooooof   fooooof fofofofoosd fooooooo bar bar gooooof   fooooof fofofofoosd').for(:email) }
+  end
+
+  it "should not allow a non-digit word for phone number" do
+    should_not allow_value('foo bar').for(:phone_number)
+  end
+
+  it "should allow a blank phone number" do
+    should allow_value('').for(:phone_number)
+  end
+
+  it "should not allow a very short phone number" do
+    should_not allow_value('999').for(:phone_number)
+  end
+
+  context "with a petition" do
+    include_context "setup_stubbed_petition"
+
+    it "should reject duplicate emails in different case for the same petition" do
+      first_sig = Factory.build(:signature, email: "ANemail@email.com", postcode: '3245', petition: @petition)
+      second_sig = Factory.build(:signature, email: "ANEMAIL@EMAIL.COM", postcode: '3245', petition: @petition)
+      first_sig.save.should be_true
+      second_sig.save.should be_false
+      second_sig.errors[:email].should == ['has already signed']
+    end
   end
 
   describe "#strip_attributes" do
+    include_context "setup_stubbed_petition"
+
     it "should strip attributes" do
-      signature = Factory(:signature, email: "  email@email.com ", first_name: " Huan Huan ", last_name: " Huang ",
-                     phone_number: " 123456 ", postcode: " 1234 ", petition: Factory(:petition))
+      signature = Factory.build(:signature, email: "  email@email.com ", first_name: " Huan Huan ", last_name: " Huang ",
+                     phone_number: " 123456 ", postcode: " 1234 ", petition: @petition)
+      signature.valid?
       signature.email.should == "email@email.com"
       signature.first_name.should == "Huan Huan"
       signature.last_name.should == "Huang"
@@ -107,8 +158,7 @@ describe Signature do
 
   describe "#first_name_or_friend" do
     it "should take first name if present" do
-      s = Signature.new(first_name: "Fredo")
-      s.first_name_or_friend.should == "Fredo"
+      Signature.new(first_name: "Fredo").first_name_or_friend.should == "Fredo"
     end
 
     it "should return Friend if no first name" do
@@ -118,9 +168,11 @@ describe Signature do
 
   describe "deletion" do
     context "two signatures, one deleted" do
+      include_context "setup_stubbed_petition"
+
       before(:each) do
-        @present = Factory(:signature, :petition => Factory(:petition))
-        @deleted = Factory(:signature, :petition => Factory(:petition), :deleted_at => Time.now)
+        @present = Factory(:signature, :petition => @petition)
+        @deleted = Factory(:signature, :petition => @petition, :deleted_at => Time.now)
       end
 
       it "should not find the deleted signature" do
@@ -134,16 +186,20 @@ describe Signature do
     specify { Signature.should  respond_to(:find_by_token!) }
     specify { Signature.should  respond_to(:find_by_token) }
 
-    it "should have token generated after save" do
-      signature = Factory.build(:signature, petition: Factory(:petition))
-      signature.token.should be_nil
-      signature.save!
-      signature.token.should_not be_nil
+    context "a petition" do
+      include_context 'setup_stubbed_petition'
+
+      it "should have token generated after save" do
+        signature = Factory.build(:signature, petition: petition)
+        signature.token.should be_nil
+        signature.save!
+        signature.token.should_not be_nil
+      end
     end
   end
   
   describe "#subscribed" do
-    let(:petition) { Factory(:petition) }
+    include_context 'setup_stubbed_petition'
 
     before :each do
      Factory(:signature, petition: petition, join_organisation: true)
@@ -176,25 +232,38 @@ describe Signature do
       end
     end
   end
+
+  describe "#employees" do
+    include_context 'setup_stubbed_petition'
+
+    it "should return signatures where is_employee is true" do
+      Factory(:signature, petition: petition, join_organisation: true, additional_fields: {"is_employee" => "1"})
+      Factory(:signature, petition: petition, unsubscribe_at: Time.now, join_organisation: true, additional_fields: {"is_employee" => "0"})
+      Factory(:signature, petition: petition, unsubscribe_at: Time.now, join_organisation: true, additional_fields: {"is_employee" => "1"})
+      
+      Signature.employees.count.should == 2
+      Signature.employees.each do |s|
+        s.additional_fields["is_employee"].should == "1"
+      end
+    end
+  end
   
   describe "#since" do
-    let(:petition) { Factory(:petition) }
+    include_context 'setup_stubbed_petition'
     
     before :each do
-      @signature1 = Factory(:signature, created_at: Time.now - 10.day, petition: petition)
-      @signature2 = Factory(:signature, created_at: Time.now - 6.day, petition: petition)
-      @signature3 = Factory(:signature, created_at: Time.now - 2.day, petition: petition)
+      @signature1 = Factory(:signature, created_at: 10.days.ago, petition: petition)
+      @signature2 = Factory(:signature, created_at: 2.days.ago, petition: petition)
     end
     
     it "should get signatures since date" do
-      signatures = petition.signatures.since(Time.now - 7.day)
-      signatures.count.should == 2
-      signatures.should =~ [@signature2, @signature3]
+      signatures = petition.signatures.since(7.days.ago)
+      signatures.should =~ [@signature2]
     end
   end
 
   describe "lookup" do
-    let(:petition) { Factory(:petition) }
+    include_context 'setup_stubbed_petition'
 
     before(:each) do
       @signature = Factory(:signature, petition: petition)
@@ -214,8 +283,9 @@ describe Signature do
   end
 
   describe "members" do
+    include_context 'setup_stubbed_petition'
+
     it "should create a member when created" do
-      petition = Factory(:petition)
       signature = Signature.new(email: "george@washington.com", first_name: "George", last_name: "Washington", postcode: "11238", phone_number: "555-555-5555")
       signature.petition = petition
       signature.save
@@ -224,9 +294,7 @@ describe Signature do
     end
 
     it "should associate with an existing member" do
-      organisation = Factory(:organisation)
-      member = Member.create(email: "george@washington.com", organisation: organisation)
-      petition = Factory(:petition, organisation: organisation)
+      member = Member.create(email: "george@washington.com", organisation: @organisation)
       signature = Signature.new(email: "george@washington.com", first_name: "George", last_name: "Washington", postcode: "11238", phone_number: "555-555-5555")
       signature.petition = petition
       signature.save
@@ -239,9 +307,11 @@ describe Signature do
 
   describe "country" do
     before(:each) do
-      @organisation = Factory(:organisation, country: 'US')
-      @petition = Factory(:petition, organisation: @organisation)
-      @signature = Factory(:signature, petition: @petition)
+      @organisation = FactoryGirl.build_stubbed(:organisation, country: 'US')
+      @user = FactoryGirl.build_stubbed(:user)
+      @petition = FactoryGirl.build_stubbed(:petition, organisation: @organisation, user: @user)
+      @signature = Signature.new
+      @signature.petition = @petition
     end
 
     it "should have a country" do

@@ -1,6 +1,9 @@
 require 'sidekiq/web'
 
 Agra::Application.routes.draw do
+
+  pulse # for monitoring
+
   devise_for :users, controllers: {registrations: 'registrations', sessions: 'sessions', confirmations: 'confirmations', passwords: 'passwords', omniauth_callbacks: 'users/omniauth_callbacks'} do
     match '/users/auth/facebook/setup', to: 'users/omniauth_callbacks#setup'
   end
@@ -11,7 +14,7 @@ Agra::Application.routes.draw do
   end
 
   root to: 'home#index'
-  
+
   mount FacebookShareWidget::Engine => "/widget"
 
   match 'intro' => 'home#intro', as: :intro
@@ -20,7 +23,7 @@ Agra::Application.routes.draw do
   match 'tos' => 'home#tos', as: :tos
   match 'community' => 'home#community', as: :community
   match 'media' => 'home#media', as: :media
-  
+
   get 'account' => 'users#edit'
   put 'account' => 'users#update'
   put 'account/update_password' => 'users#update_password'
@@ -31,7 +34,7 @@ Agra::Application.routes.draw do
   end
 
   resources :categories, only: [:index, :show]
-  
+
   match 'admin' => 'admin/admin#index', as: :admin
   namespace :admin do
     resources :petitions, only: [:index] do
@@ -45,6 +48,7 @@ Agra::Application.routes.draw do
       collection do
         get 'export'
         get 'email'
+        get 'jobs'
       end
     end
   end
@@ -53,16 +57,24 @@ Agra::Application.routes.draw do
     member do
       get 'settings'
     end
+    resource :placeholder, controller: 'org/organisation/placeholder', only: [:show, :update]
   end
   namespace :org do
-    resources :petitions, only: [:index, :update] do
+    resources :csv_reports, only: [:show]
+    resources :comments, only: [:index] do
+       member do
+        put 'approve'
+        put 'remove'
+       end
+    end
+    resources :petitions, only: [:index, :update, :show] do
       collection do
         get 'search'
         get 'hot'
         get 'flagged'
         get 'moderation_queue'
       end
-      resources :signatures, only: [:index], controller: 'petitions/signatures' do
+      resources :signatures, only: [:index, :destroy], controller: 'petitions/signatures' do
         collection do
           get 'email'
         end
@@ -71,8 +83,17 @@ Agra::Application.routes.draw do
           put 'unsubscribe'
         end
       end
+      resource :settings, only: [:show, :update], controller: 'petitions/settings'
       resource :note, only: [:update], controller: 'petitions/note'
+      resource :user, only: [:edit, :update], controller: 'petitions/user'
       resources :flags, only: [:index], controller: 'petitions/flags'
+      resources :facebook_share_variants, controller: 'petitions/facebook_share_variants'
+      resources :comments, only: [:index], controller: 'petitions/comments' do
+        member do
+          put 'approve'
+          put 'remove'
+        end
+      end
     end
     resources :categories, except: ['show']
     resources :emails, only: [:index, :show, :update] do
@@ -80,7 +101,9 @@ Agra::Application.routes.draw do
         get 'moderation'
       end
     end
-    
+
+    resources :landing_pages
+
     resources :efforts do
       resources :leaders, controller: 'efforts/leaders', only: [:show, :destroy]
       resources :petitions, controller: 'efforts/petitions', only: [] do
@@ -90,16 +113,22 @@ Agra::Application.routes.draw do
           put 'note'
         end
       end
+
+      resources :imports, controller: 'efforts/imports', only: [:new, :create]
       resources :targets, controller: 'efforts/targets', only: [:new, :create, :index, :edit, :update] do
         collection do
           get 'find'
           post 'add'
+          put  'add_collection'
         end
+
+
+
         member {delete 'remove'}
       end
     end
 
-    resources :groups do
+    resources :groups, :path => 'partnerships'do
       resources :invitations, controller: 'groups/invitations', only: [:create]
       resources :users, controller: 'groups/users'
       resources :petitions, controller: 'groups/petitions', only: [] do
@@ -151,12 +180,28 @@ Agra::Application.routes.draw do
   match '/petition/new' => 'petitions#new', as: :new_petition
   get '/p/:id' => 'petitions/view#show_alias', as: :petition_alias
 
+  namespace :petitions do
+    resources :near, only: [:new, :index] do
+      member do
+        get 'embed'
+        get 'iframe'
+      end
+    end
+    resources :locations, only: [:index]
+    resources :countries, only: [:show] do
+      member do
+        get 'embed'
+        get 'iframe'
+      end
+    end
+  end
+
   resources :petitions, except: [:new, :show] do
     collection do
       get 'search'
       get 'landing', to: 'petitions#landing'
     end
-    
+
     member do
       get 'share'
       get 'launch', to: 'petitions#launching'
@@ -165,7 +210,8 @@ Agra::Application.routes.draw do
       get 'show', to: 'petitions/view#show'
     end
 
-    resources :contacts, controller: 'petitions/contacts', only: [:create]
+    resources :facebook_share_variants, controller: 'petitions/facebook_share_variants', only: [:show, :update]
+    resources :contacts, controller: 'petitions/contacts', only: [:new, :create]
 
     resource :categories, controller: 'petitions/categories', only: [:show, :update]
 
@@ -196,6 +242,14 @@ Agra::Application.routes.draw do
       end
     end
 
+    resources :comments, controller: 'petitions/comments', only: [:index, :show] do
+      resources :flags, controller: 'petitions/comments/flags', only: [:new, :create]
+      member do
+        post 'create', :as => :create
+        put 'like'
+      end
+    end
+
     resources :emails, controller: 'petitions/emails', only: [:new, :create] do
       collection do
         post 'test', to: 'petitions/emails#test'
@@ -204,6 +258,10 @@ Agra::Application.routes.draw do
 
     resources :flags, controller: 'petitions/petition_flags', only: [:create] do
     end
+  end
+
+  resources :shares, only:[:show] do
+    collection { get 'lookup' }
   end
 
   resources :efforts, only: [:show] do
@@ -219,7 +277,7 @@ Agra::Application.routes.draw do
     resources :near, controller: 'efforts/near', only: [:new, :index]
   end
 
-  resources :groups, only: [:show, :index] do
+  resources :groups, only: [:index, :show], :path => 'partnerships' do
     resources :unsubscribes, controller: 'groups/unsubscribes', only: [:show, :update]
     resources :invitations, controller: 'groups/invitations', only: [:show, :update]
     resources :petitions, controller: 'groups/petitions', only: [:index, :new] do
@@ -241,7 +299,7 @@ Agra::Application.routes.draw do
 
   get 'errors/pingdom'   #makes sure the app is up.
   get 'errors/exception' #convenient way to test if exception notification is working
-  match '/admin/vanity(/:action(/:id(.:format)))', :controller=> 'admin/vanity'
+  get 'errors/streaming' # test for streaming responses.
 
   match '/404', to: 'errors#not_found'
   match '/500', to: 'errors#internal_server_error'

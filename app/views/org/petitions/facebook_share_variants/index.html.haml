@@ -1,0 +1,50 @@
+%ul.breadcrumb
+  %li
+    = link_to 'Petitions', org_petitions_path
+    %span.divider
+      >
+  %li
+    = link_to "#{@petition.title} Admin", org_petition_path(@petition)
+    %span.divider
+      >
+  %li.active
+    Facebook Share Experiment
+.clear
+
+= title "Facebook Share Experiment"
+
+- if @share_variants.any?
+  .row
+    .span10.table-header
+      .left
+        %h3 Share Variants
+      .right
+        = link_to new_org_petition_facebook_share_variant_path(@petition), class: 'table-action' do
+          %i.icon-plus-sign
+          Add Share Variant
+  = table_for @share_variants do |t|
+    = t.data do
+      - t.cell(:title)
+      - t.cell(:participant_count, heading: 'Share Count')
+      - t.cell(:completed_count, heading: 'Page Views Generated')
+      - t.cell(:rate)
+      - t.cell(:actions){|s| render partial: 'actions', locals: {s: s} }
+- else
+  .row.mt20
+    .span5
+      %p
+        Facebook share experiments allow site admins to optimise the viral potential of a petition on Facebook.
+
+      %p
+        Specify several potential facebook share titles, descriptions, and images for the petition, and the system will conduct a randomized trial to automatically select
+        the highest performing version.
+
+      %p
+        No Facebook Share Variants have been created for this petition, so a default will be extracted from the content.
+
+      %p
+        = link_to new_org_petition_facebook_share_variant_path(@petition), class: 'btn' do
+          %i.icon-plus-sign
+          Add Share Variant
+
+

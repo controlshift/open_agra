@@ -1,0 +1,5 @@
+- content_for :head do
+  %script{ type: "text/javascript", src:"http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true"}
+  = javascript_include_tag 'location'
+#location-map{'data-country' => params[:id],
+              'data-default-bounds' => params[:bounds].try(:to_json) || (@petitions ? '' : current_organisation.default_map_bounds.to_json)}

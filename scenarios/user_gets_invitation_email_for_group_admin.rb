@@ -22,7 +22,7 @@ describe 'user gets invitation email to be a admin member of a group', type: :re
 
   def accepts_invitation
     page.should have_content('You have been invited to be an administrator')
-    click_on 'Join Group'
+    click_on 'Join Partnership'
   end
 
   def sees_group_admin_page

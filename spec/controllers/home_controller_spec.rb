@@ -5,7 +5,8 @@ describe HomeController do
     render_views(true)
     before(:each) do
       @current_org = Factory.build(:organisation, slug: 'rspec')
-
+      Story.stub(:featured_stories).and_return([])
+      Petition.stub(:featured_homepage_petitions).and_return([])
       Organisation.stub(:find_by_host).and_return(@current_org)
       controller.stub(:current_organisation).and_return(@current_org)
       get :index
@@ -83,36 +84,28 @@ describe HomeController do
         it { response.should be_success }
         it { response.should render_template(:index) }
       end
-      
-      it "should not render the special overridden template" do
-        response.body.should_not match(/rspec test homepage/)
-      end
-
-      it "should return latest awesome petitions even without leader" do
-        2.times { Factory(:petition, organisation: @organisation, admin_status: :awesome) }
-        Factory(:petition_without_leader, organisation: @organisation, admin_status: :awesome)
-        get :index
-        assigns(:featured_petitions).count.should == 3
-      end
-
-      it "should return featured stories" do
-        3.times { Factory(:story, organisation: @organisation, featured: true) }
-        get :index
-        assigns(:featured_stories).count.should == 3
-      end
-
-      it "should return the latest featured effort" do
-        earlier_featured_petition = create(:effort, organisation: @organisation, featured: true)
-        latest_featured_petition = create(:effort, organisation: @organisation, featured: true)
-        get :index
-        assigns(:featured_effort).should == latest_featured_petition
-      end
     end
   end
 
   describe "#show_login_link" do
     it "should return true" do
       controller.send(:show_login_link).should be_true
+    end
+  end
+
+  describe "set locale" do
+    before(:each) do
+      @current_org = Factory.build(:organisation)
+
+      Organisation.stub(:find_by_host).and_return(@current_org)
+      controller.stub(:current_organisation).and_return(@current_org)
+    end
+
+    it "should be able to change the default locale from the params passed" do
+      I18n.locale.should == :en
+      request.env["HTTP_ACCEPT_LANGUAGE"] = 'en-IN'
+      get :index
+      I18n.locale.should == 'en-IN'.to_sym
     end
   end
 end

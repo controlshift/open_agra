@@ -20,8 +20,8 @@
 #  why_help                        :text
 #  why_label                       :string(255)
 #  why_default                     :text
-#  created_at                      :datetime
-#  updated_at                      :datetime
+#  created_at                      :datetime        not null
+#  updated_at                      :datetime        not null
 #  image_file_name                 :string(255)
 #  image_content_type              :string(255)
 #  image_file_size                 :integer
@@ -220,13 +220,14 @@ describe Effort do
 
   describe '#petition_locations' do
     before(:each) do
-      @effort = create(:specific_targets_effort)
+      @organisation = create(:organisation)
+      @effort = create(:specific_targets_effort, organisation: @organisation)
       @appropriate_petition_location = create(:location)
-      create(:target_petition, effort: @effort, location: @appropriate_petition_location)
+      create(:target_petition, effort: @effort, location: @appropriate_petition_location, organisation: @organisation)
     end
 
     it 'should return locations of all appropriate petitions under an effort' do
-      create(:inappropriate_petition, effort: @effort, location: create(:location), target: create(:target))
+      FactoryGirl.create(:inappropriate_petition, effort: @effort, location: create(:location), target: create(:target))
 
       @effort.petition_locations.should == [@appropriate_petition_location]
     end
@@ -238,17 +239,18 @@ describe Effort do
   end
 
   describe 'order petitions by location' do
+    
     it 'should return petitions order by nearest' do
+      # This does not appear to actually test this... probably an important one
       effort = FactoryGirl.build(:specific_targets_effort)
-      petitions = mock
-      query = mock
-      input_latitude = 2
-      input_longitude = 2
-      Queries::Petitions::EffortLocationQuery.stub(:new).and_return query
-      query.should_receive(:execute!)
-      query.stub(:petitions) { petitions }
-
-      effort.order_petitions_by_location(location: {latitude: input_latitude, longitude: input_longitude}).should == petitions
+      chicago = Factory.create(:petition, organisation: effort.organisation, effort: effort, location: Factory.create(:location), admin_status: 'good', target: Factory.create(:target)) 
+      museum = Factory.create(:petition, organisation: effort.organisation, effort: effort, location: Factory.create(:museum), admin_status: 'good', target: Factory.create(:target))
+      manly = Factory.create(:petition, organisation: effort.organisation, effort: effort, location: Factory.create(:manly), admin_status: 'good', target: Factory.create(:target))
+      input_latitude = museum.location.latitude
+      input_longitude = museum.location.longitude
+      
+      proper_order = [museum, manly, chicago]
+      effort.order_petitions_by_location({latitude: input_latitude, longitude: input_longitude}, 25000).map(&:location).map(&:locality).should == proper_order.map(&:location).map(&:locality)
     end
 
     it 'should return all appropriate petition without params' do
@@ -264,9 +266,10 @@ describe Effort do
 
   describe '#signatures_size' do
     it 'should return the signatures count across all petitions of an effort' do
-      effort = FactoryGirl.create(:effort)
-      petition1 = FactoryGirl.create(:petition, effort: effort)
-      petition2 = FactoryGirl.create(:petition, effort: effort)
+      organisation = FactoryGirl.create(:organisation)
+      effort = FactoryGirl.create(:effort, organisation: organisation)
+      petition1 = FactoryGirl.create(:petition, effort: effort, organisation: organisation,  user: nil)
+      petition2 = FactoryGirl.create(:petition, effort: effort, organisation: organisation, user: nil)
       petition1.stub(:cached_signatures_size).and_return(50)
       petition2.stub(:cached_signatures_size).and_return(40)
       effort.stub(:petitions).and_return([petition1, petition2])
@@ -291,8 +294,9 @@ describe Effort do
 
     it 'should create two different petitions when adding the same target to two different efforts with the same default title' do
       target = FactoryGirl.create(:target, name: "target name")
-      effort1 = FactoryGirl.create(:specific_targets_effort, title_default: "title default")
-      effort2 = FactoryGirl.create(:specific_targets_effort, title_default: "title default")
+      organisation = FactoryGirl.create(:organisation)
+      effort1 = FactoryGirl.create(:specific_targets_effort, title_default: "title default", organisation: organisation)
+      effort2 = FactoryGirl.create(:specific_targets_effort, title_default: "title default", organisation: organisation)
 
       petition1 = effort1.create_petition_with_target(target)
       petition1.save

@@ -9,10 +9,10 @@ describe Petitions::ViewController do
     end
 
     context "well stubbed signed in user" do
+      include_context('setup_petition')
+
       before(:each) do
-        @user = Factory.build(:user, organisation: @organisation)
         controller.stub(:current_user).and_return(@user)
-        @petition = Factory(:petition, organisation: @organisation)
       end
 
       it "should autopopulate signature with current user info" do
@@ -27,29 +27,84 @@ describe Petitions::ViewController do
     end
 
     shared_context "show as public" do
-      it "should show appropriate petition" do
-        get :show, id: @petition
-        response.should render_template :show
+      context "stubbed load_petition" do
+        include_context "setup_stubbed_petition"
+
+        before(:each) do
+          Petition.stub(:load_petition).and_return(@petition)
+        end
+
+        context "as facebook" do
+          before(:each) do
+            controller.stub(:has_facebook_user_agent?).and_return(true)
+          end
+
+          context "with a share varirant" do
+            before(:each) do
+              @petition.stub(:facebook_share_variants).and_return([FactoryGirl.build_stubbed(:facebook_share_variant, petition: @petition)])
+            end
+
+            it "should redirect to a share page" do
+              get :show, id: @petition
+              response.should be_redirect
+            end
+          end
+
+          it "should show the standard page" do
+            get :show, id: @petition
+            response.should be_success
+          end
+
+        end
+
+        it "should show appropriate petition" do
+          get :show, id: @petition
+          response.should render_template :show
+        end
+
+        it "should allow setting the source" do
+          get :show, id: @petition, source: 'source'
+          assigns[:signature].source.should == 'source'
+        end
+
+        it "should allow the setting of akid" do
+          get :show, id: @petition, akid: 'akid'
+          assigns[:signature].akid.should == 'akid'
+        end
+
+        it "should fetch previous signature if cookie signature_id is set, being used in facebook login" do
+          signature = Factory :signature, :petition => @petition
+          cookies[:signature_id] = signature.id
+          get :show, id: @petition
+          assigns(:previous_signature).should_not be_nil
+          assigns(:previous_signature).id.should_not be_nil
+          assigns(:comment).should_not be_nil
+        end
       end
 
-      it "should show an alert message if petition is cancelled" do
-        @petition.update_attribute(:cancelled, true)
-        get :show, id: @petition
-        response.should redirect_to root_path
-        flash[:alert].should == "We're sorry, this petition is not available."
-      end
+      context "actual petition" do
+        include_context "setup_petition"
 
-      it "should show an alert message if petition is not launched" do
-        @petition.update_attribute(:launched, false)
-        get :show, id: @petition
-        response.should redirect_to root_path
-        flash[:alert].should == "We're sorry, this petition is not available."
-      end
+        it "should show inappropriate page if petition is inappropriate" do
+          @petition.update_attribute(:admin_status, :inappropriate)
+          get :show, id: @petition
+          response.should render_template :show_inappropriate
+        end
 
-      it "should show inappropriate page if petition is inappropriate" do
-        @petition.update_attribute(:admin_status, :inappropriate)
-        get :show, id: @petition
-        response.should render_template :show_inappropriate
+        it "should show inappropriate page if petition is inappropriate" do
+          @petition.stub(:admin_status).and_return(:inappropriate)
+          Petition.stub(:load_petition).and_return(@petition)
+          get :show, id: @petition
+          response.should render_template :show_inappropriate
+        end
+
+
+        it "should show an alert message if petition is cancelled" do
+          @petition.update_attribute(:cancelled, true)
+          get :show, id: @petition
+          response.should redirect_to root_path
+          flash[:alert].should == "We're sorry, this petition is not available."
+        end
       end
     end
 
@@ -63,22 +118,32 @@ describe Petitions::ViewController do
     end
 
     context "is public user" do
+      include_context "setup_petition"
       include_context "show as public"
 
-      before :each do
-        @user = Factory(:user, organisation: @organisation)
-        @petition = Factory(:petition, user: @user, organisation: @organisation)
+      it "should not assign signature object if there is a blank cookie and no signed in user" do
+        cookies[:signature_id] = ""
+        get :show, id: @petition
+        assigns(:previous_signature).should be_nil
       end
     end
 
     context "is not petition owner" do
+      include_context "setup_petition"
       include_context "show as public"
 
       before :each do
-        @user = Factory(:user, organisation: @organisation )
         @viewer = Factory(:user, organisation: @organisation)
-        @petition = Factory(:petition, user: @user, organisation: @organisation)
         sign_in @viewer
+      end
+
+      it "should only assign a blank object signature if there was cookie passed as blank string and a user is logged in" do
+        cookies[:signature_id] = ""
+        get :show, id: @petition
+        assigns(:previous_signature).should_not be_nil
+        assigns(:previous_signature).id.should be_nil
+        assigns(:previous_signature).email.should == @viewer.email
+        assigns(:comment).should be_nil
       end
     end
 
@@ -110,46 +175,44 @@ describe Petitions::ViewController do
     end
 
     context "is petition owner" do
+      include_context "setup_petition"
       include_context "show as admin or owner"
 
       before :each do
-        @user = Factory(:user, organisation: @organisation)
-        @petition = Factory(:petition, user: @user, organisation: @organisation)
         sign_in @user
       end
     end
 
     context "is org admin" do
+      include_context "setup_petition"
       include_context "show as admin or owner"
 
       before :each do
-        @user = Factory(:user, organisation: @organisation)
         @org_admin = Factory(:user, organisation: @organisation, org_admin: true)
-        @petition = Factory(:petition, user: @user, organisation: @organisation)
         sign_in @org_admin
       end
     end
 
     context "is admin" do
+      include_context "setup_petition"
       include_context "show as admin or owner"
 
       before :each do
-        @user = Factory(:user, organisation: @organisation)
         @admin = Factory(:user, organisation: @organisation, admin: true)
-        @petition = Factory(:petition, user: @user, organisation: @organisation)
         sign_in @admin
       end
     end
   end
 
   describe "#show_alias" do
-    it "should show petition by alias" do
+    before(:each) do
       user = Factory(:user, organisation: @organisation)
-      petition = Factory(:petition, user: user, alias: "abc", organisation: @organisation)
+      @petition = Factory(:petition, user: user, alias: "abc", organisation: @organisation)
+    end
 
+    it "should show petition by alias" do
       get :show_alias, id: "abc"
-      
-      response.should redirect_to petition_path(petition)
+      response.should redirect_to petition_path(@petition)
     end
   end
 
@@ -239,6 +302,22 @@ describe Petitions::ViewController do
       it "should return json with error message if petition is inappropriate" do
         get :show, {id: @petition, format: 'json'}
         response.body.should == {error: true, msg: "This Petition has been disabled because of inappropriate content"}.to_json
+      end
+    end
+  end
+
+  describe "facebook share variants" do
+    context "with a facebook share variant for the petition" do
+      include_context('setup_petition')
+
+      before(:each) do
+        @fb_share_variant =FactoryGirl.create(:facebook_share_variant, petition: petition)
+        get :show, {id: petition}
+      end
+
+      it "should have a facebook_share variant" do
+        assigns(:petition).facebook_share.variant.should_not be_nil
+        assigns(:petition).facebook_share.variant.should == @fb_share_variant
       end
     end
   end

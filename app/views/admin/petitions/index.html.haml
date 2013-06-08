@@ -1,5 +1,6 @@
-= title "#{org_admin? ? current_organisation.name : 'Global'} Petitions"
+= title "#{org_admin? ? current_organisation.name : 'Global'} Petitions", class: 'left'
 
 = render partial: 'admin/petitions/search_form', locals: { form_action: org_admin? ? search_org_petitions_path : search_admin_petitions_path, search_input_name: "query" }
+.clear
 
 = render partial: 'admin/petitions/petition_list_table'
