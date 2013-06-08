@@ -7,7 +7,7 @@ ruby '1.9.3'
 # A sample agra_private is provided at https://github.com/controlshift/agra_private_sample.git
 
 #gem 'agra_private', path: '/work/agra_private'
-gem 'agra_private', git: 'https://controlshiftdeployment:ZxcG2LQVsU6cBF@github.com/controlshift/agra_private.git'
+gem 'agra_private', git: 'https://github.com/controlshift/agra_private_sample.git'
 
 gem 'rails', '3.2.12'
 gem 'pg'
